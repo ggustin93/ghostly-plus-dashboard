@@ -20,11 +20,9 @@ COPY pyproject.toml poetry.lock* ./
 
 # Install project dependencies
 # --no-root: Don't install the project itself, only dependencies
-# --no-dev: Exclude development dependencies for production image
-RUN poetry install --no-root --no-dev --no-interaction --no-ansi
-
-# Create a non-root user
-RUN adduser --disabled-password --gecos '' appuser
+# --only main: Install only main dependencies (exclude dev)
+RUN poetry config virtualenvs.create false --local && \
+    poetry install --no-root --only main --no-interaction --no-ansi
 
 # --- Second Stage: Runtime --- #
 FROM python:3.11-slim
@@ -36,12 +34,16 @@ ENV PYTHONUNBUFFERED 1
 # Set work directory
 WORKDIR /app
 
-# Copy virtual env from builder stage
-COPY --from=builder /root/.local/share/pypoetry/virtualenvs/* /.venv
-ENV PATH="/.venv/bin:$PATH"
+# Create a non-root user here, in the final stage
+RUN adduser --disabled-password --gecos '' appuser
 
-# Copy application code
-COPY ./app ./app
+# Copy installed packages AND executables from builder stage
+COPY --from=builder /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
+COPY --from=builder /usr/local/bin /usr/local/bin
+
+# Copy application code from the build context (which is ./backend)
+COPY --chown=appuser:appuser app /app/app/ 
+# Source path is relative to ./backend context
 
 # Switch to non-root user
 USER appuser

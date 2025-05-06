@@ -9,7 +9,7 @@ source_documents: [docs/prd.md](mdc:docs/prd.md) (Section 4), [docs/security.md]
 
 -   **Frontend (Web Dashboard)**:
     -   Framework: **Vue.js 3** (Composition API)
-    -   UI Library: **Tailwind CSS** with **shadcn/ui** components
+    -   UI Library: **Tailwind CSS v4** with **shadcn/ui** components
     -   State Management: **Pinia**
     -   Routing: **Vue Router**
     -   Charting: **Chart.js** (primary, D3.js as potential for complex visualizations)
