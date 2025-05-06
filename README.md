@@ -78,6 +78,8 @@ npm run dev
 
 *(More details can be found in the `docs/` and `memory-bank/` directories.)*
 
+For a detailed breakdown of the development process and task management, see `docs/development_workflow.md`.
+
 ### AI Assistance
 
 -   **AI Rules Source**: AI-assisted development for this project primarily uses the rules defined within the `.cursor/rules/` directory. Other rule files may exist in the repository but are secondary.
@@ -89,6 +91,6 @@ The project structure is organized as follows:
 - `backend/`: Contains the backend code and dependencies.
 - `frontend/`: Contains the frontend code and dependencies.
 - `docs/`: Contains project documentation and setup instructions.
-- `memory-bank/`: Contains project-related data and resources.
+- `memory-bank/`: Contains AI-managed context files tracking project state, decisions, and technical details.
 
 The project is designed to be modular and scalable, with a focus on security and data privacy. 

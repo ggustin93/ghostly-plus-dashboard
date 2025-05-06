@@ -1,0 +1,32 @@
+# Task ID: 7
+# Title: Cohort Management System
+# Status: pending
+# Dependencies: 6
+# Priority: medium
+# Description: Develop functionality to create and manage patient cohorts, assign therapists to cohorts, and enable comparative analysis between cohorts.
+# Details:
+1. Create database models and API endpoints for cohort management:
+   - Cohort creation and configuration
+   - Patient assignment to cohorts
+   - Therapist assignment to cohorts
+   - Cohort metadata management
+2. Implement frontend components:
+   - Cohort creation and editing interface
+   - Patient assignment interface
+   - Cohort listing and filtering
+   - Cohort comparison view
+3. Develop cohort analytics features:
+   - Aggregate statistics calculation
+   - Comparative visualizations
+   - Progress tracking across cohorts
+4. Implement permissions system for cohort access
+5. Add export functionality for cohort data
+
+# Test Strategy:
+- Test cohort creation and configuration
+- Verify patient and therapist assignment
+- Test permissions system with different user roles
+- Validate cohort comparison functionality
+- Test aggregate statistics calculations
+- Verify export functionality
+- Test UI components for usability

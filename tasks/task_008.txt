@@ -1,0 +1,33 @@
+# Task ID: 8
+# Title: OpenFeasyo Game Integration
+# Status: pending
+# Dependencies: 2, 3, 5
+# Priority: high
+# Description: Modify the OpenFeasyo game (C#/MonoGame) to implement Supabase authentication and direct C3D file upload to the backend API.
+# Details:
+1. Analyze the OpenFeasyo game codebase to identify integration points
+2. Implement Supabase authentication in the game:
+   - Add login screen or integration with existing UI
+   - Implement REST API calls to Supabase Auth
+   - Store and manage JWT tokens securely
+3. Develop C3D file upload functionality:
+   - Create a service to handle file uploads
+   - Implement authenticated API calls to the backend
+   - Add progress indication and error handling
+4. Implement fallback mechanism for offline operation:
+   - Store files locally when connection is unavailable
+   - Queue for later upload when connection is restored
+5. Add session metadata collection:
+   - Capture therapist ID, patient ID, session parameters
+   - Include metadata in C3D file or as separate payload
+6. Test integration on Android tablets
+7. Document integration for future maintenance
+
+# Test Strategy:
+- Test authentication flow in the game
+- Verify C3D file generation and upload
+- Test offline operation and sync
+- Validate error handling and recovery
+- Test on actual Android tablets
+- Verify metadata is correctly associated with uploaded files
+- Test with various network conditions

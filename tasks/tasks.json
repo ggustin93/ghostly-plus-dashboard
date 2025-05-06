@@ -1,0 +1,436 @@
+{
+  "tasks": [
+    {
+      "id": 1,
+      "title": "Project Setup and Repository Configuration",
+      "description": "Initialize the project repository with the recommended structure, configure Git, and set up the development environment for both frontend and backend components.",
+      "details": "1. Create a new Git repository with the recommended project structure\n2. Initialize backend directory with FastAPI project:\n   - Set up Python virtual environment\n   - Install initial dependencies (FastAPI, Uvicorn, SQLAlchemy, etc.)\n   - Configure pyproject.toml or requirements.txt\n3. Initialize frontend directory with Vue.js 3 project:\n   - Use Vite as the build tool\n   - Configure TypeScript\n   - Set up Tailwind CSS with shadcn/ui\n   - Configure Pinia for state management\n4. Create Docker configuration files:\n   - Create Dockerfiles for backend and frontend\n   - Set up docker-compose.yml for local development\n5. Configure .gitignore, README.md, and other project documentation\n6. Set up .env files for environment variables with .env.example template",
+      "testStrategy": "- Verify all project directories and files are created according to the recommended structure\n- Ensure Docker containers can be built and run locally\n- Confirm frontend dev server starts successfully\n- Confirm backend server starts successfully\n- Verify Git repository is properly initialized with appropriate .gitignore",
+      "priority": "high",
+      "dependencies": [],
+      "status": "done",
+      "subtasks": [
+        {
+          "id": 1,
+          "title": "Initialize Git Repository and Base Project Structure",
+          "description": "Create the Git repository with the recommended folder structure and configure essential project documentation.",
+          "dependencies": [],
+          "details": "1. Create a new Git repository\n2. Initialize the base project structure with directories: `/backend`, `/frontend`, `/nginx`, `/docs`\n3. Create initial documentation files: README.md with project overview, CONTRIBUTING.md with development guidelines\n4. Set up comprehensive .gitignore file for Python, Node.js, and environment files\n5. Create LICENSE file if applicable\n6. Make initial commit with the base structure\n\nTesting approach: Verify that Git repository is properly initialized with the correct directory structure and documentation files.\n<info added on 2025-05-06T09:40:44.183Z>\nThe Git repository has been successfully initialized with the following structure:\n\n- Created main directories: `/backend`, `/frontend`, `/nginx` with `.gitkeep` files to preserve empty directories in Git\n- Documentation files have been added:\n  - README.md with project overview\n  - CONTRIBUTING.md with development guidelines\n- Configured a comprehensive .gitignore file covering Python, Node.js, and environment files\n- Added a placeholder Apache 2.0 LICENSE file\n- Created Task #26 for VUB TTO license consultation to ensure proper licensing\n- Made initial commit with the complete base structure\n\nAll required components have been set up according to specifications, and the repository is now ready for the next phase of development (configuring the backend environment with FastAPI).\n</info added on 2025-05-06T09:40:44.183Z>",
+          "status": "done",
+          "parentTaskId": 1
+        },
+        {
+          "id": 2,
+          "title": "Configure Backend Environment with FastAPI",
+          "description": "Set up the Python backend environment with FastAPI framework, including virtual environment and dependencies.",
+          "dependencies": [
+            1
+          ],
+          "details": "1. Navigate to `/backend` directory\n2. Set up Python virtual environment: `python -m venv venv`\n3. Create `pyproject.toml` or `requirements.txt` with dependencies (FastAPI, Uvicorn, SQLAlchemy, etc.)\n4. Install dependencies: `pip install -r requirements.txt`\n5. Create basic FastAPI application structure:\n   - `app/` directory for application code\n   - `app/main.py` with minimal FastAPI app\n   - `app/api/` for API routes\n   - `app/models/` for database models\n6. Create `.env` and `.env.example` files for environment variables\n7. Add a simple health check endpoint\n\nTesting approach: Run the FastAPI application locally and verify the health check endpoint returns a successful response.\n<info added on 2025-05-06T11:23:02.316Z>\nThe backend environment has been successfully configured with FastAPI. The following tasks were completed:\n\n1. Navigated to the `/backend` directory\n2. Initialized Poetry for dependency management instead of using a traditional virtual environment\n3. Added and installed the following dependencies:\n   - FastAPI for the web framework\n   - Uvicorn as the ASGI server\n   - SQLAlchemy for database ORM\n   - Other required packages\n\n4. Created the application structure:\n   - `app/` directory for application code\n   - `app/main.py` with minimal FastAPI app implementation\n   - `app/api/` directory for API routes\n   - `app/models/` directory for database models\n\n5. Created configuration files:\n   - `backend/README.md` with documentation\n   - `.env` file for environment variables\n   - `.env.example` as a template for required environment variables\n\n6. Implemented and verified a `/health` endpoint that returns a successful response\n\nThe backend is now properly set up and ready for further development.\n</info added on 2025-05-06T11:23:02.316Z>",
+          "status": "done",
+          "parentTaskId": 1
+        },
+        {
+          "id": 3,
+          "title": "Set Up Frontend with Vue.js 3, TypeScript, and Tailwind CSS",
+          "description": "Initialize and configure the Vue.js 3 frontend with TypeScript, Tailwind CSS, shadcn/ui, and Pinia state management.",
+          "dependencies": [
+            1
+          ],
+          "details": "1. Navigate to `/frontend` directory\n2. Initialize Vue.js project with Vite: `npm create vite@latest . -- --template vue-ts`\n3. Install dependencies: `npm install`\n4. Set up Tailwind CSS:\n   - Install packages: `npm install -D tailwindcss postcss autoprefixer`\n   - Initialize configuration: `npx tailwindcss init -p`\n   - Configure content paths in `tailwind.config.js`\n   - Add Tailwind directives to CSS\n5. Configure shadcn/ui components:\n   - Follow shadcn/ui installation for Vue\n   - Set up component configuration\n6. Set up Pinia for state management:\n   - Install: `npm install pinia`\n   - Create store configuration in `src/stores/`\n7. Create `.env` and `.env.example` files for environment variables\n\nTesting approach: Run the development server and verify the Vue application loads correctly with Tailwind CSS styling applied.\n<info added on 2025-05-06T11:44:07.646Z>\n1. Navigate to `/frontend` directory\n2. Initialize Vue.js project with Vite: `npm create vite@latest . -- --template vue-ts`\n3. Install dependencies: `npm install`\n4. Set up Tailwind CSS:\n   - Install packages: `npm install -D tailwindcss postcss autoprefixer`\n   - Initialize configuration: `npx tailwindcss init -p`\n   - Configure content paths in `tailwind.config.js`\n   - Add Tailwind directives to CSS\n5. Configure shadcn/ui components:\n   - Follow shadcn/ui installation for Vue\n   - Set up component configuration\n   - Configure path aliases for improved imports\n6. Set up Pinia for state management:\n   - Install: `npm install pinia`\n   - Create store configuration in `src/stores/`\n7. Create `.env` and `.env.example` files for environment variables\n8. Ensure TypeScript configuration:\n   - Verify tsconfig.json settings\n   - Document TypeScript usage patterns in memory bank\n   - Add TypeScript-specific notes to PRD for team reference\n\nTesting approach: Run the development server and verify the Vue application loads correctly with Tailwind CSS styling applied.\n</info added on 2025-05-06T11:44:07.646Z>",
+          "status": "done",
+          "parentTaskId": 1
+        },
+        {
+          "id": 4,
+          "title": "Create Docker Configuration for Backend and Frontend",
+          "description": "Set up Docker configurations for the backend and frontend services with appropriate development and production settings.",
+          "dependencies": [
+            2,
+            3
+          ],
+          "details": "1. Create `Dockerfile` for backend in `/backend` directory:\n   - Use Python base image\n   - Set up working directory\n   - Copy requirements and install dependencies\n   - Configure application startup with Uvicorn\n2. Create `Dockerfile` for frontend in `/frontend` directory:\n   - Use Node.js base image for build stage\n   - Configure build process with Vite\n   - Use nginx image for serving in production\n3. Create `.dockerignore` files for both services\n4. Create `docker-compose.yml` in the root directory:\n   - Define backend service with appropriate volumes and environment variables\n   - Define frontend service with hot-reload for development\n   - Configure service ports and networking\n\nTesting approach: Build and run the Docker containers individually to verify they start without errors. Test the docker-compose setup to ensure services can communicate.\n\n<info added on 2025-05-05T15:39:07.197Z>\n## Enhanced Docker Configuration\n\n### Simplified Deployment System\n\n1. Create a comprehensive `docker-compose.yml` in the root directory:\n   - Add Supabase service configuration with proper initialization scripts\n   - Configure Nginx as a reverse proxy for both frontend and backend\n   - Set up service dependencies with `depends_on` directives\n   - Define named volumes for data persistence\n\n2. Create `.env.example` file with default reasonable values:\n   ```\n   # Backend settings\n   BACKEND_PORT=8000\n   SECRET_KEY=your_default_secret_key\n   DEBUG=false\n   \n   # Frontend settings\n   FRONTEND_PORT=3000\n   VITE_API_URL=http://localhost/api\n   \n   # Supabase settings\n   SUPABASE_DB_PASSWORD=your_default_password\n   SUPABASE_URL=http://localhost:8000\n   SUPABASE_ANON_KEY=your_default_anon_key\n   ```\n\n3. Add volume configurations for data persistence:\n   ```yaml\n   volumes:\n     supabase_data:\n     supabase_config:\n     app_logs:\n   ```\n\n4. Create deployment automation scripts:\n   - `setup.sh`: Copies .env.example to .env, generates secure keys, and validates prerequisites\n   - `deploy.sh`: Builds and starts all containers with proper environment\n\n5. Add multi-stage builds to Dockerfiles for optimization:\n   - Use builder pattern to reduce final image size\n   - Add detailed comments explaining each step\n   - Include health checks for container orchestration\n\n6. Create step-by-step documentation in `DEPLOYMENT.md`:\n   - Local development setup instructions\n   - VM deployment guide with prerequisites\n   - Troubleshooting section for common issues\n   - Environment customization options\n\n7. Add container resource limits in docker-compose.yml to prevent resource exhaustion\n</info added on 2025-05-05T15:39:07.197Z>\n<info added on 2025-05-06T11:45:49.473Z>\n## Implementation Details\n\n### Backend Dockerfile\n- Created multi-stage build process using Poetry for dependency management\n- First stage handles dependency installation and environment setup\n- Second stage creates a lightweight production image\n- Configured proper working directory and file copying\n- Set up Uvicorn server with optimized settings\n\n### Frontend Dockerfile\n- Implemented multi-stage build approach\n- Build stage uses Node.js to compile Vue/TypeScript with Vite\n- Production stage uses Nginx to serve static assets\n- Optimized for smaller image size and faster builds\n\n### Docker Compose Configuration\n- Created docker-compose.yml in the root directory\n- Configured services with appropriate port mappings\n- Set up volume mounts for local development\n- Enabled hot-reloading for frontend development\n- Established proper networking between services\n\n### Additional Files\n- Added comprehensive .dockerignore files for both services\n- Excluded node_modules, __pycache__, and other unnecessary files\n- Configured to ignore development-specific files\n\nThe Docker setup is now ready for local development with proper isolation between services. The multi-stage builds ensure optimized production images while maintaining a good developer experience.\n</info added on 2025-05-06T11:45:49.473Z>",
+          "status": "done",
+          "parentTaskId": 1
+        },
+        {
+          "id": 5,
+          "title": "Configure Nginx as Reverse Proxy",
+          "description": "Set up and configure Nginx as a reverse proxy to route requests to the appropriate backend and frontend services.",
+          "dependencies": [
+            4
+          ],
+          "details": "1. Create `/nginx/Dockerfile` for Nginx configuration:\n   - Use official Nginx image\n   - Copy configuration files\n2. Create `/nginx/conf.d/default.conf` with reverse proxy settings:\n   - Configure server block for the main domain\n   - Set up location directives to proxy requests to backend API (/api)\n   - Configure static file serving for frontend assets\n   - Add headers for security and caching\n   - Set up WebSocket support if needed\n3. Update `docker-compose.yml` to include the Nginx service:\n   - Map ports 80/443 to host\n   - Link to backend and frontend services\n   - Configure volumes for configuration and SSL certificates\n\nTesting approach: Start the complete docker-compose setup and test that requests to different paths are correctly routed to the appropriate services.\n\n<info added on 2025-05-05T15:39:45.710Z>\n# Configuration Nginx renforcée\n\n## Configuration optimisée et sécurisée\n```nginx\n# /nginx/conf.d/security.conf\nserver_tokens off;\nadd_header X-Content-Type-Options nosniff;\nadd_header X-Frame-Options SAMEORIGIN;\nadd_header X-XSS-Protection \"1; mode=block\";\nadd_header Content-Security-Policy \"default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:;\";\nadd_header Strict-Transport-Security \"max-age=31536000; includeSubDomains\" always;\n\n# Rate limiting configuration\nlimit_req_zone $binary_remote_addr zone=api_limit:10m rate=10r/s;\n```\n\n## Configuration complète du routage\n```nginx\n# /nginx/conf.d/default.conf\nserver {\n    listen 80;\n    server_name localhost;\n    \n    # Redirect to HTTPS in production\n    # return 301 https://$host$request_uri;\n    \n    # Frontend routing\n    location / {\n        proxy_pass http://frontend:8080;\n        proxy_set_header Host $host;\n        proxy_set_header X-Real-IP $remote_addr;\n        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;\n        proxy_set_header X-Forwarded-Proto $scheme;\n    }\n    \n    # API routing with rate limiting\n    location /api/ {\n        limit_req zone=api_limit burst=20 nodelay;\n        proxy_pass http://backend:8000/;\n        proxy_set_header Host $host;\n        proxy_set_header X-Real-IP $remote_addr;\n        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;\n        proxy_set_header X-Forwarded-Proto $scheme;\n    }\n    \n    # Supabase routing\n    location /supabase/ {\n        proxy_pass http://supabase:8000/;\n        proxy_set_header Host $host;\n        proxy_set_header X-Real-IP $remote_addr;\n        proxy_http_version 1.1;\n        proxy_set_header Upgrade $http_upgrade;\n        proxy_set_header Connection \"upgrade\";\n    }\n    \n    # WebSocket support\n    location /ws/ {\n        proxy_pass http://backend:8000/ws/;\n        proxy_http_version 1.1;\n        proxy_set_header Upgrade $http_upgrade;\n        proxy_set_header Connection \"upgrade\";\n        proxy_set_header Host $host;\n        proxy_set_header X-Real-IP $remote_addr;\n    }\n    \n    # Configuration optimisée pour les fichiers statiques\n    location /static/ {\n        alias /app/static/;\n        expires 7d;\n        add_header Cache-Control \"public, max-age=604800\";\n    }\n}\n```\n\n## Configuration SSL\n```bash\n# /nginx/ssl/generate-certs.sh\n#!/bin/bash\n# Script pour générer des certificats auto-signés pour le développement\nmkdir -p /etc/nginx/ssl\nopenssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/nginx/ssl/nginx.key -out /etc/nginx/ssl/nginx.crt -subj \"/C=FR/ST=Paris/L=Paris/O=Dev/CN=localhost\"\n```\n\n## Instructions Let's Encrypt pour la production\n```bash\n# /nginx/ssl/setup-letsencrypt.sh\n#!/bin/bash\n# À exécuter en production\napt-get update\napt-get install -y certbot python3-certbot-nginx\ncertbot --nginx -d votredomaine.com -d www.votredomaine.com --non-interactive --agree-tos --email votre@email.com\n```\n\n## Configuration des logs\n```nginx\n# /nginx/conf.d/logging.conf\nlog_format detailed '$remote_addr - $remote_user [$time_local] '\n                    '\"$request\" $status $body_bytes_sent '\n                    '\"$http_referer\" \"$http_user_agent\" '\n                    '$request_time $upstream_response_time $pipe';\n\naccess_log /var/log/nginx/access.log detailed;\nerror_log /var/log/nginx/error.log warn;\n```\n\n## Script de personnalisation de la configuration\n```bash\n# /nginx/customize-config.sh\n#!/bin/bash\n# Script pour personnaliser la configuration Nginx\n# Usage: ./customize-config.sh [dev|prod] [domain]\n\nENV=${1:-dev}\nDOMAIN=${2:-localhost}\n\nif [ \"$ENV\" = \"prod\" ]; then\n    # Activer HTTPS et redirection\n    sed -i 's/# return 301/return 301/' /etc/nginx/conf.d/default.conf\n    # Mettre à jour le nom de domaine\n    sed -i \"s/server_name localhost/server_name $DOMAIN/\" /etc/nginx/conf.d/default.conf\nfi\n\necho \"Configuration Nginx personnalisée pour l'environnement: $ENV avec domaine: $DOMAIN\"\n```\n</info added on 2025-05-05T15:39:45.710Z>\n<info added on 2025-05-06T11:47:05.809Z>\nI've successfully implemented the Nginx reverse proxy configuration as planned. Here's what was accomplished:\n\n1. Created `/nginx/Dockerfile` using the official Nginx image as a base and configured it to copy our custom configuration files.\n\n2. Set up `/nginx/conf.d/default.conf` with the following proxy configurations:\n   - Configured the main server block to listen on port 80\n   - Added location directives to properly route requests:\n     - Frontend requests to the frontend service\n     - API requests (/api) to the backend service\n   - Set appropriate proxy headers (Host, X-Real-IP, X-Forwarded-For, etc.)\n   - Included basic security headers\n\n3. Updated `docker-compose.yml` with a new nginx service:\n   - Exposed port 80 to the host machine\n   - Created links to both backend and frontend services\n   - Added volume mounts for the Nginx configuration files\n   - Ensured proper networking between services\n\n4. Tested the configuration by starting the complete docker-compose setup and verified that:\n   - Frontend requests are correctly routed to the frontend service\n   - API requests are properly forwarded to the backend service\n   - The services can communicate with each other through the Nginx proxy\n\nThe basic reverse proxy setup is now complete and functioning as expected. This implementation provides a solid foundation that can be extended with additional security features, SSL configuration, and performance optimizations in the future.\n</info added on 2025-05-06T11:47:05.809Z>",
+          "status": "done",
+          "parentTaskId": 1
+        },
+        {
+          "id": 6,
+          "title": "Finalize Development Environment Configuration",
+          "description": "Complete the development environment setup with configuration for local development, testing, and CI/CD preparation.",
+          "dependencies": [
+            2,
+            3,
+            4,
+            5
+          ],
+          "details": "1. Create development scripts in package.json (frontend) and Makefile (backend):\n   - Add commands for starting services\n   - Configure linting and formatting\n   - Set up testing commands\n2. Configure environment variable handling:\n   - Update all `.env.example` files with required variables\n   - Document environment setup in README.md\n3. Add Docker Compose override file for development:\n   - Create `docker-compose.override.yml` with development-specific settings\n   - Configure volume mappings for hot-reload\n4. Add basic CI configuration:\n   - Create `.github/workflows/` directory with initial CI workflow\n   - Configure linting and testing jobs\n5. Update README.md with comprehensive setup instructions:\n   - Document both Docker and non-Docker setup processes\n   - Add development workflow guidelines\n   - Include troubleshooting section\n\nTesting approach: Follow the documented setup process from scratch to verify that a new developer can successfully set up and run the project.\n\n<info added on 2025-05-05T15:40:15.896Z>\n# Déploiement simplifié\n\nAjout des éléments suivants pour renforcer l'aspect \"déploiement facile\" :\n\n1. **Script de déploiement unifié** :\n   - Créer `deploy.sh` à la racine qui orchestre l'ensemble du processus\n   - Implémenter une interface en ligne de commande interactive avec `whiptail` ou `dialog`\n   - Inclure des options pour : dev/staging/prod, domaine, certificats SSL, mode de déploiement\n\n2. **Vérification automatique des prérequis** :\n   ```bash\n   # Exemple de vérification de prérequis dans deploy.sh\n   check_prerequisites() {\n     command -v docker >/dev/null 2>&1 || { echo \"Installation de Docker...\"; install_docker; }\n     command -v docker-compose >/dev/null 2>&1 || { echo \"Installation de Docker Compose...\"; install_docker_compose; }\n     # Vérifications supplémentaires...\n   }\n   ```\n\n3. **Génération de certificats SSL** :\n   - Intégrer Let's Encrypt pour l'environnement de production\n   - Utiliser mkcert pour les certificats de développement local\n   - Créer des certificats auto-signés comme solution de repli\n\n4. **Mécanisme de restauration** :\n   - Implémenter une sauvegarde automatique avant déploiement\n   - Créer un script `rollback.sh` qui restaure la version précédente\n   - Journaliser chaque déploiement avec horodatage pour faciliter la restauration\n\n5. **Documentation visuelle** :\n   - Créer un dossier `docs/deployment/` avec captures d'écran du processus\n   - Ajouter des diagrammes de flux pour illustrer les étapes de déploiement\n   - Inclure un guide vidéo court pour les cas d'utilisation courants\n\n6. **Exemples de configuration** :\n   ```\n   # Exemple de configuration pour poste développeur\n   ENVIRONMENT=development\n   DOMAIN=localhost\n   SSL=self-signed\n   DATABASE_TYPE=sqlite\n   \n   # Exemple de configuration pour VM production\n   ENVIRONMENT=production\n   DOMAIN=monapp.example.com\n   SSL=letsencrypt\n   DATABASE_TYPE=postgres\n   ```\n\n7. **Tests de déploiement automatisés** :\n   - Ajouter un workflow GitHub Actions simulant le déploiement\n   - Créer des tests vérifiant l'accessibilité post-déploiement\n   - Implémenter des tests de charge basiques pour valider la configuration\n</info added on 2025-05-05T15:40:15.896Z>\n<info added on 2025-05-06T11:49:48.952Z>\n1. Create development scripts in package.json (frontend) and Makefile (backend):\\n   - Add commands for starting services\\n   - Configure linting and formatting\\n   - Set up testing commands\\n2. Configure environment variable handling:\\n   - Update all `.env.example` files with required variables\\n   - Document environment setup in README.md\\n3. Add Docker Compose override file for development:\\n   - Create `docker-compose.override.yml` with development-specific settings\\n   - Configure volume mappings for hot-reload\\n4. Add basic CI configuration:\\n   - Create `.github/workflows/` directory with initial CI workflow\\n   - Configure linting and testing jobs\\n5. Update README.md with comprehensive setup instructions:\\n   - Document both Docker and non-Docker setup processes\\n   - Add development workflow guidelines\\n   - Include troubleshooting section\\n\\nTesting approach: Follow the documented setup process from scratch to verify that a new developer can successfully set up and run the project.\\n\\n<info added on 2025-05-05T15:40:15.896Z>\\n# Déploiement simplifié\\n\\nAjout des éléments suivants pour renforcer l'aspect \\\"déploiement facile\\\" :\\n\\n1. **Script de déploiement unifié** :\\n   - Créer `deploy.sh` à la racine qui orchestre l'ensemble du processus\\n   - Implémenter une interface en ligne de commande interactive avec `whiptail` ou `dialog`\\n   - Inclure des options pour : dev/staging/prod, domaine, certificats SSL, mode de déploiement\\n\\n2. **Vérification automatique des prérequis** :\\n   ```bash\\n   # Exemple de vérification de prérequis dans deploy.sh\\n   check_prerequisites() {\\n     command -v docker >/dev/null 2>&1 || { echo \\\"Installation de Docker...\\\"; install_docker; }\\n     command -v docker-compose >/dev/null 2>&1 || { echo \\\"Installation de Docker Compose...\\\"; install_docker_compose; }\\n     # Vérifications supplémentaires...\\n   }\\n   ```\\n\\n3. **Génération de certificats SSL** :\\n   - Intégrer Let's Encrypt pour l'environnement de production\\n   - Utiliser mkcert pour les certificats de développement local\\n   - Créer des certificats auto-signés comme solution de repli\\n\\n4. **Mécanisme de restauration** :\\n   - Implémenter une sauvegarde automatique avant déploiement\\n   - Créer un script `rollback.sh` qui restaure la version précédente\\n   - Journaliser chaque déploiement avec horodatage pour faciliter la restauration\\n\\n5. **Documentation visuelle** :\\n   - Créer un dossier `docs/deployment/` avec captures d'écran du processus\\n   - Ajouter des diagrammes de flux pour illustrer les étapes de déploiement\\n   - Inclure un guide vidéo court pour les cas d'utilisation courants\\n\\n6. **Exemples de configuration** :\\n   ```\\n   # Exemple de configuration pour poste développeur\\n   ENVIRONMENT=development\\n   DOMAIN=localhost\\n   SSL=self-signed\\n   DATABASE_TYPE=sqlite\\n   \\n   # Exemple de configuration pour VM production\\n   ENVIRONMENT=production\\n   DOMAIN=monapp.example.com\\n   SSL=letsencrypt\\n   DATABASE_TYPE=postgres\\n   ```\\n\\n7. **Tests de déploiement automatisés** :\\n   - Ajouter un workflow GitHub Actions simulant le déploiement\\n   - Créer des tests vérifiant l'accessibilité post-déploiement\\n   - Implémenter des tests de charge basiques pour valider la configuration\\n</info added on 2025-05-05T15:40:15.896Z>\\n\\n<info added on 2023-06-15T10:22:45.123Z>\\nImplementation details for completed development environment configuration:\\n\\n1. Frontend configuration:\\n   - Added lint/format scripts to frontend/package.json:\\n     ```json\\n     \\\"scripts\\\": {\\n       \\\"lint\\\": \\\"eslint src/**/*.{js,jsx,ts,tsx}\\\",\\n       \\\"lint:fix\\\": \\\"eslint --fix src/**/*.{js,jsx,ts,tsx}\\\",\\n       \\\"format\\\": \\\"prettier --write src/**/*.{js,jsx,ts,tsx,css,scss}\\\"\\n     }\\n     ```\\n   - Installed ESLint and Prettier as dev dependencies\\n   - Added .eslintrc.js and .prettierrc configuration files\\n\\n2. Backend configuration:\\n   - Created Makefile with the following targets:\\n     ```makefile\\n     .PHONY: run lint format test\\n     \\n     run:\\n     \\tpython -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000\\n     \\n     lint:\\n     \\truff check app tests\\n     \\n     format:\\n     \\truff format app tests\\n     \\n     test:\\n     \\tpytest -xvs tests/\\n     ```\\n   - Installed Ruff for linting/formatting and Pytest for testing\\n   - Added pyproject.toml with Ruff and Pytest configurations\\n\\n3. Docker development setup:\\n   - Added empty docker-compose.override.yml file structure for future development-specific settings\\n   - Will be populated with volume mappings and development ports in next iteration\\n\\n4. CI/CD configuration:\\n   - Created .github/workflows/ci.yml with basic workflow:\\n     ```yaml\\n     name: CI\\n     on: [push, pull_request]\\n     jobs:\\n       lint-and-test:\\n         runs-on: ubuntu-latest\\n         steps:\\n           - uses: actions/checkout@v3\\n           - name: Set up environment\\n             run: make setup\\n           - name: Lint code\\n             run: make lint\\n           - name: Run tests\\n             run: make test\\n     ```\\n\\n5. Documentation:\\n   - Updated README.md with comprehensive setup instructions for both Docker and local development\\n   - Added troubleshooting section for common issues\\n   - Included development workflow guidelines\\n\\nNext steps: Configure the docker-compose.override.yml with proper volume mappings and finalize environment variable handling across all components.\n</info added on 2023-06-15T10:22:45.123Z>\n</info added on 2025-05-06T11:49:48.952Z>",
+          "status": "done",
+          "parentTaskId": 1
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "Supabase Infrastructure Setup",
+      "description": "Set up and configure Supabase infrastructure in two phases: first locally for immediate development, then on a VUB VM for production. Both setups will provide authentication, database, and storage services, ensuring complete data sovereignty and GDPR compliance. This task focuses specifically on the technical infrastructure setup, ending with functional Supabase endpoints ready for application integration.",
+      "details": "## PHASE 1: LOCAL DEVELOPMENT ENVIRONMENT\n\n1. Prepare local development environment for Supabase:\n   - Install Docker and Docker Compose on developer machines\n   - Install Supabase CLI for local development\n   - Create setup scripts for consistent developer environments\n   - Document resource requirements for local development\n\n2. Deploy local Supabase using official Docker images:\n   - Configure environment variables in docker-compose.yml\n   - Generate and securely store JWT keys\n   - Configure CORS settings to allow access from both Ghostly Game and Web Dashboard\n   - Create initialization scripts for consistent setup across developer machines\n\n3. Set up local PostgreSQL database infrastructure:\n   - Configure initial database instance\n   - Set up database security parameters\n   - Implement data encryption for sensitive information\n   - Create database schema initialization scripts\n\n4. Configure local Supabase Auth service (GoTrue):\n   - Set up the technical infrastructure for the authentication service\n   - Configure JWT settings with appropriate token lifetimes\n   - Set up proper API endpoints for authentication\n   - Configure basic security parameters\n\n5. Set up local Supabase Storage service:\n   - Configure storage service infrastructure\n   - Create initial storage buckets structure\n   - Set up basic security parameters\n\n6. Local API and Security Configuration:\n   - Generate and configure API keys for service access\n   - Set up secure JWT secrets and configurations\n   - Document all API endpoints and access methods\n\n7. Local Environment Documentation:\n   - Create comprehensive setup guide for developers\n   - Document all configuration settings\n   - Highlight differences between local and future production environment\n\n## PHASE 2: PRODUCTION ENVIRONMENT (VUB VM)\n\n1. Prepare VUB VM for self-hosted Supabase deployment:\n   - Install Docker and Docker Compose on the VM\n   - Configure appropriate VM resources (CPU, RAM, storage)\n   - Set up network security groups and firewall rules\n\n2. Deploy Supabase on VM using official Docker images:\n   - Clone the Supabase Docker repository\n   - Adapt environment variables from local setup to production\n   - Generate and securely store production JWT keys\n   - Set up proper container isolation and resource limits\n   - Configure production CORS settings\n\n3. Migrate database configuration to production:\n   - Apply database schema and configurations from local environment\n   - Set up enhanced security parameters for production\n   - Configure comprehensive backup procedures\n   - Implement data retention policies for GDPR compliance\n\n4. Configure production Supabase Auth service:\n   - Migrate Auth service configuration from local environment\n   - Adjust security parameters for production environment\n   - Configure production-appropriate JWT settings\n\n5. Set up production Supabase Storage service:\n   - Migrate storage configuration from local environment\n   - Implement production-grade security measures\n   - Configure backup and retention policies\n\n6. Production API and Security Configuration:\n   - Generate production API keys with appropriate restrictions\n   - Implement enhanced security measures for production\n   - Document production API endpoints and access methods\n\n7. Deployment and Verification:\n   - Deploy the complete infrastructure\n   - Verify all services start correctly\n   - Test basic connectivity to all endpoints\n   - Ensure infrastructure restarts properly after VM reboot\n\n8. Production Infrastructure Documentation:\n   - Document all production configuration settings\n   - Create deployment and maintenance guides\n   - Document security measures and compliance considerations\n   - Document infrastructure endpoints for use in Task 3\n   - Detail migration process from local to production environment",
+      "testStrategy": "## Local Environment Testing\n- Verify all Supabase services are running correctly in local environment\n- Confirm basic connectivity to local PostgreSQL database\n- Verify local Auth service endpoints are accessible and responding\n- Confirm local Storage service is operational\n- Test CORS configuration in local environment\n- Verify basic API key authentication works locally\n- Confirm JWT configuration is properly set up locally\n- Validate developer setup documentation completeness\n\n## Production Environment Testing\n- Verify all Supabase services are running correctly after production deployment\n- Confirm basic connectivity to production PostgreSQL database\n- Verify production Auth service endpoints are accessible and responding\n- Confirm production Storage service is operational\n- Test CORS configuration for proper security settings in production\n- Validate that all services start correctly after VM restart\n- Verify production API key authentication works\n- Confirm production JWT configuration is properly set up\n- Test infrastructure-level backup procedures\n- Verify GDPR compliance of the infrastructure deployment\n- Test migration path from local to production environment\n- Create a basic endpoint verification checklist for handover to Task 3",
+      "priority": "high",
+      "dependencies": [
+        1
+      ],
+      "status": "pending",
+      "subtasks": []
+    },
+    {
+      "id": 3,
+      "title": "Authentication and Authorization System",
+      "description": "Implement a secure multi-level login system with role management for therapists, researchers, and administrators, ensuring unified authentication between the Ghostly Game (OpenFeasyo/C#) and the Web Dashboard (Vue.js) using the pre-configured Supabase Auth infrastructure. Include optional Two-Factor Authentication (2FA/MFA) using TOTP authenticator apps for enhanced security.",
+      "status": "pending",
+      "dependencies": [
+        2
+      ],
+      "priority": "high",
+      "details": "This task focuses specifically on the application-level implementation of authentication, not the infrastructure setup (covered in Task 2):\n\n1. Implement Supabase Auth clients for both applications:\n   - JavaScript Supabase client integration for Vue.js dashboard\n   - REST API authentication implementation for C# OpenFeasyo game\n   - Ensure both clients connect to the same Supabase Auth instance\n\n2. Implement secure JWT management in both environments:\n   - Dashboard: Implement frontend authentication store using Pinia\n     - JWT secure storage and management\n     - User session persistence\n     - Automatic token refresh\n   - Game: Create equivalent authentication management in C#\n     - JWT secure storage and handling\n     - Session management\n     - Token refresh mechanism\n\n3. Implement FastAPI backend middleware for authentication:\n   - JWT validation using python-jose\n   - Role-based access control based on token claims\n   - Session validation\n   - Error handling for authentication failures\n\n4. Create authentication UI components:\n   - Dashboard: Login form with validation\n     - Password reset flow\n     - User profile management\n   - Game: Implement appropriate login interface for OpenFeasyo\n     - Game-specific authentication screens\n     - Session persistence appropriate for game context\n\n5. Implement authentication protection:\n   - Dashboard: Route guards in Vue Router for protected routes\n   - Game: Authentication checks for protected game features\n   - Role-based feature access in both applications\n\n6. Implement cross-application authentication consistency:\n   - Ensure login state is properly synchronized between applications\n   - Handle edge cases like session expiration gracefully\n   - Implement secure logout across all platforms\n\n7. Implement optional Two-Factor Authentication (2FA/MFA):\n   - Integrate TOTP (Time-based One-Time Password) authentication as per security.md\n   - Create configuration options for users/administrators to enable 2FA\n   - Implement QR code generation for authenticator app setup\n   - Develop UI flow for 2FA enrollment (QR code scanning, verification)\n   - Add 2FA verification step to login flow when enabled\n   - Ensure authentication system works seamlessly with or without 2FA\n   - Implement backup/recovery codes for 2FA-enabled accounts",
+      "testStrategy": "- Test authentication flow end-to-end in both applications:\n  - Login with valid credentials\n  - Attempt login with invalid credentials\n  - Password reset flow\n  - Session persistence\n  - Token refresh\n\n- Verify role-based access control:\n  - Test access to protected routes/features with different user roles\n  - Verify appropriate UI elements appear/disappear based on permissions\n\n- Test cross-platform authentication consistency:\n  - Verify login state is maintained appropriately across applications\n  - Test logout functionality clears session in both environments\n\n- Security testing:\n  - Verify JWT is stored securely in both environments\n  - Test token expiration and refresh mechanisms\n  - Verify authentication failures are handled gracefully with appropriate user feedback\n\n- Integration testing:\n  - Verify both applications successfully communicate with the Supabase Auth infrastructure\n  - Test API endpoints with valid and invalid authentication tokens\n  - Verify middleware correctly validates tokens and enforces permissions\n\n- Two-Factor Authentication testing:\n  - Test enabling/disabling 2FA functionality\n  - Verify QR code generation and scanning process\n  - Test login flow with 2FA enabled (valid and invalid TOTP codes)\n  - Verify backup/recovery codes functionality\n  - Test 2FA across both web dashboard and game environments\n  - Ensure graceful handling of edge cases (clock drift, lost authenticator)",
+      "subtasks": []
+    },
+    {
+      "id": 4,
+      "title": "Database Schema Design and Implementation",
+      "description": "Design and implement the PostgreSQL database schema for patient data, EMG recordings, game metrics, and user management with proper relationships and constraints.",
+      "details": "1. Design comprehensive database schema including:\n   - Users table (linked to Supabase Auth)\n   - Patients table with demographic and medical data\n   - Medical centers table\n   - Therapist-patient relationships\n   - Sessions table for recording therapy sessions\n   - EMG data tables (processed data from C3D files)\n   - Game metrics tables\n   - Cohorts and cohort membership\n2. Implement schema using SQL migrations:\n   - Create tables with appropriate constraints\n   - Set up foreign key relationships\n   - Configure indexes for performance\n3. Implement Row-Level Security (RLS) policies:\n   - Therapists can only access their patients' data\n   - Researchers can access data based on their center/study\n   - Administrators have full access\n4. Set up encryption for sensitive patient data using pgcrypto\n5. Create database views for common queries\n6. Document schema with entity-relationship diagrams",
+      "testStrategy": "- Validate schema with test data insertion\n- Test foreign key constraints and cascading operations\n- Verify RLS policies with different user roles\n- Benchmark query performance for common operations\n- Test encryption and decryption of sensitive data\n- Verify data integrity constraints",
+      "priority": "high",
+      "dependencies": [
+        2
+      ],
+      "status": "pending",
+      "subtasks": []
+    },
+    {
+      "id": 5,
+      "title": "C3D File Parser Development",
+      "description": "Develop a Python module to parse, validate, and extract relevant data from C3D files generated by the OpenFeasyo game and EMG sensors.",
+      "details": "1. Research and select appropriate C3D parsing library for Python (e.g., ezc3d, c3d, or pyCGM2)\n2. Create a C3DParser class with methods to:\n   - Load and validate C3D files\n   - Extract EMG signal data\n   - Extract metadata (recording date, duration, etc.)\n   - Extract game metrics if included in the C3D file\n3. Implement data transformation functions:\n   - Convert raw EMG data to appropriate formats for analysis\n   - Normalize signals if needed\n   - Extract key metrics (e.g., muscle activation patterns)\n4. Add error handling for corrupted or invalid C3D files\n5. Optimize for performance with large files (>100MB)\n6. Create utility functions for common operations on extracted data\n7. Document the parser API and usage examples",
+      "testStrategy": "- Test with sample C3D files from the OpenFeasyo game\n- Validate extracted data against known values\n- Benchmark performance with large files\n- Test error handling with corrupted files\n- Verify all required metrics can be extracted\n- Unit test individual parser components",
+      "priority": "high",
+      "dependencies": [
+        1
+      ],
+      "status": "pending",
+      "subtasks": []
+    },
+    {
+      "id": 6,
+      "title": "Patient Management System",
+      "description": "Implement the patient management system including registration, profile management, therapist assignment, and medical history tracking.",
+      "details": "1. Create backend API endpoints for patient management:\n   - Patient registration\n   - Profile updates\n   - Therapist assignment\n   - Medical history management\n   - Patient listing with filtering and pagination\n2. Implement data validation using Pydantic models\n3. Create frontend components:\n   - Patient registration form\n   - Patient profile view/edit\n   - Patient list with search and filters\n   - Medical history timeline\n   - Therapist assignment interface\n4. Implement patient data pseudonymization:\n   - Generate unique patient identifiers\n   - Separate personal identifiers from medical data\n   - Implement secure linking mechanism\n5. Add audit logging for all patient data modifications\n6. Implement data export functionality for patient records",
+      "testStrategy": "- Test API endpoints with valid and invalid data\n- Verify pseudonymization is working correctly\n- Test therapist assignment and permissions\n- Validate form validation and error handling\n- Test search and filtering functionality\n- Verify audit logging captures all relevant events\n- Test data export formats",
+      "priority": "medium",
+      "dependencies": [
+        3,
+        4
+      ],
+      "status": "pending",
+      "subtasks": []
+    },
+    {
+      "id": 7,
+      "title": "Cohort Management System",
+      "description": "Develop functionality to create and manage patient cohorts, assign therapists to cohorts, and enable comparative analysis between cohorts.",
+      "details": "1. Create database models and API endpoints for cohort management:\n   - Cohort creation and configuration\n   - Patient assignment to cohorts\n   - Therapist assignment to cohorts\n   - Cohort metadata management\n2. Implement frontend components:\n   - Cohort creation and editing interface\n   - Patient assignment interface\n   - Cohort listing and filtering\n   - Cohort comparison view\n3. Develop cohort analytics features:\n   - Aggregate statistics calculation\n   - Comparative visualizations\n   - Progress tracking across cohorts\n4. Implement permissions system for cohort access\n5. Add export functionality for cohort data",
+      "testStrategy": "- Test cohort creation and configuration\n- Verify patient and therapist assignment\n- Test permissions system with different user roles\n- Validate cohort comparison functionality\n- Test aggregate statistics calculations\n- Verify export functionality\n- Test UI components for usability",
+      "priority": "medium",
+      "dependencies": [
+        6
+      ],
+      "status": "pending",
+      "subtasks": []
+    },
+    {
+      "id": 8,
+      "title": "OpenFeasyo Game Integration",
+      "description": "Modify the OpenFeasyo game (C#/MonoGame) to implement Supabase authentication and direct C3D file upload to the backend API.",
+      "details": "1. Analyze the OpenFeasyo game codebase to identify integration points\n2. Implement Supabase authentication in the game:\n   - Add login screen or integration with existing UI\n   - Implement REST API calls to Supabase Auth\n   - Store and manage JWT tokens securely\n3. Develop C3D file upload functionality:\n   - Create a service to handle file uploads\n   - Implement authenticated API calls to the backend\n   - Add progress indication and error handling\n4. Implement fallback mechanism for offline operation:\n   - Store files locally when connection is unavailable\n   - Queue for later upload when connection is restored\n5. Add session metadata collection:\n   - Capture therapist ID, patient ID, session parameters\n   - Include metadata in C3D file or as separate payload\n6. Test integration on Android tablets\n7. Document integration for future maintenance",
+      "testStrategy": "- Test authentication flow in the game\n- Verify C3D file generation and upload\n- Test offline operation and sync\n- Validate error handling and recovery\n- Test on actual Android tablets\n- Verify metadata is correctly associated with uploaded files\n- Test with various network conditions",
+      "priority": "high",
+      "dependencies": [
+        2,
+        3,
+        5
+      ],
+      "status": "pending",
+      "subtasks": []
+    },
+    {
+      "id": 9,
+      "title": "Backend API Core Implementation",
+      "description": "Develop the core FastAPI backend with essential endpoints, middleware, error handling, and integration with Supabase services.",
+      "details": "1. Set up FastAPI application structure:\n   - Configure ASGI server (Uvicorn)\n   - Set up middleware (CORS, authentication, logging)\n   - Implement dependency injection system\n   - Configure error handling and response models\n2. Implement core API endpoints:\n   - Health check and system status\n   - Authentication endpoints (if not using Supabase directly)\n   - User management\n   - File upload and management\n3. Create database interaction layer:\n   - Set up SQLAlchemy models or Core\n   - Implement repository pattern for data access\n   - Configure connection pooling\n4. Implement Supabase integration:\n   - JWT validation\n   - Storage access\n   - Database access (if not direct)\n5. Add logging and monitoring:\n   - Request logging\n   - Error tracking\n   - Performance metrics\n6. Document API with OpenAPI/Swagger",
+      "testStrategy": "- Unit test individual API endpoints\n- Test middleware functionality\n- Verify error handling for various scenarios\n- Test database interactions\n- Validate JWT authentication\n- Benchmark API performance\n- Verify API documentation is accurate\n- Test with mock Supabase services",
+      "priority": "high",
+      "dependencies": [
+        3,
+        4,
+        5
+      ],
+      "status": "pending",
+      "subtasks": []
+    },
+    {
+      "id": 10,
+      "title": "EMG Data Visualization Components",
+      "description": "Develop frontend components for visualizing EMG signals, muscle strength analysis, contraction detection, and fatigue analysis.",
+      "details": "1. Research and select appropriate charting libraries (Chart.js or D3.js)\n2. Develop reusable visualization components:\n   - Temporal EMG signal graphs\n   - Muscle strength analysis charts\n   - Contraction detection visualization\n   - Fatigue analysis graphs\n   - Session comparison views\n3. Implement data processing utilities:\n   - Signal filtering and normalization\n   - Feature extraction\n   - Statistical calculations\n4. Create interactive features:\n   - Zoom and pan functionality\n   - Time range selection\n   - Annotation capabilities\n   - Export to image/PDF\n5. Optimize rendering performance for large datasets\n6. Ensure responsive design for different screen sizes\n7. Implement accessibility features (WCAG 2.1 AA compliance)",
+      "testStrategy": "- Test visualization components with sample EMG data\n- Verify interactive features work correctly\n- Test performance with large datasets\n- Validate responsive behavior on different devices\n- Test accessibility with screen readers\n- Verify data processing accuracy\n- User testing with therapists for usability feedback",
+      "priority": "medium",
+      "dependencies": [
+        5,
+        9
+      ],
+      "status": "pending",
+      "subtasks": []
+    },
+    {
+      "id": 11,
+      "title": "Game Performance Analysis Components",
+      "description": "Develop frontend components for analyzing and visualizing game performance metrics, session duration, frequency, and correlation with EMG activity.",
+      "details": "1. Design and implement game performance visualization components:\n   - Score progression charts\n   - Session duration and frequency graphs\n   - Level completion statistics\n   - Performance trend analysis\n2. Create correlation analysis components:\n   - EMG activity vs. game performance\n   - Muscle fatigue vs. game scores\n   - Progress over time visualizations\n3. Implement filtering and comparison tools:\n   - Date range selection\n   - Session comparison\n   - Patient comparison\n4. Add export functionality for analysis results\n5. Ensure responsive design and accessibility\n6. Optimize for performance with large datasets",
+      "testStrategy": "- Test visualization components with sample game data\n- Verify correlation analysis accuracy\n- Test filtering and comparison functionality\n- Validate export features\n- Test responsive behavior\n- Verify accessibility compliance\n- User testing with therapists and researchers",
+      "priority": "medium",
+      "dependencies": [
+        9,
+        10
+      ],
+      "status": "pending",
+      "subtasks": []
+    },
+    {
+      "id": 12,
+      "title": "Session Management System",
+      "description": "Implement the session management system for scheduling, recording results, adding therapist comments, and sending notifications and reminders.",
+      "details": "1. Create database models and API endpoints for session management:\n   - Session scheduling\n   - Session results recording\n   - Therapist comments and notes\n   - Session status tracking\n2. Implement notification system:\n   - Email notifications for upcoming sessions\n   - Reminder configuration\n   - Notification preferences\n3. Develop frontend components:\n   - Calendar view for session scheduling\n   - Session detail view/edit\n   - Comments and notes interface\n   - Session history view\n4. Add search and filtering functionality for sessions\n5. Implement session analytics:\n   - Attendance tracking\n   - Progress visualization\n   - Compliance metrics\n6. Create print/export functionality for session data",
+      "testStrategy": "- Test session scheduling and management\n- Verify notification system works correctly\n- Test comments and notes functionality\n- Validate search and filtering\n- Test analytics calculations\n- Verify print/export features\n- Test calendar view interactions\n- User testing with therapists",
+      "priority": "medium",
+      "dependencies": [
+        6,
+        9
+      ],
+      "status": "pending",
+      "subtasks": []
+    },
+    {
+      "id": 13,
+      "title": "Report Generation System",
+      "description": "Develop functionality to generate PDF clinical reports, raw data exports, printable dashboards, and summary reports by medical center.",
+      "details": "1. Research and select appropriate PDF generation library (e.g., ReportLab, WeasyPrint)\n2. Design report templates:\n   - Clinical patient reports\n   - Cohort summary reports\n   - Medical center reports\n   - Research data exports\n3. Implement backend report generation service:\n   - PDF rendering\n   - Data aggregation and processing\n   - Template rendering\n   - Background processing for large reports\n4. Create data export utilities:\n   - CSV export\n   - Excel export\n   - Raw data export\n5. Develop frontend components:\n   - Report configuration interface\n   - Report preview\n   - Download management\n6. Implement report scheduling and automation\n7. Add report sharing and access control",
+      "testStrategy": "- Test report generation with various data inputs\n- Verify PDF formatting and layout\n- Test data export formats\n- Validate report scheduling\n- Test access control for reports\n- Verify large report handling\n- User testing with therapists and researchers\n- Test report sharing functionality",
+      "priority": "medium",
+      "dependencies": [
+        6,
+        7,
+        10,
+        11,
+        12
+      ],
+      "status": "pending",
+      "subtasks": []
+    },
+    {
+      "id": 14,
+      "title": "Data Encryption and Pseudonymization System",
+      "description": "Implement end-to-end encryption for sensitive data and patient identifier pseudonymization to ensure GDPR compliance and data privacy.",
+      "details": "1. Design encryption strategy:\n   - Select appropriate encryption algorithms (e.g., Fernet for symmetric encryption)\n   - Define key management approach\n   - Identify data fields requiring encryption\n2. Implement pseudonymization system:\n   - Generate unique pseudonyms for patient identifiers\n   - Create secure linking mechanism\n   - Implement reversible pseudonymization for authorized users\n3. Develop encryption/decryption services:\n   - Key generation and storage\n   - Data encryption/decryption utilities\n   - Integration with database operations\n4. Implement secure key management:\n   - Key rotation policies\n   - Secure key storage\n   - Access control for keys\n5. Add audit logging for all encryption/decryption operations\n6. Create utilities for data anonymization for research exports\n7. Document encryption approach and security measures",
+      "testStrategy": "- Test encryption/decryption functionality\n- Verify pseudonymization is effective\n- Test key rotation and management\n- Validate audit logging for security operations\n- Test data anonymization for exports\n- Verify authorized access to encrypted data\n- Security review of implementation",
+      "priority": "high",
+      "dependencies": [
+        4,
+        9
+      ],
+      "status": "pending",
+      "subtasks": []
+    },
+    {
+      "id": 15,
+      "title": "GDPR Compliance Features",
+      "description": "Implement features required for GDPR compliance including consent management, data access, portability, right to erasure, and audit logging.",
+      "details": "1. Implement consent management system:\n   - Digital consent forms\n   - Consent tracking and versioning\n   - Consent withdrawal process\n2. Develop data subject rights features:\n   - Data access request handling\n   - Data portability exports\n   - Right to erasure (data deletion)\n   - Data correction mechanisms\n3. Create comprehensive audit logging:\n   - User activity tracking\n   - Data access logging\n   - Changes to patient data\n   - Authentication events\n4. Implement data retention policies:\n   - Automatic data anonymization\n   - Data archiving\n   - Data deletion workflows\n5. Create privacy policy and terms documentation\n6. Develop administrator tools for GDPR compliance management\n7. Implement data breach notification procedures",
+      "testStrategy": "- Test consent management workflow\n- Verify data access request handling\n- Test data deletion and anonymization\n- Validate audit logging comprehensiveness\n- Test data retention policy enforcement\n- Verify data portability exports\n- Test administrator compliance tools\n- Legal review of implementation",
+      "priority": "high",
+      "dependencies": [
+        6,
+        14
+      ],
+      "status": "pending",
+      "subtasks": []
+    },
+    {
+      "id": 16,
+      "title": "Therapist Dashboard Implementation",
+      "description": "Develop the therapist-specific dashboard interface for patient management, session scheduling, progress tracking, and exercise program configuration.",
+      "details": "1. Design therapist dashboard layout and navigation\n2. Implement dashboard components:\n   - Patient overview with key metrics\n   - Recent sessions summary\n   - Upcoming appointments\n   - Patient progress charts\n   - Quick actions menu\n3. Create patient detail view:\n   - Comprehensive patient information\n   - EMG data visualizations\n   - Game performance metrics\n   - Session history\n   - Notes and comments\n4. Develop exercise program configuration tools:\n   - Program creation and editing\n   - Exercise assignment\n   - Difficulty adjustment\n   - Schedule management\n5. Implement notification center for therapists\n6. Add search and filtering functionality\n7. Ensure responsive design for tablet use in clinical settings",
+      "testStrategy": "- Test dashboard with sample patient data\n- Verify all components display correctly\n- Test exercise program configuration\n- Validate notification functionality\n- Test search and filtering\n- Verify responsive behavior on tablets\n- User testing with therapists\n- Test performance with multiple patients",
+      "priority": "medium",
+      "dependencies": [
+        6,
+        10,
+        11,
+        12
+      ],
+      "status": "pending",
+      "subtasks": []
+    },
+    {
+      "id": 17,
+      "title": "Researcher Dashboard Implementation",
+      "description": "Develop the researcher-specific dashboard interface for comparative data analysis, data export, multi-site statistics, and data filtering and segmentation.",
+      "details": "1. Design researcher dashboard layout and navigation\n2. Implement dashboard components:\n   - Cohort overview and statistics\n   - Multi-site data comparison\n   - Research metrics and KPIs\n   - Recent data additions\n   - Study progress tracking\n3. Create advanced analysis tools:\n   - Cohort comparison visualizations\n   - Statistical analysis components\n   - Data filtering and segmentation\n   - Custom query builder\n4. Develop data export functionality:\n   - Configurable data exports\n   - Anonymization options\n   - Export format selection\n   - Scheduled exports\n5. Implement research collaboration features\n6. Add bookmark and saved query functionality\n7. Create research notes and annotation tools",
+      "testStrategy": "- Test dashboard with sample research data\n- Verify analysis tools functionality\n- Test data export with various options\n- Validate statistical calculations\n- Test filtering and segmentation\n- Verify collaboration features\n- User testing with researchers\n- Test performance with large datasets",
+      "priority": "medium",
+      "dependencies": [
+        7,
+        10,
+        11,
+        13
+      ],
+      "status": "pending",
+      "subtasks": []
+    },
+    {
+      "id": 18,
+      "title": "Advanced EMG Analytics Implementation",
+      "description": "Develop advanced EMG signal analysis features including muscle fatigue analysis, strength progression tracking, and comparative analytics.",
+      "details": "1. Research and implement advanced EMG analysis algorithms:\n   - Muscle fatigue detection and quantification\n   - Strength progression metrics\n   - Contraction quality assessment\n   - Pattern recognition in EMG signals\n2. Develop visualization components for advanced metrics:\n   - Fatigue index charts\n   - Strength progression graphs\n   - Contraction quality visualizations\n   - Comparative analysis views\n3. Create analysis configuration tools:\n   - Parameter adjustment\n   - Algorithm selection\n   - Baseline configuration\n4. Implement batch processing for historical data\n5. Add export functionality for analysis results\n6. Create documentation for analysis methodologies\n7. Develop interpretation guides for therapists",
+      "testStrategy": "- Test analysis algorithms with sample EMG data\n- Verify visualization components\n- Validate calculation accuracy\n- Test batch processing performance\n- Expert review of analysis methodologies\n- User testing with therapists and researchers\n- Test export functionality",
+      "priority": "medium",
+      "dependencies": [
+        5,
+        10
+      ],
+      "status": "pending",
+      "subtasks": []
+    },
+    {
+      "id": 19,
+      "title": "Multilingual Support Implementation",
+      "description": "Implement multilingual support for English, Dutch, and French throughout the application interface and reports.",
+      "status": "pending",
+      "dependencies": [
+        16,
+        17
+      ],
+      "priority": "low",
+      "details": "1. Set up internationalization (i18n) framework:\n   - Configure Vue I18n for frontend\n   - Set up translation management\n   - Implement language selection\n2. Create translation files for all supported languages:\n   - English (default)\n   - Dutch\n   - French\n3. Implement language switching in the UI\n4. Add language preference to user profiles\n5. Extend translation to dynamic content:\n   - Error messages\n   - Notifications\n   - Generated reports\n6. Implement date, time, and number formatting based on locale\n7. Test and review translations with native speakers",
+      "testStrategy": "- Test language switching functionality\n- Verify all UI elements are translated\n- Test date and number formatting\n- Validate report generation in different languages\n- Review translations with native speakers\n- Test language preference persistence\n- Verify dynamic content translation",
+      "subtasks": []
+    },
+    {
+      "id": 20,
+      "title": "Accessibility Implementation",
+      "description": "Ensure the application meets WCAG 2.1 level AA compliance requirements and supports screen readers and other assistive technologies.",
+      "status": "pending",
+      "dependencies": [
+        16,
+        17
+      ],
+      "priority": "low",
+      "details": "1. Conduct accessibility audit of existing components\n2. Implement accessibility improvements:\n   - Proper semantic HTML structure\n   - ARIA attributes where needed\n   - Keyboard navigation support\n   - Focus management\n   - Color contrast compliance\n   - Text resizing support\n3. Test with screen readers and assistive technologies:\n   - NVDA\n   - JAWS\n   - VoiceOver\n   - Screen magnifiers\n4. Create accessibility documentation for developers\n5. Implement accessibility features in custom components:\n   - Charts and visualizations\n   - Form controls\n   - Modal dialogs\n   - Navigation menus\n6. Add skip navigation links\n7. Ensure proper tab order throughout the application",
+      "testStrategy": "- Automated accessibility testing with tools like axe\n- Manual testing with screen readers\n- Keyboard navigation testing\n- Color contrast verification\n- Test with various assistive technologies\n- User testing with individuals with disabilities if possible\n- Verify WCAG 2.1 AA compliance",
+      "subtasks": []
+    },
+    {
+      "id": 21,
+      "title": "Performance Optimization",
+      "description": "Optimize application performance to meet requirements for page load times, simultaneous users, and efficient processing of large C3D files.",
+      "status": "pending",
+      "dependencies": [
+        9,
+        16,
+        17
+      ],
+      "priority": "low",
+      "details": "1. Conduct performance audit of frontend and backend\n2. Implement frontend optimizations:\n   - Code splitting and lazy loading\n   - Asset optimization (images, fonts, etc.)\n   - Component virtualization for large lists\n   - Memoization of expensive calculations\n   - Efficient state management\n3. Optimize backend performance:\n   - Database query optimization\n   - Caching strategies (Redis or similar)\n   - Asynchronous processing for heavy tasks\n   - API response optimization\n4. Improve C3D file processing:\n   - Streaming processing for large files\n   - Parallel processing where applicable\n   - Optimized algorithms for data extraction\n5. Implement performance monitoring\n6. Add load testing infrastructure\n7. Document performance best practices",
+      "testStrategy": "- Benchmark page load times\n- Test with simulated concurrent users\n- Measure C3D processing performance\n- Profile database query performance\n- Load testing with realistic scenarios\n- Verify performance on target devices\n- Monitor memory usage and CPU utilization",
+      "subtasks": []
+    },
+    {
+      "id": 22,
+      "title": "Security Testing and Hardening",
+      "description": "Conduct comprehensive security testing and implement security hardening measures to protect sensitive patient data and prevent vulnerabilities, with special focus on the unified authentication system serving both the Ghostly Game and Web Dashboard applications.",
+      "status": "pending",
+      "dependencies": [
+        3,
+        9,
+        14,
+        15
+      ],
+      "priority": "high",
+      "details": "1. Conduct security audit of the application:\n   - Static code analysis\n   - Dependency vulnerability scanning\n   - Manual code review for security issues\n   - Specific review of unified authentication components\n2. Implement security hardening measures:\n   - Secure HTTP headers\n   - Content Security Policy (CSP)\n   - Cross-Site Scripting (XSS) protection\n   - Cross-Site Request Forgery (CSRF) protection\n   - SQL injection prevention\n3. Enhance authentication security:\n   - Rate limiting for login attempts\n   - Multi-factor authentication option\n   - Session management improvements\n   - Consistent JWT handling and validation across platforms\n   - Platform-specific authentication safeguards\n4. Test unified authentication system:\n   - Authentication flows from Ghostly Game application\n   - Authentication flows from Web Dashboard application\n   - Cross-platform authentication vulnerabilities\n   - JWT token security and validation across platforms\n5. Implement secure deployment practices:\n   - Secret management\n   - Environment separation\n   - Least privilege principle\n6. Create security documentation and incident response plan:\n   - Document unified authentication architecture\n   - Detail security considerations for both client environments\n   - Specify cross-platform security protocols\n7. Conduct penetration testing:\n   - Target authentication endpoints used by both applications\n   - Test for authentication bypass vulnerabilities\n   - Attempt session hijacking across platforms\n8. Implement security monitoring and alerting:\n   - Audit authentication logs from both applications\n   - Set up alerts for suspicious authentication patterns\n   - Monitor cross-platform authentication attempts",
+      "testStrategy": "- Automated security scanning with tools like OWASP ZAP\n- Penetration testing by security experts with focus on unified authentication endpoints\n- Test authentication security measures across both Ghostly Game and Web Dashboard\n- Test authentication flows in both directions to ensure consistent security\n- Verify secure headers and CSP\n- Test for common vulnerabilities (OWASP Top 10)\n- Validate encryption implementation\n- Review security logs and monitoring with special attention to cross-platform authentication\n- Verify proper JWT handling, validation, and expiration across platforms\n- Test for vulnerabilities specific to cross-platform authentication systems\n- Audit authentication logs to confirm proper tracking of logins from both applications",
+      "subtasks": []
+    },
+    {
+      "id": 23,
+      "title": "Deployment Pipeline Setup",
+      "description": "Set up CI/CD pipeline for automated testing, building, and deployment of the application to development, testing, and production environments.",
+      "status": "pending",
+      "dependencies": [
+        1
+      ],
+      "priority": "high",
+      "details": "1. Select CI/CD platform (e.g., GitHub Actions, GitLab CI, Jenkins)\n2. Configure build pipelines:\n   - Frontend build process\n   - Backend build process\n   - Docker image building\n3. Implement automated testing in the pipeline:\n   - Unit tests\n   - Integration tests\n   - End-to-end tests\n   - Security scans\n4. Set up deployment workflows:\n   - Development environment deployment\n   - Testing/staging environment deployment\n   - Production deployment with approval\n5. Configure environment-specific configurations\n6. Implement database migration handling\n7. Add monitoring and rollback capabilities\n8. Document deployment procedures and emergency rollback",
+      "testStrategy": "- Test build pipeline with sample changes\n- Verify automated tests run correctly\n- Test deployment to development environment\n- Validate environment-specific configurations\n- Test rollback procedures\n- Verify database migrations\n- Test monitoring and alerting",
+      "subtasks": []
+    },
+    {
+      "id": 24,
+      "title": "Documentation and Knowledge Transfer",
+      "description": "Create comprehensive documentation for the system including API documentation, user guides, deployment instructions, and conduct knowledge transfer sessions.",
+      "status": "pending",
+      "dependencies": [],
+      "priority": "high",
+      "details": "1. Create technical documentation:\n   - API documentation with OpenAPI/Swagger\n   - Database schema documentation\n   - Architecture overview\n   - Security implementation details\n   - Development setup instructions\n2. Develop user documentation:\n   - Therapist user guide\n   - Researcher user guide\n   - Administrator manual\n   - Troubleshooting guide\n3. Create deployment and operations documentation:\n   - Deployment instructions\n   - Backup and restore procedures\n   - Monitoring setup\n   - Maintenance tasks\n4. Prepare knowledge transfer materials:\n   - Presentation slides\n   - Code walkthrough documents\n   - Video tutorials\n5. Conduct knowledge transfer sessions\n6. Set up documentation repository with version control\n7. Create onboarding guide for new developers",
+      "testStrategy": "- Review documentation for accuracy and completeness\n- Test following instructions in documentation\n- Gather feedback from knowledge transfer sessions\n- Verify API documentation matches implementation\n- Test user guides with actual users\n- Validate deployment instructions in test environment",
+      "subtasks": []
+    },
+    {
+      "id": 25,
+      "title": "User Testing and Feedback Implementation",
+      "description": "Conduct user testing sessions with therapists and researchers, collect feedback, and implement improvements based on user input.",
+      "status": "pending",
+      "dependencies": [
+        16,
+        17
+      ],
+      "priority": "high",
+      "details": "1. Design user testing protocol:\n   - Define testing scenarios\n   - Create task lists for participants\n   - Prepare feedback collection forms\n   - Set up testing environment\n2. Recruit test participants:\n   - Therapists from participating centers\n   - Researchers from the project team\n   - Potential end users\n3. Conduct testing sessions:\n   - Round 1: Early prototype feedback (Week 10)\n   - Round 2: Core functionality validation (Week 15)\n   - Round 3: Final usability assessment (Week 19)\n4. Analyze feedback and identify improvements:\n   - Usability issues\n   - Missing features\n   - Workflow optimizations\n   - Interface improvements\n5. Prioritize and implement changes\n6. Conduct follow-up testing to validate improvements\n7. Document user testing results and implemented changes",
+      "testStrategy": "- Collect quantitative metrics (task completion time, success rate)\n- Gather qualitative feedback (interviews, surveys)\n- Test implemented changes with original participants\n- Compare metrics before and after improvements\n- Validate that critical issues are resolved\n- Document remaining issues for future iterations\n- Collect overall satisfaction ratings",
+      "subtasks": []
+    },
+    {
+      "id": 26,
+      "title": "Clarify Project Licensing with VUB TTO",
+      "description": "Consult with the VUB TTO to determine the appropriate software license for the GHOSTLY+ Dashboard project, considering its academic nature, VUB IP policies, and the potential for a future commercial spin-off. Confirm or select the definitive license to be used.",
+      "details": "",
+      "testStrategy": "",
+      "status": "pending",
+      "dependencies": [
+        1
+      ],
+      "priority": "high",
+      "subtasks": []
+    }
+  ]
+}

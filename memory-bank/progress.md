@@ -4,47 +4,51 @@ description: Tracks what works, what's left to build, current status, known issu
 
 # GHOSTLY+ Dashboard: Progress Log
 
-## Current Overall Status: Phase 1 - Infrastructure Setup (Task 1 in progress)
+## Current Overall Status: Phase 1 - Infrastructure Setup COMPLETE
 
-- **Date**: 2025-05-06
+- **Date**: 2025-05-06 (Updated after Task 1 completion and subsequent fixes)
 
 ## What Works / Completed Milestones
 
 -   Initial project documentation (`docs/prd.md`, `docs/task-summary.md`, `docs/security.md`) reviewed.
 -   Decision made to include optional 2FA/MFA; relevant documents and Taskmaster task (ID 3) updated.
--   Memory Bank core files (`projectbrief.md`, `productContext.md`, `systemPatterns.md`, `techContext.md`, `activeContext.md`, `progress.md`) created with initial content.
--   **Subtask 1.1: Initialize Git Repository and Base Project Structure COMPLETED**
-    -   Git repository initialized with `backend/`, `frontend/`, `nginx/`, `docs/` structure.
-    -   `README.md`, `CONTRIBUTING.md` created.
-    -   Comprehensive `.gitignore` configured.
-    -   Placeholder `LICENSE` (Apache 2.0) added.
-    -   Taskmaster task #26 created for VUB TTO license consultation.
-    -   Initial commit of base structure made.
--   **Subtask 1.2: Configure Backend Environment with FastAPI COMPLETED**
-    -   Poetry initialized in `backend/` with FastAPI, Uvicorn, SQLAlchemy.
-    -   Basic `backend/app/` structure created (`main.py`, `api/`, `models/`).
-    -   `backend/README.md` added.
-    -   `backend/.env.example` and `backend/.env` set up.
-    -   FastAPI `/health` endpoint implemented and verified.
+-   Memory Bank core files (`projectbrief.md`, `productContext.md`, `systemPatterns.md`, `techContext.md`, `activeContext.md`, `progress.md`) created and updated.
+-   **Task 1: Project Setup and Repository Configuration - FULLY COMPLETED.**
+    -   Subtask 1.1: Git & Base Structure (repo init, core docs, .gitignore, LICENSE, Task #26).
+    -   Subtask 1.2: Backend Environment with FastAPI (Poetry, dependencies, app structure, .env, /health endpoint).
+    -   Subtask 1.3: Frontend with Vue.js 3, TS, Tailwind (Vite, dependencies, Tailwind CSS v4, shadcn/ui, Pinia, .env).
+        - Explicitly documented TypeScript usage in memory bank and PRD.
+        - Migrated ESLint to v9 with flat config (`eslint.config.js`), resolving compatibility issues.
+    -   Subtask 1.4: Docker Configuration (Dockerfiles for backend/frontend, .dockerignore files, initial `docker-compose.yml`).
+    -   Subtask 1.5: Nginx as Reverse Proxy (Nginx Dockerfile, `default.conf`, `docker-compose.yml` update).
+    -   Subtask 1.6: Finalize Development Environment (Frontend lint/format scripts, Backend Makefile, dev dependencies, README updates, `docker-compose.override.yml`, basic GitHub Actions CI).
+-   **Post-Task 1 Fixes & Refinements COMPLETED:**
+    -   Resolved Docker build issues in `backend/Dockerfile` related to Poetry install flags, user permissions, and COPY paths.
+    -   Updated `frontend/Dockerfile` and `frontend/postcss.config.js` for Tailwind CSS v4 compatibility.
+    -   Corrected Nginx `default.conf` rewrite rule for proper API proxying.
+    -   Addressed and fixed all frontend linting errors after ESLint v9 migration (type definitions, ESLint configuration details).
+    -   Applied Prettier (frontend) and Ruff (backend) formatting to codebase.
+    -   Verified complete Docker environment (`docker-compose up --build`) with all services (backend, frontend, nginx) running and accessible correctly.
+    -   Updated `memory-bank/techContext.md` to specify Tailwind CSS v4.
+-   All changes related to Task 1 and subsequent fixes have been committed.
 
 ## What's Left to Build / Immediate Next Steps
 
--   **Currently working on Subtask 1.3: Set Up Frontend with Vue.js 3, TypeScript, and Tailwind CSS.**
--   Complete remaining subtasks for Task 1 (Project Setup and Repository Configuration):
-    -   1.4: Create Docker Configuration for Backend and Frontend
-    -   1.5: Configure Nginx as Reverse Proxy
-    -   1.6: Finalize Development Environment Configuration
--   Thorough review of all Memory Bank files against recent progress.
--   Address open questions in `docs/prd.md` (Section 8).
--   Continue with Phase 1: Infrastructure Setup tasks.
+-   Await user direction for the next task (e.g., using `task-master next` or specifying a task ID).
+-   Likely proceed to Task 2: User Authentication & Authorization (Supabase Integration).
+-   Address open questions in `docs/prd.md` (Section 8) as they become relevant.
 
 ## Known Issues / Blockers
 
--   Global Git ignore settings on user's machine initially prevented creation of `.env.example` files; workaround was manual creation by user. This is not a project blocker but a local environment note.
+-   (Resolved) Global Git ignore settings on user's machine initially prevented creation of `.env.example` files; workaround was manual creation by user.
+-   (Resolved) ESLint v9 upgrade required migration to flat config (`eslint.config.js`) and careful resolution of plugin/parser compatibility issues.
+-   (Resolved) Docker build and runtime errors required iterative debugging of Dockerfiles (Poetry flags, COPY paths, user permissions) and Nginx configuration.
 
 ## Evolution of Project Decisions
 
 -   **[Date of 2FA discussion]**: Decided to implement 2FA/MFA as an optional feature.
 -   **2025-05-06**: Selected Apache 2.0 as a placeholder license, pending VUB TTO consultation (Task #26).
+-   **2025-05-06**: Migrated frontend linting from ESLint v8 (legacy config) to ESLint v9 (flat config) due to compatibility issues and to align with current best practices.
+-   **2025-05-06**: Confirmed Tailwind CSS v4 usage and updated relevant configurations and documentation.
 
 *(This section will be updated as major decisions are made or plans evolve.)* 

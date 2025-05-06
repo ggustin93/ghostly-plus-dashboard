@@ -1,0 +1,510 @@
+# Task ID: 1
+# Title: Project Setup and Repository Configuration
+# Status: done
+# Dependencies: None
+# Priority: high
+# Description: Initialize the project repository with the recommended structure, configure Git, and set up the development environment for both frontend and backend components.
+# Details:
+1. Create a new Git repository with the recommended project structure
+2. Initialize backend directory with FastAPI project:
+   - Set up Python virtual environment
+   - Install initial dependencies (FastAPI, Uvicorn, SQLAlchemy, etc.)
+   - Configure pyproject.toml or requirements.txt
+3. Initialize frontend directory with Vue.js 3 project:
+   - Use Vite as the build tool
+   - Configure TypeScript
+   - Set up Tailwind CSS with shadcn/ui
+   - Configure Pinia for state management
+4. Create Docker configuration files:
+   - Create Dockerfiles for backend and frontend
+   - Set up docker-compose.yml for local development
+5. Configure .gitignore, README.md, and other project documentation
+6. Set up .env files for environment variables with .env.example template
+
+# Test Strategy:
+- Verify all project directories and files are created according to the recommended structure
+- Ensure Docker containers can be built and run locally
+- Confirm frontend dev server starts successfully
+- Confirm backend server starts successfully
+- Verify Git repository is properly initialized with appropriate .gitignore
+
+# Subtasks:
+## 1. Initialize Git Repository and Base Project Structure [done]
+### Dependencies: None
+### Description: Create the Git repository with the recommended folder structure and configure essential project documentation.
+### Details:
+1. Create a new Git repository
+2. Initialize the base project structure with directories: `/backend`, `/frontend`, `/nginx`, `/docs`
+3. Create initial documentation files: README.md with project overview, CONTRIBUTING.md with development guidelines
+4. Set up comprehensive .gitignore file for Python, Node.js, and environment files
+5. Create LICENSE file if applicable
+6. Make initial commit with the base structure
+
+Testing approach: Verify that Git repository is properly initialized with the correct directory structure and documentation files.
+<info added on 2025-05-06T09:40:44.183Z>
+The Git repository has been successfully initialized with the following structure:
+
+- Created main directories: `/backend`, `/frontend`, `/nginx` with `.gitkeep` files to preserve empty directories in Git
+- Documentation files have been added:
+  - README.md with project overview
+  - CONTRIBUTING.md with development guidelines
+- Configured a comprehensive .gitignore file covering Python, Node.js, and environment files
+- Added a placeholder Apache 2.0 LICENSE file
+- Created Task #26 for VUB TTO license consultation to ensure proper licensing
+- Made initial commit with the complete base structure
+
+All required components have been set up according to specifications, and the repository is now ready for the next phase of development (configuring the backend environment with FastAPI).
+</info added on 2025-05-06T09:40:44.183Z>
+
+## 2. Configure Backend Environment with FastAPI [done]
+### Dependencies: 1.1
+### Description: Set up the Python backend environment with FastAPI framework, including virtual environment and dependencies.
+### Details:
+1. Navigate to `/backend` directory
+2. Set up Python virtual environment: `python -m venv venv`
+3. Create `pyproject.toml` or `requirements.txt` with dependencies (FastAPI, Uvicorn, SQLAlchemy, etc.)
+4. Install dependencies: `pip install -r requirements.txt`
+5. Create basic FastAPI application structure:
+   - `app/` directory for application code
+   - `app/main.py` with minimal FastAPI app
+   - `app/api/` for API routes
+   - `app/models/` for database models
+6. Create `.env` and `.env.example` files for environment variables
+7. Add a simple health check endpoint
+
+Testing approach: Run the FastAPI application locally and verify the health check endpoint returns a successful response.
+<info added on 2025-05-06T11:23:02.316Z>
+The backend environment has been successfully configured with FastAPI. The following tasks were completed:
+
+1. Navigated to the `/backend` directory
+2. Initialized Poetry for dependency management instead of using a traditional virtual environment
+3. Added and installed the following dependencies:
+   - FastAPI for the web framework
+   - Uvicorn as the ASGI server
+   - SQLAlchemy for database ORM
+   - Other required packages
+
+4. Created the application structure:
+   - `app/` directory for application code
+   - `app/main.py` with minimal FastAPI app implementation
+   - `app/api/` directory for API routes
+   - `app/models/` directory for database models
+
+5. Created configuration files:
+   - `backend/README.md` with documentation
+   - `.env` file for environment variables
+   - `.env.example` as a template for required environment variables
+
+6. Implemented and verified a `/health` endpoint that returns a successful response
+
+The backend is now properly set up and ready for further development.
+</info added on 2025-05-06T11:23:02.316Z>
+
+## 3. Set Up Frontend with Vue.js 3, TypeScript, and Tailwind CSS [done]
+### Dependencies: 1.1
+### Description: Initialize and configure the Vue.js 3 frontend with TypeScript, Tailwind CSS, shadcn/ui, and Pinia state management.
+### Details:
+1. Navigate to `/frontend` directory
+2. Initialize Vue.js project with Vite: `npm create vite@latest . -- --template vue-ts`
+3. Install dependencies: `npm install`
+4. Set up Tailwind CSS:
+   - Install packages: `npm install -D tailwindcss postcss autoprefixer`
+   - Initialize configuration: `npx tailwindcss init -p`
+   - Configure content paths in `tailwind.config.js`
+   - Add Tailwind directives to CSS
+5. Configure shadcn/ui components:
+   - Follow shadcn/ui installation for Vue
+   - Set up component configuration
+6. Set up Pinia for state management:
+   - Install: `npm install pinia`
+   - Create store configuration in `src/stores/`
+7. Create `.env` and `.env.example` files for environment variables
+
+Testing approach: Run the development server and verify the Vue application loads correctly with Tailwind CSS styling applied.
+<info added on 2025-05-06T11:44:07.646Z>
+1. Navigate to `/frontend` directory
+2. Initialize Vue.js project with Vite: `npm create vite@latest . -- --template vue-ts`
+3. Install dependencies: `npm install`
+4. Set up Tailwind CSS:
+   - Install packages: `npm install -D tailwindcss postcss autoprefixer`
+   - Initialize configuration: `npx tailwindcss init -p`
+   - Configure content paths in `tailwind.config.js`
+   - Add Tailwind directives to CSS
+5. Configure shadcn/ui components:
+   - Follow shadcn/ui installation for Vue
+   - Set up component configuration
+   - Configure path aliases for improved imports
+6. Set up Pinia for state management:
+   - Install: `npm install pinia`
+   - Create store configuration in `src/stores/`
+7. Create `.env` and `.env.example` files for environment variables
+8. Ensure TypeScript configuration:
+   - Verify tsconfig.json settings
+   - Document TypeScript usage patterns in memory bank
+   - Add TypeScript-specific notes to PRD for team reference
+
+Testing approach: Run the development server and verify the Vue application loads correctly with Tailwind CSS styling applied.
+</info added on 2025-05-06T11:44:07.646Z>
+
+## 4. Create Docker Configuration for Backend and Frontend [done]
+### Dependencies: 1.2, 1.3
+### Description: Set up Docker configurations for the backend and frontend services with appropriate development and production settings.
+### Details:
+1. Create `Dockerfile` for backend in `/backend` directory:
+   - Use Python base image
+   - Set up working directory
+   - Copy requirements and install dependencies
+   - Configure application startup with Uvicorn
+2. Create `Dockerfile` for frontend in `/frontend` directory:
+   - Use Node.js base image for build stage
+   - Configure build process with Vite
+   - Use nginx image for serving in production
+3. Create `.dockerignore` files for both services
+4. Create `docker-compose.yml` in the root directory:
+   - Define backend service with appropriate volumes and environment variables
+   - Define frontend service with hot-reload for development
+   - Configure service ports and networking
+
+Testing approach: Build and run the Docker containers individually to verify they start without errors. Test the docker-compose setup to ensure services can communicate.
+
+<info added on 2025-05-05T15:39:07.197Z>
+## Enhanced Docker Configuration
+
+### Simplified Deployment System
+
+1. Create a comprehensive `docker-compose.yml` in the root directory:
+   - Add Supabase service configuration with proper initialization scripts
+   - Configure Nginx as a reverse proxy for both frontend and backend
+   - Set up service dependencies with `depends_on` directives
+   - Define named volumes for data persistence
+
+2. Create `.env.example` file with default reasonable values:
+   ```
+   # Backend settings
+   BACKEND_PORT=8000
+   SECRET_KEY=your_default_secret_key
+   DEBUG=false
+   
+   # Frontend settings
+   FRONTEND_PORT=3000
+   VITE_API_URL=http://localhost/api
+   
+   # Supabase settings
+   SUPABASE_DB_PASSWORD=your_default_password
+   SUPABASE_URL=http://localhost:8000
+   SUPABASE_ANON_KEY=your_default_anon_key
+   ```
+
+3. Add volume configurations for data persistence:
+   ```yaml
+   volumes:
+     supabase_data:
+     supabase_config:
+     app_logs:
+   ```
+
+4. Create deployment automation scripts:
+   - `setup.sh`: Copies .env.example to .env, generates secure keys, and validates prerequisites
+   - `deploy.sh`: Builds and starts all containers with proper environment
+
+5. Add multi-stage builds to Dockerfiles for optimization:
+   - Use builder pattern to reduce final image size
+   - Add detailed comments explaining each step
+   - Include health checks for container orchestration
+
+6. Create step-by-step documentation in `DEPLOYMENT.md`:
+   - Local development setup instructions
+   - VM deployment guide with prerequisites
+   - Troubleshooting section for common issues
+   - Environment customization options
+
+7. Add container resource limits in docker-compose.yml to prevent resource exhaustion
+</info added on 2025-05-05T15:39:07.197Z>
+<info added on 2025-05-06T11:45:49.473Z>
+## Implementation Details
+
+### Backend Dockerfile
+- Created multi-stage build process using Poetry for dependency management
+- First stage handles dependency installation and environment setup
+- Second stage creates a lightweight production image
+- Configured proper working directory and file copying
+- Set up Uvicorn server with optimized settings
+
+### Frontend Dockerfile
+- Implemented multi-stage build approach
+- Build stage uses Node.js to compile Vue/TypeScript with Vite
+- Production stage uses Nginx to serve static assets
+- Optimized for smaller image size and faster builds
+
+### Docker Compose Configuration
+- Created docker-compose.yml in the root directory
+- Configured services with appropriate port mappings
+- Set up volume mounts for local development
+- Enabled hot-reloading for frontend development
+- Established proper networking between services
+
+### Additional Files
+- Added comprehensive .dockerignore files for both services
+- Excluded node_modules, __pycache__, and other unnecessary files
+- Configured to ignore development-specific files
+
+The Docker setup is now ready for local development with proper isolation between services. The multi-stage builds ensure optimized production images while maintaining a good developer experience.
+</info added on 2025-05-06T11:45:49.473Z>
+
+## 5. Configure Nginx as Reverse Proxy [done]
+### Dependencies: 1.4
+### Description: Set up and configure Nginx as a reverse proxy to route requests to the appropriate backend and frontend services.
+### Details:
+1. Create `/nginx/Dockerfile` for Nginx configuration:
+   - Use official Nginx image
+   - Copy configuration files
+2. Create `/nginx/conf.d/default.conf` with reverse proxy settings:
+   - Configure server block for the main domain
+   - Set up location directives to proxy requests to backend API (/api)
+   - Configure static file serving for frontend assets
+   - Add headers for security and caching
+   - Set up WebSocket support if needed
+3. Update `docker-compose.yml` to include the Nginx service:
+   - Map ports 80/443 to host
+   - Link to backend and frontend services
+   - Configure volumes for configuration and SSL certificates
+
+Testing approach: Start the complete docker-compose setup and test that requests to different paths are correctly routed to the appropriate services.
+
+<info added on 2025-05-05T15:39:45.710Z>
+# Configuration Nginx renforcée
+
+## Configuration optimisée et sécurisée
+```nginx
+# /nginx/conf.d/security.conf
+server_tokens off;
+add_header X-Content-Type-Options nosniff;
+add_header X-Frame-Options SAMEORIGIN;
+add_header X-XSS-Protection "1; mode=block";
+add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:;";
+add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+
+# Rate limiting configuration
+limit_req_zone $binary_remote_addr zone=api_limit:10m rate=10r/s;
+```
+
+## Configuration complète du routage
+```nginx
+# /nginx/conf.d/default.conf
+server {
+    listen 80;
+    server_name localhost;
+    
+    # Redirect to HTTPS in production
+    # return 301 https://$host$request_uri;
+    
+    # Frontend routing
+    location / {
+        proxy_pass http://frontend:8080;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+    
+    # API routing with rate limiting
+    location /api/ {
+        limit_req zone=api_limit burst=20 nodelay;
+        proxy_pass http://backend:8000/;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+    
+    # Supabase routing
+    location /supabase/ {
+        proxy_pass http://supabase:8000/;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+    }
+    
+    # WebSocket support
+    location /ws/ {
+        proxy_pass http://backend:8000/ws/;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+    }
+    
+    # Configuration optimisée pour les fichiers statiques
+    location /static/ {
+        alias /app/static/;
+        expires 7d;
+        add_header Cache-Control "public, max-age=604800";
+    }
+}
+```
+
+## Configuration SSL
+```bash
+# /nginx/ssl/generate-certs.sh
+#!/bin/bash
+# Script pour générer des certificats auto-signés pour le développement
+mkdir -p /etc/nginx/ssl
+openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/nginx/ssl/nginx.key -out /etc/nginx/ssl/nginx.crt -subj "/C=FR/ST=Paris/L=Paris/O=Dev/CN=localhost"
+```
+
+## Instructions Let's Encrypt pour la production
+```bash
+# /nginx/ssl/setup-letsencrypt.sh
+#!/bin/bash
+# À exécuter en production
+apt-get update
+apt-get install -y certbot python3-certbot-nginx
+certbot --nginx -d votredomaine.com -d www.votredomaine.com --non-interactive --agree-tos --email votre@email.com
+```
+
+## Configuration des logs
+```nginx
+# /nginx/conf.d/logging.conf
+log_format detailed '$remote_addr - $remote_user [$time_local] '
+                    '"$request" $status $body_bytes_sent '
+                    '"$http_referer" "$http_user_agent" '
+                    '$request_time $upstream_response_time $pipe';
+
+access_log /var/log/nginx/access.log detailed;
+error_log /var/log/nginx/error.log warn;
+```
+
+## Script de personnalisation de la configuration
+```bash
+# /nginx/customize-config.sh
+#!/bin/bash
+# Script pour personnaliser la configuration Nginx
+# Usage: ./customize-config.sh [dev|prod] [domain]
+
+ENV=${1:-dev}
+DOMAIN=${2:-localhost}
+
+if [ "$ENV" = "prod" ]; then
+    # Activer HTTPS et redirection
+    sed -i 's/# return 301/return 301/' /etc/nginx/conf.d/default.conf
+    # Mettre à jour le nom de domaine
+    sed -i "s/server_name localhost/server_name $DOMAIN/" /etc/nginx/conf.d/default.conf
+fi
+
+echo "Configuration Nginx personnalisée pour l'environnement: $ENV avec domaine: $DOMAIN"
+```
+</info added on 2025-05-05T15:39:45.710Z>
+<info added on 2025-05-06T11:47:05.809Z>
+I've successfully implemented the Nginx reverse proxy configuration as planned. Here's what was accomplished:
+
+1. Created `/nginx/Dockerfile` using the official Nginx image as a base and configured it to copy our custom configuration files.
+
+2. Set up `/nginx/conf.d/default.conf` with the following proxy configurations:
+   - Configured the main server block to listen on port 80
+   - Added location directives to properly route requests:
+     - Frontend requests to the frontend service
+     - API requests (/api) to the backend service
+   - Set appropriate proxy headers (Host, X-Real-IP, X-Forwarded-For, etc.)
+   - Included basic security headers
+
+3. Updated `docker-compose.yml` with a new nginx service:
+   - Exposed port 80 to the host machine
+   - Created links to both backend and frontend services
+   - Added volume mounts for the Nginx configuration files
+   - Ensured proper networking between services
+
+4. Tested the configuration by starting the complete docker-compose setup and verified that:
+   - Frontend requests are correctly routed to the frontend service
+   - API requests are properly forwarded to the backend service
+   - The services can communicate with each other through the Nginx proxy
+
+The basic reverse proxy setup is now complete and functioning as expected. This implementation provides a solid foundation that can be extended with additional security features, SSL configuration, and performance optimizations in the future.
+</info added on 2025-05-06T11:47:05.809Z>
+
+## 6. Finalize Development Environment Configuration [done]
+### Dependencies: 1.2, 1.3, 1.4, 1.5
+### Description: Complete the development environment setup with configuration for local development, testing, and CI/CD preparation.
+### Details:
+1. Create development scripts in package.json (frontend) and Makefile (backend):
+   - Add commands for starting services
+   - Configure linting and formatting
+   - Set up testing commands
+2. Configure environment variable handling:
+   - Update all `.env.example` files with required variables
+   - Document environment setup in README.md
+3. Add Docker Compose override file for development:
+   - Create `docker-compose.override.yml` with development-specific settings
+   - Configure volume mappings for hot-reload
+4. Add basic CI configuration:
+   - Create `.github/workflows/` directory with initial CI workflow
+   - Configure linting and testing jobs
+5. Update README.md with comprehensive setup instructions:
+   - Document both Docker and non-Docker setup processes
+   - Add development workflow guidelines
+   - Include troubleshooting section
+
+Testing approach: Follow the documented setup process from scratch to verify that a new developer can successfully set up and run the project.
+
+<info added on 2025-05-05T15:40:15.896Z>
+# Déploiement simplifié
+
+Ajout des éléments suivants pour renforcer l'aspect "déploiement facile" :
+
+1. **Script de déploiement unifié** :
+   - Créer `deploy.sh` à la racine qui orchestre l'ensemble du processus
+   - Implémenter une interface en ligne de commande interactive avec `whiptail` ou `dialog`
+   - Inclure des options pour : dev/staging/prod, domaine, certificats SSL, mode de déploiement
+
+2. **Vérification automatique des prérequis** :
+   ```bash
+   # Exemple de vérification de prérequis dans deploy.sh
+   check_prerequisites() {
+     command -v docker >/dev/null 2>&1 || { echo "Installation de Docker..."; install_docker; }
+     command -v docker-compose >/dev/null 2>&1 || { echo "Installation de Docker Compose..."; install_docker_compose; }
+     # Vérifications supplémentaires...
+   }
+   ```
+
+3. **Génération de certificats SSL** :
+   - Intégrer Let's Encrypt pour l'environnement de production
+   - Utiliser mkcert pour les certificats de développement local
+   - Créer des certificats auto-signés comme solution de repli
+
+4. **Mécanisme de restauration** :
+   - Implémenter une sauvegarde automatique avant déploiement
+   - Créer un script `rollback.sh` qui restaure la version précédente
+   - Journaliser chaque déploiement avec horodatage pour faciliter la restauration
+
+5. **Documentation visuelle** :
+   - Créer un dossier `docs/deployment/` avec captures d'écran du processus
+   - Ajouter des diagrammes de flux pour illustrer les étapes de déploiement
+   - Inclure un guide vidéo court pour les cas d'utilisation courants
+
+6. **Exemples de configuration** :
+   ```
+   # Exemple de configuration pour poste développeur
+   ENVIRONMENT=development
+   DOMAIN=localhost
+   SSL=self-signed
+   DATABASE_TYPE=sqlite
+   
+   # Exemple de configuration pour VM production
+   ENVIRONMENT=production
+   DOMAIN=monapp.example.com
+   SSL=letsencrypt
+   DATABASE_TYPE=postgres
+   ```
+
+7. **Tests de déploiement automatisés** :
+   - Ajouter un workflow GitHub Actions simulant le déploiement
+   - Créer des tests vérifiant l'accessibilité post-déploiement
+   - Implémenter des tests de charge basiques pour valider la configuration
+</info added on 2025-05-05T15:40:15.896Z>
+<info added on 2025-05-06T11:49:48.952Z>
+1. Create development scripts in package.json (frontend) and Makefile (backend):\n   - Add commands for starting services\n   - Configure linting and formatting\n   - Set up testing commands\n2. Configure environment variable handling:\n   - Update all `.env.example` files with required variables\n   - Document environment setup in README.md\n3. Add Docker Compose override file for development:\n   - Create `docker-compose.override.yml` with development-specific settings\n   - Configure volume mappings for hot-reload\n4. Add basic CI configuration:\n   - Create `.github/workflows/` directory with initial CI workflow\n   - Configure linting and testing jobs\n5. Update README.md with comprehensive setup instructions:\n   - Document both Docker and non-Docker setup processes\n   - Add development workflow guidelines\n   - Include troubleshooting section\n\nTesting approach: Follow the documented setup process from scratch to verify that a new developer can successfully set up and run the project.\n\n<info added on 2025-05-05T15:40:15.896Z>\n# Déploiement simplifié\n\nAjout des éléments suivants pour renforcer l'aspect \"déploiement facile\" :\n\n1. **Script de déploiement unifié** :\n   - Créer `deploy.sh` à la racine qui orchestre l'ensemble du processus\n   - Implémenter une interface en ligne de commande interactive avec `whiptail` ou `dialog`\n   - Inclure des options pour : dev/staging/prod, domaine, certificats SSL, mode de déploiement\n\n2. **Vérification automatique des prérequis** :\n   ```bash\n   # Exemple de vérification de prérequis dans deploy.sh\n   check_prerequisites() {\n     command -v docker >/dev/null 2>&1 || { echo \"Installation de Docker...\"; install_docker; }\n     command -v docker-compose >/dev/null 2>&1 || { echo \"Installation de Docker Compose...\"; install_docker_compose; }\n     # Vérifications supplémentaires...\n   }\n   ```\n\n3. **Génération de certificats SSL** :\n   - Intégrer Let's Encrypt pour l'environnement de production\n   - Utiliser mkcert pour les certificats de développement local\n   - Créer des certificats auto-signés comme solution de repli\n\n4. **Mécanisme de restauration** :\n   - Implémenter une sauvegarde automatique avant déploiement\n   - Créer un script `rollback.sh` qui restaure la version précédente\n   - Journaliser chaque déploiement avec horodatage pour faciliter la restauration\n\n5. **Documentation visuelle** :\n   - Créer un dossier `docs/deployment/` avec captures d'écran du processus\n   - Ajouter des diagrammes de flux pour illustrer les étapes de déploiement\n   - Inclure un guide vidéo court pour les cas d'utilisation courants\n\n6. **Exemples de configuration** :\n   ```\n   # Exemple de configuration pour poste développeur\n   ENVIRONMENT=development\n   DOMAIN=localhost\n   SSL=self-signed\n   DATABASE_TYPE=sqlite\n   \n   # Exemple de configuration pour VM production\n   ENVIRONMENT=production\n   DOMAIN=monapp.example.com\n   SSL=letsencrypt\n   DATABASE_TYPE=postgres\n   ```\n\n7. **Tests de déploiement automatisés** :\n   - Ajouter un workflow GitHub Actions simulant le déploiement\n   - Créer des tests vérifiant l'accessibilité post-déploiement\n   - Implémenter des tests de charge basiques pour valider la configuration\n</info added on 2025-05-05T15:40:15.896Z>\n\n<info added on 2023-06-15T10:22:45.123Z>\nImplementation details for completed development environment configuration:\n\n1. Frontend configuration:\n   - Added lint/format scripts to frontend/package.json:\n     ```json\n     \"scripts\": {\n       \"lint\": \"eslint src/**/*.{js,jsx,ts,tsx}\",\n       \"lint:fix\": \"eslint --fix src/**/*.{js,jsx,ts,tsx}\",\n       \"format\": \"prettier --write src/**/*.{js,jsx,ts,tsx,css,scss}\"\n     }\n     ```\n   - Installed ESLint and Prettier as dev dependencies\n   - Added .eslintrc.js and .prettierrc configuration files\n\n2. Backend configuration:\n   - Created Makefile with the following targets:\n     ```makefile\n     .PHONY: run lint format test\n     \n     run:\n     \tpython -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000\n     \n     lint:\n     \truff check app tests\n     \n     format:\n     \truff format app tests\n     \n     test:\n     \tpytest -xvs tests/\n     ```\n   - Installed Ruff for linting/formatting and Pytest for testing\n   - Added pyproject.toml with Ruff and Pytest configurations\n\n3. Docker development setup:\n   - Added empty docker-compose.override.yml file structure for future development-specific settings\n   - Will be populated with volume mappings and development ports in next iteration\n\n4. CI/CD configuration:\n   - Created .github/workflows/ci.yml with basic workflow:\n     ```yaml\n     name: CI\n     on: [push, pull_request]\n     jobs:\n       lint-and-test:\n         runs-on: ubuntu-latest\n         steps:\n           - uses: actions/checkout@v3\n           - name: Set up environment\n             run: make setup\n           - name: Lint code\n             run: make lint\n           - name: Run tests\n             run: make test\n     ```\n\n5. Documentation:\n   - Updated README.md with comprehensive setup instructions for both Docker and local development\n   - Added troubleshooting section for common issues\n   - Included development workflow guidelines\n\nNext steps: Configure the docker-compose.override.yml with proper volume mappings and finalize environment variable handling across all components.
+</info added on 2023-06-15T10:22:45.123Z>
+</info added on 2025-05-06T11:49:48.952Z>
+

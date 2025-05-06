@@ -1,0 +1,35 @@
+# Task ID: 6
+# Title: Patient Management System
+# Status: pending
+# Dependencies: 3, 4
+# Priority: medium
+# Description: Implement the patient management system including registration, profile management, therapist assignment, and medical history tracking.
+# Details:
+1. Create backend API endpoints for patient management:
+   - Patient registration
+   - Profile updates
+   - Therapist assignment
+   - Medical history management
+   - Patient listing with filtering and pagination
+2. Implement data validation using Pydantic models
+3. Create frontend components:
+   - Patient registration form
+   - Patient profile view/edit
+   - Patient list with search and filters
+   - Medical history timeline
+   - Therapist assignment interface
+4. Implement patient data pseudonymization:
+   - Generate unique patient identifiers
+   - Separate personal identifiers from medical data
+   - Implement secure linking mechanism
+5. Add audit logging for all patient data modifications
+6. Implement data export functionality for patient records
+
+# Test Strategy:
+- Test API endpoints with valid and invalid data
+- Verify pseudonymization is working correctly
+- Test therapist assignment and permissions
+- Validate form validation and error handling
+- Test search and filtering functionality
+- Verify audit logging captures all relevant events
+- Test data export formats

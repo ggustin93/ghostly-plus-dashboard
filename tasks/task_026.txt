@@ -1,0 +1,11 @@
+# Task ID: 26
+# Title: Clarify Project Licensing with VUB TTO
+# Status: pending
+# Dependencies: 1
+# Priority: high
+# Description: Consult with the VUB TTO to determine the appropriate software license for the GHOSTLY+ Dashboard project, considering its academic nature, VUB IP policies, and the potential for a future commercial spin-off. Confirm or select the definitive license to be used.
+# Details:
+
+
+# Test Strategy:
+

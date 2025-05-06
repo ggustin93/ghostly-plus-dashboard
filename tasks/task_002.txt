@@ -1,0 +1,120 @@
+# Task ID: 2
+# Title: Supabase Infrastructure Setup
+# Status: pending
+# Dependencies: 1
+# Priority: high
+# Description: Set up and configure Supabase infrastructure in two phases: first locally for immediate development, then on a VUB VM for production. Both setups will provide authentication, database, and storage services, ensuring complete data sovereignty and GDPR compliance. This task focuses specifically on the technical infrastructure setup, ending with functional Supabase endpoints ready for application integration.
+# Details:
+## PHASE 1: LOCAL DEVELOPMENT ENVIRONMENT
+
+1. Prepare local development environment for Supabase:
+   - Install Docker and Docker Compose on developer machines
+   - Install Supabase CLI for local development
+   - Create setup scripts for consistent developer environments
+   - Document resource requirements for local development
+
+2. Deploy local Supabase using official Docker images:
+   - Configure environment variables in docker-compose.yml
+   - Generate and securely store JWT keys
+   - Configure CORS settings to allow access from both Ghostly Game and Web Dashboard
+   - Create initialization scripts for consistent setup across developer machines
+
+3. Set up local PostgreSQL database infrastructure:
+   - Configure initial database instance
+   - Set up database security parameters
+   - Implement data encryption for sensitive information
+   - Create database schema initialization scripts
+
+4. Configure local Supabase Auth service (GoTrue):
+   - Set up the technical infrastructure for the authentication service
+   - Configure JWT settings with appropriate token lifetimes
+   - Set up proper API endpoints for authentication
+   - Configure basic security parameters
+
+5. Set up local Supabase Storage service:
+   - Configure storage service infrastructure
+   - Create initial storage buckets structure
+   - Set up basic security parameters
+
+6. Local API and Security Configuration:
+   - Generate and configure API keys for service access
+   - Set up secure JWT secrets and configurations
+   - Document all API endpoints and access methods
+
+7. Local Environment Documentation:
+   - Create comprehensive setup guide for developers
+   - Document all configuration settings
+   - Highlight differences between local and future production environment
+
+## PHASE 2: PRODUCTION ENVIRONMENT (VUB VM)
+
+1. Prepare VUB VM for self-hosted Supabase deployment:
+   - Install Docker and Docker Compose on the VM
+   - Configure appropriate VM resources (CPU, RAM, storage)
+   - Set up network security groups and firewall rules
+
+2. Deploy Supabase on VM using official Docker images:
+   - Clone the Supabase Docker repository
+   - Adapt environment variables from local setup to production
+   - Generate and securely store production JWT keys
+   - Set up proper container isolation and resource limits
+   - Configure production CORS settings
+
+3. Migrate database configuration to production:
+   - Apply database schema and configurations from local environment
+   - Set up enhanced security parameters for production
+   - Configure comprehensive backup procedures
+   - Implement data retention policies for GDPR compliance
+
+4. Configure production Supabase Auth service:
+   - Migrate Auth service configuration from local environment
+   - Adjust security parameters for production environment
+   - Configure production-appropriate JWT settings
+
+5. Set up production Supabase Storage service:
+   - Migrate storage configuration from local environment
+   - Implement production-grade security measures
+   - Configure backup and retention policies
+
+6. Production API and Security Configuration:
+   - Generate production API keys with appropriate restrictions
+   - Implement enhanced security measures for production
+   - Document production API endpoints and access methods
+
+7. Deployment and Verification:
+   - Deploy the complete infrastructure
+   - Verify all services start correctly
+   - Test basic connectivity to all endpoints
+   - Ensure infrastructure restarts properly after VM reboot
+
+8. Production Infrastructure Documentation:
+   - Document all production configuration settings
+   - Create deployment and maintenance guides
+   - Document security measures and compliance considerations
+   - Document infrastructure endpoints for use in Task 3
+   - Detail migration process from local to production environment
+
+# Test Strategy:
+## Local Environment Testing
+- Verify all Supabase services are running correctly in local environment
+- Confirm basic connectivity to local PostgreSQL database
+- Verify local Auth service endpoints are accessible and responding
+- Confirm local Storage service is operational
+- Test CORS configuration in local environment
+- Verify basic API key authentication works locally
+- Confirm JWT configuration is properly set up locally
+- Validate developer setup documentation completeness
+
+## Production Environment Testing
+- Verify all Supabase services are running correctly after production deployment
+- Confirm basic connectivity to production PostgreSQL database
+- Verify production Auth service endpoints are accessible and responding
+- Confirm production Storage service is operational
+- Test CORS configuration for proper security settings in production
+- Validate that all services start correctly after VM restart
+- Verify production API key authentication works
+- Confirm production JWT configuration is properly set up
+- Test infrastructure-level backup procedures
+- Verify GDPR compliance of the infrastructure deployment
+- Test migration path from local to production environment
+- Create a basic endpoint verification checklist for handover to Task 3

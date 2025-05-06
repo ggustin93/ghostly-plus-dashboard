@@ -1,0 +1,35 @@
+# Task ID: 4
+# Title: Database Schema Design and Implementation
+# Status: pending
+# Dependencies: 2
+# Priority: high
+# Description: Design and implement the PostgreSQL database schema for patient data, EMG recordings, game metrics, and user management with proper relationships and constraints.
+# Details:
+1. Design comprehensive database schema including:
+   - Users table (linked to Supabase Auth)
+   - Patients table with demographic and medical data
+   - Medical centers table
+   - Therapist-patient relationships
+   - Sessions table for recording therapy sessions
+   - EMG data tables (processed data from C3D files)
+   - Game metrics tables
+   - Cohorts and cohort membership
+2. Implement schema using SQL migrations:
+   - Create tables with appropriate constraints
+   - Set up foreign key relationships
+   - Configure indexes for performance
+3. Implement Row-Level Security (RLS) policies:
+   - Therapists can only access their patients' data
+   - Researchers can access data based on their center/study
+   - Administrators have full access
+4. Set up encryption for sensitive patient data using pgcrypto
+5. Create database views for common queries
+6. Document schema with entity-relationship diagrams
+
+# Test Strategy:
+- Validate schema with test data insertion
+- Test foreign key constraints and cascading operations
+- Verify RLS policies with different user roles
+- Benchmark query performance for common operations
+- Test encryption and decryption of sensitive data
+- Verify data integrity constraints

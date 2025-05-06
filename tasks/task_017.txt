@@ -1,0 +1,37 @@
+# Task ID: 17
+# Title: Researcher Dashboard Implementation
+# Status: pending
+# Dependencies: 7, 10, 11, 13
+# Priority: medium
+# Description: Develop the researcher-specific dashboard interface for comparative data analysis, data export, multi-site statistics, and data filtering and segmentation.
+# Details:
+1. Design researcher dashboard layout and navigation
+2. Implement dashboard components:
+   - Cohort overview and statistics
+   - Multi-site data comparison
+   - Research metrics and KPIs
+   - Recent data additions
+   - Study progress tracking
+3. Create advanced analysis tools:
+   - Cohort comparison visualizations
+   - Statistical analysis components
+   - Data filtering and segmentation
+   - Custom query builder
+4. Develop data export functionality:
+   - Configurable data exports
+   - Anonymization options
+   - Export format selection
+   - Scheduled exports
+5. Implement research collaboration features
+6. Add bookmark and saved query functionality
+7. Create research notes and annotation tools
+
+# Test Strategy:
+- Test dashboard with sample research data
+- Verify analysis tools functionality
+- Test data export with various options
+- Validate statistical calculations
+- Test filtering and segmentation
+- Verify collaboration features
+- User testing with researchers
+- Test performance with large datasets

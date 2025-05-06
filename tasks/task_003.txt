@@ -1,0 +1,90 @@
+# Task ID: 3
+# Title: Authentication and Authorization System
+# Status: pending
+# Dependencies: 2
+# Priority: high
+# Description: Implement a secure multi-level login system with role management for therapists, researchers, and administrators, ensuring unified authentication between the Ghostly Game (OpenFeasyo/C#) and the Web Dashboard (Vue.js) using the pre-configured Supabase Auth infrastructure. Include optional Two-Factor Authentication (2FA/MFA) using TOTP authenticator apps for enhanced security.
+# Details:
+This task focuses specifically on the application-level implementation of authentication, not the infrastructure setup (covered in Task 2):
+
+1. Implement Supabase Auth clients for both applications:
+   - JavaScript Supabase client integration for Vue.js dashboard
+   - REST API authentication implementation for C# OpenFeasyo game
+   - Ensure both clients connect to the same Supabase Auth instance
+
+2. Implement secure JWT management in both environments:
+   - Dashboard: Implement frontend authentication store using Pinia
+     - JWT secure storage and management
+     - User session persistence
+     - Automatic token refresh
+   - Game: Create equivalent authentication management in C#
+     - JWT secure storage and handling
+     - Session management
+     - Token refresh mechanism
+
+3. Implement FastAPI backend middleware for authentication:
+   - JWT validation using python-jose
+   - Role-based access control based on token claims
+   - Session validation
+   - Error handling for authentication failures
+
+4. Create authentication UI components:
+   - Dashboard: Login form with validation
+     - Password reset flow
+     - User profile management
+   - Game: Implement appropriate login interface for OpenFeasyo
+     - Game-specific authentication screens
+     - Session persistence appropriate for game context
+
+5. Implement authentication protection:
+   - Dashboard: Route guards in Vue Router for protected routes
+   - Game: Authentication checks for protected game features
+   - Role-based feature access in both applications
+
+6. Implement cross-application authentication consistency:
+   - Ensure login state is properly synchronized between applications
+   - Handle edge cases like session expiration gracefully
+   - Implement secure logout across all platforms
+
+7. Implement optional Two-Factor Authentication (2FA/MFA):
+   - Integrate TOTP (Time-based One-Time Password) authentication as per security.md
+   - Create configuration options for users/administrators to enable 2FA
+   - Implement QR code generation for authenticator app setup
+   - Develop UI flow for 2FA enrollment (QR code scanning, verification)
+   - Add 2FA verification step to login flow when enabled
+   - Ensure authentication system works seamlessly with or without 2FA
+   - Implement backup/recovery codes for 2FA-enabled accounts
+
+# Test Strategy:
+- Test authentication flow end-to-end in both applications:
+  - Login with valid credentials
+  - Attempt login with invalid credentials
+  - Password reset flow
+  - Session persistence
+  - Token refresh
+
+- Verify role-based access control:
+  - Test access to protected routes/features with different user roles
+  - Verify appropriate UI elements appear/disappear based on permissions
+
+- Test cross-platform authentication consistency:
+  - Verify login state is maintained appropriately across applications
+  - Test logout functionality clears session in both environments
+
+- Security testing:
+  - Verify JWT is stored securely in both environments
+  - Test token expiration and refresh mechanisms
+  - Verify authentication failures are handled gracefully with appropriate user feedback
+
+- Integration testing:
+  - Verify both applications successfully communicate with the Supabase Auth infrastructure
+  - Test API endpoints with valid and invalid authentication tokens
+  - Verify middleware correctly validates tokens and enforces permissions
+
+- Two-Factor Authentication testing:
+  - Test enabling/disabling 2FA functionality
+  - Verify QR code generation and scanning process
+  - Test login flow with 2FA enabled (valid and invalid TOTP codes)
+  - Verify backup/recovery codes functionality
+  - Test 2FA across both web dashboard and game environments
+  - Ensure graceful handling of edge cases (clock drift, lost authenticator)

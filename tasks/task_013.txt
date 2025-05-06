@@ -1,0 +1,38 @@
+# Task ID: 13
+# Title: Report Generation System
+# Status: pending
+# Dependencies: 6, 7, 10, 11, 12
+# Priority: medium
+# Description: Develop functionality to generate PDF clinical reports, raw data exports, printable dashboards, and summary reports by medical center.
+# Details:
+1. Research and select appropriate PDF generation library (e.g., ReportLab, WeasyPrint)
+2. Design report templates:
+   - Clinical patient reports
+   - Cohort summary reports
+   - Medical center reports
+   - Research data exports
+3. Implement backend report generation service:
+   - PDF rendering
+   - Data aggregation and processing
+   - Template rendering
+   - Background processing for large reports
+4. Create data export utilities:
+   - CSV export
+   - Excel export
+   - Raw data export
+5. Develop frontend components:
+   - Report configuration interface
+   - Report preview
+   - Download management
+6. Implement report scheduling and automation
+7. Add report sharing and access control
+
+# Test Strategy:
+- Test report generation with various data inputs
+- Verify PDF formatting and layout
+- Test data export formats
+- Validate report scheduling
+- Test access control for reports
+- Verify large report handling
+- User testing with therapists and researchers
+- Test report sharing functionality
