@@ -32,6 +32,7 @@ Familiarity with Task Master's concepts is crucial for understanding project pro
     -   `memory-bank/techContext.md`: Technologies and setup.
     -   `memory-bank/activeContext.md`: Current focus and recent changes.
     -   `memory-bank/progress.md`: What's done and what's next.
+-   **Context7 Tool**: For detailed information on specific libraries, consider using the Context7 MCP tool (`resolve-library-id` followed by `get-library-docs`) to retrieve up-to-date, version-specific documentation and code examples directly from the source. This helps ensure accuracy when implementing or understanding library features.
 -   **Source Documents**: Key information is also located in:
     -   `[docs/prd.md](mdc:docs/prd.md)`: Product Requirements Document.
     -   `[docs/task-summary.md](mdc:docs/task-summary.md)`: High-level task overview.

@@ -82,4 +82,10 @@ source_documents: [docs/prd.md](mdc:docs/prd.md) (Section 4), [docs/security.md]
 -   **Frontend**: `vue`, `vue-router`, `pinia`, `tailwindcss`, `chart.js`, `axios` (or `fetch` for API calls), `shadcn-ui` related packages.
 -   **Backend**: `fastapi`, `uvicorn`, `pydantic`, `sqlalchemy`, `python-jose` (or similar for JWT), `numpy`, `pandas`, `scipy`, `cryptography` (for Fernet), `reportlab` (or similar for PDF generation), Supabase Python client (if used directly, though often interaction is via SQLAlchemy/direct DB connection for self-hosted).
 
-(Refer to [docs/prd.md](mdc:docs/prd.md) Section 4.10 for recommended project structure which implies these dependencies.) 
+(Refer to [docs/prd.md](mdc:docs/prd.md) Section 4.10 for recommended project structure which implies these dependencies.)
+
+## Development Tooling & Resources
+
+-   **Context7**: Consider using the Context7 MCP tool (`resolve-library-id` followed by `get-library-docs`) to fetch up-to-date, version-specific documentation and code examples for libraries. This is particularly helpful for ensuring AI assistants have accurate information and for verifying library usage against the latest official sources.
+
+## Outstanding Technical Questions 
