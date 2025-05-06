@@ -9,8 +9,9 @@ services:
     command: uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
     volumes:
       - ./backend/app:/app/app # Mount app code for hot-reloading
-    ports:
-      - "8000:8000"
+    # Port 8000 is not exposed directly to host anymore, proxied via Nginx
+    # ports:
+    #   - "8000:8000"
     env_file:
       - ./backend/.env
     environment:
@@ -22,20 +23,35 @@ services:
       dockerfile: Dockerfile
     container_name: ghostly_frontend
     # Use Vite dev server for development with hot-reload
-    # The command overrides the CMD in the frontend Dockerfile (which uses nginx)
     command: npm run dev -- --host 0.0.0.0 --port 5173
     volumes:
       - ./frontend/src:/app/src # Mount src for hot-reloading
       - ./frontend/public:/app/public # Mount public assets
       - /app/node_modules # Use node_modules from image, don't mount local ones
-    ports:
-      - "5173:5173"
+    # Port 5173 is not exposed directly to host anymore, proxied via Nginx
+    # ports:
+    #  - "5173:5173"
     depends_on:
-      - backend
+      - backend # Frontend might make API calls
     env_file:
       - ./frontend/.env
     environment:
       - NODE_ENV=development
 
-# Note: This basic setup doesn't include Supabase or Nginx yet.
-# Those would be added in later stages or via override files for production. 
+  nginx:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    container_name: ghostly_nginx
+    ports:
+      - "80:80" # Expose Nginx on port 80
+      # - "443:443" # Uncomment if/when adding SSL
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d # Mount custom config
+      # - ./nginx/ssl:/etc/nginx/ssl # Uncomment if/when adding SSL certs
+    depends_on:
+      - backend
+      - frontend
+
+# Note: This basic setup doesn't include Supabase yet.
+# Supabase would be added as another service. 
