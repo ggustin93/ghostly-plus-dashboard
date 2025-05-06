@@ -4,6 +4,7 @@ import { cn } from '@/lib/utils'
 import { Primitive, type PrimitiveProps } from 'reka-ui'
 import { type ButtonVariants, buttonVariants } from '.'
 
+// Reverting to interface extension with @vue-ignore as it's working properly
 interface Props extends /* @vue-ignore */ PrimitiveProps {
   variant?: ButtonVariants['variant']
   size?: ButtonVariants['size']

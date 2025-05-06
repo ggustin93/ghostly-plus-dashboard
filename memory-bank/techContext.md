@@ -15,6 +15,24 @@ source_documents: [docs/prd.md](mdc:docs/prd.md) (Section 4), [docs/security.md]
     -   Charting: **Chart.js** (primary, D3.js as potential for complex visualizations)
     -   Build Tool: **Vite**
     -   Language: **TypeScript**
+    -   **Component Notes**:
+        - Shadcn/UI components require `/* @vue-ignore */` directive for interface extensions in Vue 3.5+
+        - Example: `interface Props extends /* @vue-ignore */ PrimitiveProps { ... }`
+        - This is an intentional Vue 3.5+ compiler behavior for type safety ([GitHub issue](https://github.com/vuejs/core/issues/10504))
+        - Use consistently across all Shadcn components
+    
+    -   **Example (Shadcn/UI Button with Tailwind):**
+        ```vue
+        <script setup lang="ts">
+        import { Button } from '@/components/ui/button'
+        </script>
+
+        <template>
+          <Button variant="outline" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+            Click Me
+          </Button>
+        </template>
+        ```
     (Source: [docs/prd.md](mdc:docs/prd.md) 4.2.1, 4.10)
 
 -   **Backend (API & Services)**:
@@ -89,3 +107,16 @@ source_documents: [docs/prd.md](mdc:docs/prd.md) (Section 4), [docs/security.md]
 -   **Context7**: Consider using the Context7 MCP tool (`resolve-library-id` followed by `get-library-docs`) to fetch up-to-date, version-specific documentation and code examples for libraries. This is particularly helpful for ensuring AI assistants have accurate information and for verifying library usage against the latest official sources.
 
 ## Outstanding Technical Questions 
+
+-   **Example (Shadcn/UI Button with Tailwind):**
+    ```vue
+    <script setup lang="ts">
+    import { Button } from '@/components/ui/button'
+    </script>
+
+    <template>
+      <Button variant="outline" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+        Click Me
+      </Button>
+    </template>
+    ``` 
