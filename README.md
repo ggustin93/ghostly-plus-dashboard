@@ -26,4 +26,54 @@ The Web Dashboard will:
 5.  **User Interfaces**: Therapist & Researcher dashboards, advanced EMG analytics, multilingual & accessibility.
 6.  **Finalization & Deployment**: Performance optimization, security testing, deployment pipeline, documentation, user testing.
 
+## 4. Development Setup
+
+This project uses Docker Compose for local development orchestration.
+
+### Prerequisites
+
+- Docker & Docker Compose
+- Node.js & npm (for frontend development outside Docker, if preferred)
+- Python & Poetry (for backend development outside Docker, if preferred)
+
+### Environment Variables
+
+Before running the application, you need to set up environment variables:
+
+1.  **Backend:**
+    - Copy `backend/.env.example` to `backend/.env`.
+    - Review `backend/.env` and fill in necessary values, especially `SECRET_KEY` and later, `DATABASE_URL` and any Supabase keys.
+2.  **Frontend:**
+    - Copy `frontend/.env.example` to `frontend/.env`.
+    - Review `frontend/.env` and adjust `VITE_API_BASE_URL` if needed (though the default should work with the Nginx setup).
+
+### Running with Docker Compose
+
+1.  Ensure Docker is running.
+2.  Ensure you have set up the `.env` files as described above.
+3.  From the project root directory, run:
+    ```bash
+    docker-compose up --build
+    ```
+4.  The application should be accessible at `http://localhost` (Nginx on port 80).
+    - The frontend (Vite dev server) is running internally on port 5173, proxied by Nginx.
+    - The backend (FastAPI) is running internally on port 8000, proxied by Nginx under `/api`.
+
+### Running Manually (Optional)
+
+**Backend:**
+```bash
+cd backend
+poetry install # Install dependencies
+poetry run make run # Or poetry run uvicorn ...
+```
+
+**Frontend:**
+```bash
+cd frontend
+npm install # Install dependencies
+npm run dev
+```
+*(Note: Running manually requires handling CORS and API proxying yourself if not using Docker.)*
+
 *(More details can be found in the `docs/` and `memory-bank/` directories.)* 

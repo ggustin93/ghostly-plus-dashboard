@@ -1,0 +1,13 @@
+# docker-compose.override.yml
+# Use this file to override settings in docker-compose.yml for local development.
+# For example:
+# services:
+#   backend:
+#     ports:
+#       - "8001:8000" # Map backend to a different host port
+#     environment:
+#       - DEBUG=True
+
+# Currently empty, as development settings are included in the main docker-compose.yml
+version: '3.8'
+services: {} 

@@ -1,0 +1,60 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+        cache: 'pip' # Cache pip dependencies
+
+    - name: Install Poetry
+      run: |
+        pip install poetry
+        poetry config virtualenvs.create false --local # Install deps in system python for easier caching/access in CI
+
+    - name: Install backend dependencies
+      run: poetry install --no-root
+      working-directory: ./backend
+
+    - name: Lint backend (Ruff)
+      run: poetry run ruff check .
+      working-directory: ./backend
+      
+    - name: Check backend formatting (Ruff)
+      run: poetry run ruff format --check .
+      working-directory: ./backend
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: frontend/package-lock.json
+
+    - name: Install frontend dependencies
+      run: npm ci
+      working-directory: ./frontend
+
+    - name: Lint frontend (ESLint)
+      run: npm run lint -- --no-fix # Run lint without auto-fixing in CI
+      working-directory: ./frontend
+
+    # Optional: Add tests later
+    # - name: Run backend tests
+    #   run: poetry run pytest
+    #   working-directory: ./backend
+
+    # - name: Run frontend tests
+    #   run: npm run test:unit
+    #   working-directory: ./frontend 
