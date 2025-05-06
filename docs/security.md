@@ -29,6 +29,93 @@ The GHOSTLY+ dashboard is designed with a multi-layered security approach to pro
 *   **Implementation Status**: Optional feature, not planned for initial core functionality.
 *   **Recommendation**: Offer as an optional security enhancement later if required.
 
+### Unified Authentication System and Flow
+
+One of the core security features of the GHOSTLY+ system is the **unified authentication approach** that works across both client applications:
+
+#### How Unified Authentication Works
+
+- **Single Source of Truth**: Both the Ghostly Game (on Android tablets) and the Web Dashboard connect to the **same Supabase Auth instance** running on the VUB VM.
+- **Same User Accounts**: Therapists and researchers use identical credentials regardless of which application they're accessing.
+- **Identical Authentication Flow**:
+  1. User enters credentials in either the game or the dashboard
+  2. Application connects to the self-hosted Supabase Auth service
+  3. Supabase Auth validates the credentials
+  4. Upon successful validation, a JWT (JSON Web Token) is issued
+  5. The JWT is stored securely in the application (game or dashboard)
+  6. The JWT is included in all subsequent API requests
+- **Centralized User Management**: User accounts, permissions, and password resets are managed in one place, simplifying administration and security auditing.
+
+#### Technical Implementation
+
+- The **Ghostly Game** (C#/MonoGame) **will need to implement** authentication using REST API calls to the Supabase Auth endpoints.
+- The **Web Dashboard** (Vue.js) **will use** the Supabase JavaScript client library to handle authentication (Implementation in Task 2).
+- Both applications **will receive and store** the same type of JWT tokens **to be validated** by the FastAPI backend (Implementation in Task 2).
+
+#### Key Security Benefits
+
+- **Consistent Security Enforcement**: Same authentication rules and policies across all entry points
+- **Simplified Auditing**: All authentication attempts are logged in a single system
+- **Reduced Attack Surface**: Only one authentication system to secure and monitor
+- **Better User Experience**: Users only need to remember one set of credentials
+
+This unified approach ensures that regardless of how users interact with the GHOSTLY+ ecosystem, the same robust authentication controls are applied, maintaining consistent security throughout the system.
+
+#### Detailed Authentication and Data Access Flow
+
+The following diagram shows the specific authentication sequence and subsequent data access patterns for both applications:
+
+```mermaid
+sequenceDiagram
+    participant User as Therapist/Researcher
+    participant Game as Ghostly Game (OpenFeasyo)
+    participant Dashboard as Web Dashboard (Vue.js)
+    participant Auth as Self-hosted Supabase Auth
+    participant API as FastAPI Backend
+    participant DB as Supabase DB/Storage
+    
+    Note over User,DB: Authentication Flow (Common to both applications)
+    
+    alt Therapist using Ghostly Game
+        User->>Game: Enter credentials
+        Game->>Auth: Request authentication
+        Auth->>Auth: Validate credentials
+        Auth-->>Game: Return JWT token
+        Game->>Game: Store JWT in secure storage
+        Note right of Game: JWT is used for all subsequent API calls
+    else Therapist/Researcher using Dashboard
+        User->>Dashboard: Enter credentials
+        Dashboard->>Auth: Request authentication
+        Auth->>Auth: Validate credentials
+        Auth-->>Dashboard: Return JWT token
+        Dashboard->>Dashboard: Store JWT in browser securely
+        Note right of Dashboard: JWT is used for all subsequent API calls
+    end
+    
+    Note over User,DB: Data Access Flow (with Security Checks)
+    
+    alt Uploading Data (Game)
+        Game->>API: Upload C3D file with JWT in header
+        API->>Auth: Validate JWT
+        Auth-->>API: Confirm user identity & permissions
+        API->>API: Pseudonymize patient data
+        API->>API: Encrypt sensitive data
+        API->>DB: Store data with RLS protection
+        DB-->>API: Confirm storage
+        API-->>Game: Upload success
+    else Accessing Data (Dashboard)
+        Dashboard->>API: Request data with JWT in header
+        API->>Auth: Validate JWT
+        Auth-->>API: Confirm user identity & permissions
+        API->>DB: Query data (RLS filters by user's permissions)
+        DB-->>API: Return only authorized data
+        API->>API: Decrypt sensitive data
+        API-->>Dashboard: Return decrypted data
+        Dashboard->>Dashboard: Render in UI
+        Dashboard-->>User: Display data
+    end
+```
+
 ---
 
 ## 2. 🧱 Authorization & Access Control
@@ -107,6 +194,62 @@ The GHOSTLY+ dashboard is designed with a multi-layered security approach to pro
 
 ✅ **Result**: Secure, controlled, and isolated deployment environment.
 
+#### Visualizing Security Boundaries
+
+This diagram illustrates the security boundaries and encryption zones in the GHOSTLY+ system:
+
+```mermaid
+flowchart TD
+    classDef external fill:#f9f9f9,stroke:#999,stroke-width:1px
+    classDef encrypted fill:#d5f5e3,stroke:#2ecc71,stroke-width:2px
+    classDef secured fill:#d6eaf8,stroke:#3498db,stroke-width:2px
+    classDef sensitive fill:#fadbd8,stroke:#e74c3c,stroke-width:2px
+
+    subgraph Internet["☁️ Internet Zone"]
+        Client1["📱 Ghostly Game\n(OpenFeasyo)"]
+        Client2["💻 Web Dashboard\n(Browser)"]
+    end
+    
+    subgraph VUB["🔐 VUB Private VM (Secured Network)"]
+        subgraph AppLayer["Application Layer"]
+            API["⚙️ FastAPI Backend"]:::secured
+            WebServer["🌐 Web Server\n(Nginx)"]:::secured
+        end
+        
+        subgraph DatabaseLayer["Database Layer"]
+            SupaDB["📊 Supabase PostgreSQL"]:::secured
+            SupaAuth["🔑 Supabase Auth"]:::secured
+            SupaStorage["📁 Supabase Storage"]:::secured
+        end
+        
+        subgraph EncryptionLayer["Encryption Layer"]
+            Keys["🔐 Encryption Keys"]:::sensitive
+            Decrypt["🔓 Decryption Service"]:::sensitive
+        end
+    end
+    
+    subgraph DataStorage["Data Storage"]
+        EncryptedData["🔒 Encrypted Patient\nData in DB"]:::encrypted
+        EncryptedFiles["🔒 Encrypted C3D\nFiles in Storage"]:::encrypted
+    end
+    
+    %% Connections
+    Client1 -->|"HTTPS + JWT"| WebServer
+    Client2 -->|"HTTPS + JWT"| WebServer
+    WebServer --> API
+    API -->|"Validate JWT"| SupaAuth
+    API -->|"RLS Protected\nQueries"| SupaDB
+    API -->|"Restricted\nAccess"| SupaStorage
+    API -->|"Use for\nDecryption"| Keys
+    
+    SupaDB --- EncryptedData
+    SupaStorage --- EncryptedFiles
+    
+    %% Access patterns
+    Keys -.->|"Never exposed\noutside backend"| Decrypt
+    Decrypt -.->|"Only decrypts in\nmemory for\nauthorized users"| API
+```
+
 ---
 
 ## 8. 🧾 Audit & Logging (Planned)
@@ -170,250 +313,3 @@ This security model provides a strong foundation. The specific implementation de
 *   [OWASP Top 10](https://owasp.org/www-project-top-ten/)
 *   [FastAPI Security Documentation](https://fastapi.tiangolo.com/tutorial/security/)
 *   [Supabase Self-Hosting Guide](https://supabase.com/docs/guides/self-hosting)
-
-## Data Flow Diagrams
-
-*(These diagrams use Mermaid syntax and may require a compatible viewer or browser extension to render correctly.)*
-
-### Authentication and Data Flow Overview
-
-The following diagram illustrates the authentication and data flows in the GHOSTLY+ system, highlighting how both the Ghostly Game (OpenFeasyo on Android) and the Web Dashboard authenticate using the same self-hosted Supabase Auth service:
-
-```mermaid
-flowchart TD
-    classDef external fill:#D4F1F9,stroke:#2E86C1,stroke-width:2px
-    classDef frontend fill:#FDEBD0,stroke:#333,stroke-width:1px
-    classDef backend fill:#D5F5E3,stroke:#333,stroke-width:1px
-    classDef database fill:#F5B7B1,stroke:#C0392B,stroke-width:1.5px
-    classDef security fill:#FEF9E7,stroke:#333,stroke-width:1px
-    classDef supabase fill:#3ECF8E30,stroke:#3ECF8E,stroke-width:2px
-    classDef highlight stroke:#E74C3C,stroke-width:2.5px
-
-    User1["👨‍⚕️ Therapist"]:::external
-    User2["🧪 Researcher"]:::external
-    Patient["👴 Patient"]:::external
-    
-    Game["📱 Ghostly Game\n(OpenFeasyo/C#)"]:::frontend
-    Dashboard["💻 Web Dashboard\n(Vue.js)"]:::frontend
-    
-    API["🔌 FastAPI Backend"]:::backend
-    
-    SupaAuth["🔑 Self-hosted\nSupabase Auth"]:::supabase
-    SupaDB["🗄️ Self-hosted\nSupabase Database\n(with RLS)"]:::supabase
-    SupaStorage["📂 Self-hosted\nSupabase Storage"]:::supabase
-    
-    Encrypt["🔒 Encryption/\nDecryption Service"]:::security
-    Pseudo["👤 Pseudonymization\nService"]:::security
-    
-    %% Authentication flows
-    User1 --> |"1a. Login to Game"| Game
-    User1 --> |"1b. Login to Dashboard"| Dashboard
-    User2 --> |"1c. Login to Dashboard"| Dashboard
-    
-    Game --> |"2a. Authenticate\n(JWT)"| SupaAuth
-    Dashboard --> |"2b. Authenticate\n(JWT)"| SupaAuth
-    
-    SupaAuth --> |"3a. Issue JWT Token"| Game
-    SupaAuth --> |"3b. Issue JWT Token"| Dashboard
-    
-    %% Game data flow (acquisition)
-    Patient --> |"4. Use with EMG sensors"| Game
-    Game --> |"5. Generate C3D file"| Game
-    Game --> |"6. Upload data with JWT"| API
-    
-    %% API processing
-    API --> |"7. Validate JWT"| SupaAuth
-    API --> |"8a. Pseudonymize"| Pseudo
-    Pseudo --> API
-    API --> |"8b. Encrypt sensitive data"| Encrypt
-    Encrypt --> API
-    
-    %% Storage flow
-    API --> |"9a. Store processed data"| SupaDB
-    API --> |"9b. Store C3D files"| SupaStorage
-    
-    %% Dashboard data flow (consultation)
-    Dashboard --> |"10. Request data with JWT"| API
-    API --> |"11. Validate JWT"| SupaAuth
-    API --> |"12a. Query data with RLS"| SupaDB
-    API --> |"12b. Access files"| SupaStorage
-    SupaDB --> |"13a. Return data"| API
-    SupaStorage --> |"13b. Return files"| API
-    API --> |"14. Decrypt data"| Encrypt
-    Encrypt --> API
-    API --> |"15. Send decrypted data"| Dashboard
-    Dashboard --> |"16. Display to user"| User1
-    Dashboard --> |"16. Display to user"| User2
-    
-    %% Subgraph for security perimeter
-    subgraph VUB_VM["🔐 VUB Private VM Security Perimeter"]
-        API
-        SupaAuth
-        SupaDB
-        SupaStorage
-        Encrypt
-        Pseudo
-    end
-    
-    %% Highlight key security aspects
-    class SupaAuth highlight
-    class Encrypt highlight
-    class SupaDB highlight
-```
-
-### Unified Authentication System
-
-One of the core security features of the GHOSTLY+ system is the **unified authentication approach** that works across both client applications:
-
-### How Unified Authentication Works
-
-- **Single Source of Truth**: Both the Ghostly Game (on Android tablets) and the Web Dashboard connect to the **same Supabase Auth instance** running on the VUB VM.
-
-- **Same User Accounts**: Therapists and researchers use identical credentials regardless of which application they're accessing.
-
-- **Identical Authentication Flow**:
-  1. User enters credentials in either the game or the dashboard
-  2. Application connects to the self-hosted Supabase Auth service
-  3. Supabase Auth validates the credentials
-  4. Upon successful validation, a JWT (JSON Web Token) is issued
-  5. The JWT is stored securely in the application (game or dashboard)
-  6. The JWT is included in all subsequent API requests
-
-- **Centralized User Management**: User accounts, permissions, and password resets are managed in one place, simplifying administration and security auditing.
-
-### Technical Implementation
-
-- The **Ghostly Game** (C#/MonoGame) **will need to implement** authentication using REST API calls to the Supabase Auth endpoints.
-
-- The **Web Dashboard** (Vue.js) **will use** the Supabase JavaScript client library to handle authentication (Implementation in Task 2).
-
-- Both applications **will receive and store** the same type of JWT tokens **to be validated** by the FastAPI backend (Implementation in Task 2).
-
-### Key Security Benefits
-
-- **Consistent Security Enforcement**: Same authentication rules and policies across all entry points
-- **Simplified Auditing**: All authentication attempts are logged in a single system
-- **Reduced Attack Surface**: Only one authentication system to secure and monitor
-- **Better User Experience**: Users only need to remember one set of credentials
-
-This unified approach ensures that regardless of how users interact with the GHOSTLY+ ecosystem, the same robust authentication controls are applied, maintaining consistent security throughout the system.
-
-### Detailed Authentication Flow
-
-The following diagram shows the specific authentication sequence for both applications:
-
-```mermaid
-sequenceDiagram
-    participant User as Therapist/Researcher
-    participant Game as Ghostly Game (OpenFeasyo)
-    participant Dashboard as Web Dashboard (Vue.js)
-    participant Auth as Self-hosted Supabase Auth
-    participant API as FastAPI Backend
-    participant DB as Supabase DB/Storage
-    
-    Note over User,DB: Authentication Flow (Common to both applications)
-    
-    alt Therapist using Ghostly Game
-        User->>Game: Enter credentials
-        Game->>Auth: Request authentication
-        Auth->>Auth: Validate credentials
-        Auth-->>Game: Return JWT token
-        Game->>Game: Store JWT in secure storage
-        Note right of Game: JWT is used for all subsequent API calls
-    else Therapist/Researcher using Dashboard
-        User->>Dashboard: Enter credentials
-        Dashboard->>Auth: Request authentication
-        Auth->>Auth: Validate credentials
-        Auth-->>Dashboard: Return JWT token
-        Dashboard->>Dashboard: Store JWT in browser securely
-        Note right of Dashboard: JWT is used for all subsequent API calls
-    end
-    
-    Note over User,DB: Data Access Flow (with Security Checks)
-    
-    alt Uploading Data (Game)
-        Game->>API: Upload C3D file with JWT in header
-        API->>Auth: Validate JWT
-        Auth-->>API: Confirm user identity & permissions
-        API->>API: Pseudonymize patient data
-        API->>API: Encrypt sensitive data
-        API->>DB: Store data with RLS protection
-        DB-->>API: Confirm storage
-        API-->>Game: Upload success
-    else Accessing Data (Dashboard)
-        Dashboard->>API: Request data with JWT in header
-        API->>Auth: Validate JWT
-        Auth-->>API: Confirm user identity & permissions
-        API->>DB: Query data (RLS filters by user's permissions)
-        DB-->>API: Return only authorized data
-        API->>API: Decrypt sensitive data
-        API-->>Dashboard: Return decrypted data
-        Dashboard->>Dashboard: Render in UI
-        Dashboard-->>User: Display data
-    end
-```
-
-### Security Boundaries
-
-This diagram illustrates the security boundaries and encryption zones in the GHOSTLY+ system:
-
-```mermaid
-flowchart TD
-    classDef external fill:#f9f9f9,stroke:#999,stroke-width:1px
-    classDef encrypted fill:#d5f5e3,stroke:#2ecc71,stroke-width:2px
-    classDef secured fill:#d6eaf8,stroke:#3498db,stroke-width:2px
-    classDef sensitive fill:#fadbd8,stroke:#e74c3c,stroke-width:2px
-
-    subgraph Internet["☁️ Internet Zone"]
-        Client1["📱 Ghostly Game\n(OpenFeasyo)"]
-        Client2["💻 Web Dashboard\n(Browser)"]
-    end
-    
-    subgraph VUB["🔐 VUB Private VM (Secured Network)"]
-        subgraph AppLayer["Application Layer"]
-            API["⚙️ FastAPI Backend"]:::secured
-            WebServer["🌐 Web Server\n(Nginx)"]:::secured
-        end
-        
-        subgraph DatabaseLayer["Database Layer"]
-            SupaDB["📊 Supabase PostgreSQL"]:::secured
-            SupaAuth["🔑 Supabase Auth"]:::secured
-            SupaStorage["📁 Supabase Storage"]:::secured
-        end
-        
-        subgraph EncryptionLayer["Encryption Layer"]
-            Keys["🔐 Encryption Keys"]:::sensitive
-            Decrypt["🔓 Decryption Service"]:::sensitive
-        end
-    end
-    
-    subgraph DataStorage["Data Storage"]
-        EncryptedData["🔒 Encrypted Patient\nData in DB"]:::encrypted
-        EncryptedFiles["🔒 Encrypted C3D\nFiles in Storage"]:::encrypted
-    end
-    
-    %% Connections
-    Client1 -->|"HTTPS + JWT"| WebServer
-    Client2 -->|"HTTPS + JWT"| WebServer
-    WebServer --> API
-    API -->|"Validate JWT"| SupaAuth
-    API -->|"RLS Protected\nQueries"| SupaDB
-    API -->|"Restricted\nAccess"| SupaStorage
-    API -->|"Use for\nDecryption"| Keys
-    
-    SupaDB --- EncryptedData
-    SupaStorage --- EncryptedFiles
-    
-    %% Access patterns
-    Keys -.->|"Never exposed\noutside backend"| Decrypt
-    Decrypt -.->|"Only decrypts in\nmemory for\nauthorized users"| API
-```
-
-These diagrams provide a clear visualization of:
-
-1. How both the Ghostly Game and Web Dashboard authenticate against the same Supabase Auth service
-2. The flow of data from collection to storage, with security measures at each step
-3. The security boundaries that protect sensitive patient data
-4. The encryption and decryption processes that ensure data privacy
-
-The implementation will ensure that sensitive medical data is protected throughout its lifecycle, from collection on the Android tablet to viewing in the web dashboard, while maintaining proper authentication and authorization controls. 
