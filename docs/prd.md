@@ -1,9 +1,5 @@
-<aside>
-💡
-
-IMPORTANT NOTICE: This document is preliminary and subject to change. All specifications, architectures, timelines, and requirements are tentative and will evolve as the project progresses and stakeholder feedback is incorporated.
-
-</aside>
+> [!note]
+> IMPORTANT NOTICE: This document is preliminary and subject to change. All specifications, architectures, timelines, and requirements are tentative and will evolve as the project progresses and stakeholder feedback is incorporated.
 
 ## 1. INTRODUCTION
 
