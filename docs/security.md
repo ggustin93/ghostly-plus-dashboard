@@ -6,64 +6,68 @@ This document provides a **comprehensive explanation of the planned security arc
 
 The GHOSTLY+ dashboard is designed with a multi-layered security approach to protect sensitive EMG data and patient information. This document outlines the planned security measures to ensure GDPR compliance and protection of medical data. **All Supabase services are self-hosted locally on the VUB VM** for complete data sovereignty and control (Infrastructure established in Task 1).
 
+## Table of Contents
+
+- [🔐 GHOSTLY+ Application Security Overview](#-ghostly-application-security-overview)
+  - [Executive Summary](#executive-summary)
+  - [Table of Contents](#table-of-contents)
+  - [1. 🔑 User Authentication](#1--user-authentication)
+    - [Optional: Two-Factor Authentication (2FA/MFA)](#optional-two-factor-authentication-2famfa)
+    - [Detailed Authentication and Data Access Flow](#detailed-authentication-and-data-access-flow)
+  - [2. 🧱 Authorization \& Access Control](#2--authorization--access-control)
+    - [Technology: **Self-hosted Supabase with Row Level Security (RLS)**](#technology-self-hosted-supabase-with-row-level-security-rls)
+  - [3. 🔒 Encryption of Sensitive Data (Planned)](#3--encryption-of-sensitive-data-planned)
+    - [Planned Technology: **Fernet (Python Cryptography)**](#planned-technology-fernet-python-cryptography)
+  - [4. 🔐 Pseudonymization (Planned)](#4--pseudonymization-planned)
+    - [Planned Technology: **Cryptographic Hashing (SHA-256)**](#planned-technology-cryptographic-hashing-sha-256)
+  - [5. 📦 Database Access Security (Self-hosted Supabase)](#5--database-access-security-self-hosted-supabase)
+  - [6. 📡 Transport Security (HTTPS)](#6--transport-security-https)
+  - [7. 🧪 Server and Infrastructure Isolation](#7--server-and-infrastructure-isolation)
+      - [Visualizing Security Boundaries](#visualizing-security-boundaries)
+  - [8. 🧾 Audit \& Logging (Planned)](#8--audit--logging-planned)
+  - [9. 🛡️ C3D File Security](#9-️-c3d-file-security)
+  - [🔁 Security by Layer (Planned Architecture)](#-security-by-layer-planned-architecture)
+  - [✅ Conclusion](#-conclusion)
+  - [Local Supabase Deployment Notes](#local-supabase-deployment-notes)
+  - [References](#references)
+
 ---
 
 ## 1. 🔑 User Authentication
 
-### Technology: **Self-hosted Supabase Auth**
+**Core Technology**: **Self-hosted Supabase Auth** utilizing **JWT (JSON Web Tokens)**.
 
-*   Authentication will use **email + password** (optional social logins can be added if needed).
-*   Security relies on **JWT (JSON Web Tokens)**:
-    *   Supabase Auth issues a **signed token** upon successful login.
-    *   The token must be **sent with each request** from the client (Vue/Game) to the backend API (FastAPI).
-    *   The **FastAPI backend will verify token validity** (using Supabase public keys) before authorizing API access.
-    *   Token expiration and refresh mechanisms need to be implemented in clients.
-*   **Benefit of local deployment**: Complete control over authentication data and flows.
-*   **Status**: Supabase Auth infrastructure is part of the local setup (Task 1). Actual JWT handling in Vue, validation in FastAPI, and integration with the Game are planned for **Task 2 (User Authentication & Authorization)**.
-
-✅ **Planned Result**: Only authenticated users can interact with the application.
+*   **Mechanism**:
+    *   Users authenticate via email + password.
+    *   Supabase Auth issues a signed JWT upon successful login.
+    *   Clients (Vue.js Dashboard, C# Game) send the JWT with each API request.
+    *   FastAPI backend verifies JWT validity (via Supabase public keys) before authorizing access.
+    *   Client-side token expiration and refresh mechanisms are required.
+*   **Key Principle: Unified Authentication**:
+    *   **Single Source of Truth**: Both Game and Dashboard use the same self-hosted Supabase Auth instance.
+    *   **Consistent Experience**: Identical credentials and authentication flow across applications.
+    *   **Centralized Management**: User accounts, permissions, and password resets are managed centrally.
+*   **Implementation Details**:
+    *   **Game (C#/MonoGame)**: Requires REST API calls to Supabase Auth endpoints.
+    *   **Dashboard (Vue.js)**: Will use the Supabase JavaScript client library.
+    *   Both will handle JWTs validated by the FastAPI backend.
+*   **Benefits**:
+    *   Complete control over authentication data and flows (due to local deployment).
+    *   Consistent security enforcement and simplified auditing.
+    *   Reduced attack surface and improved user experience (single credential set).
+*   **Status**:
+    *   Supabase Auth infrastructure: Established (Task 1).
+    *   JWT handling (Vue), validation (FastAPI), Game integration: Planned for **Task 2 (User Authentication & Authorization)**.
+*   ✅ **Planned Result**: Only authenticated users can interact with the application.
 
 ### Optional: Two-Factor Authentication (2FA/MFA)
 
 *   **Availability**: Supabase Auth supports MFA (e.g., TOTP via authenticator apps).
-*   **Implementation Status**: Optional feature, not planned for initial core functionality.
-*   **Recommendation**: Offer as an optional security enhancement later if required.
+*   **Status**: Considered an optional enhancement, not part of initial core functionality.
 
-### Unified Authentication System and Flow
+### Detailed Authentication and Data Access Flow
 
-One of the core security features of the GHOSTLY+ system is the **unified authentication approach** that works across both client applications:
-
-#### How Unified Authentication Works
-
-- **Single Source of Truth**: Both the Ghostly Game (on Android tablets) and the Web Dashboard connect to the **same Supabase Auth instance** running on the VUB VM.
-- **Same User Accounts**: Therapists and researchers use identical credentials regardless of which application they're accessing.
-- **Identical Authentication Flow**:
-  1. User enters credentials in either the game or the dashboard
-  2. Application connects to the self-hosted Supabase Auth service
-  3. Supabase Auth validates the credentials
-  4. Upon successful validation, a JWT (JSON Web Token) is issued
-  5. The JWT is stored securely in the application (game or dashboard)
-  6. The JWT is included in all subsequent API requests
-- **Centralized User Management**: User accounts, permissions, and password resets are managed in one place, simplifying administration and security auditing.
-
-#### Technical Implementation
-
-- The **Ghostly Game** (C#/MonoGame) **will need to implement** authentication using REST API calls to the Supabase Auth endpoints.
-- The **Web Dashboard** (Vue.js) **will use** the Supabase JavaScript client library to handle authentication (Implementation in Task 2).
-- Both applications **will receive and store** the same type of JWT tokens **to be validated** by the FastAPI backend (Implementation in Task 2).
-
-#### Key Security Benefits
-
-- **Consistent Security Enforcement**: Same authentication rules and policies across all entry points
-- **Simplified Auditing**: All authentication attempts are logged in a single system
-- **Reduced Attack Surface**: Only one authentication system to secure and monitor
-- **Better User Experience**: Users only need to remember one set of credentials
-
-This unified approach ensures that regardless of how users interact with the GHOSTLY+ ecosystem, the same robust authentication controls are applied, maintaining consistent security throughout the system.
-
-#### Detailed Authentication and Data Access Flow
-
-The following diagram shows the specific authentication sequence and subsequent data access patterns for both applications:
+The following diagram illustrates the authentication sequence and subsequent data access patterns:
 
 ```mermaid
 sequenceDiagram
