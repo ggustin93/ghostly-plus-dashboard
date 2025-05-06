@@ -1,10 +1,10 @@
 # 🔐 GHOSTLY+ Application Security Overview
 
-This document provides a **comprehensive explanation of the application's security architecture**, designed to handle **sensitive medical data** in a private environment (VUB virtual machine), while utilizing modern tools: **Supabase (self-hosted/local), FastAPI, and Vue 3**.
+This document provides a **comprehensive explanation of the planned security architecture** for the GHOSTLY+ application, designed to handle **sensitive medical data** in a private environment (VUB virtual machine), using **Supabase (self-hosted/local), FastAPI, and Vue 3**.
 
 ## Executive Summary
 
-The GHOSTLY+ dashboard implements a multi-layered security approach to protect sensitive EMG data and patient information at all levels: authentication, transportation, storage, and data access. This document outlines the security measures in place to ensure GDPR compliance and protection of medical data. **All Supabase services are self-hosted locally on the VUB VM** for complete data sovereignty and control.
+The GHOSTLY+ dashboard is designed with a multi-layered security approach to protect sensitive EMG data and patient information. This document outlines the planned security measures to ensure GDPR compliance and protection of medical data. **All Supabase services are self-hosted locally on the VUB VM** for complete data sovereignty and control (Infrastructure established in Task 1).
 
 ---
 
@@ -12,27 +12,22 @@ The GHOSTLY+ dashboard implements a multi-layered security approach to protect s
 
 ### Technology: **Self-hosted Supabase Auth**
 
-* Authentication via **email + password** (with optional Google/GitHub integration if needed)
-* Security ensured through **JWT (JSON Web Tokens)**:
-  * Each user receives a **signed token** upon login
-  * The token is **sent with each request** to the API
-  * Backend (**FastAPI**) **verifies token validity** before authorizing access
-  * Token expiration and refresh mechanisms implemented
-* **Benefit of local deployment**: Complete control over authentication data and flows
+*   Authentication will use **email + password** (optional social logins can be added if needed).
+*   Security relies on **JWT (JSON Web Tokens)**:
+    *   Supabase Auth issues a **signed token** upon successful login.
+    *   The token must be **sent with each request** from the client (Vue/Game) to the backend API (FastAPI).
+    *   The **FastAPI backend will verify token validity** (using Supabase public keys) before authorizing API access.
+    *   Token expiration and refresh mechanisms need to be implemented in clients.
+*   **Benefit of local deployment**: Complete control over authentication data and flows.
+*   **Status**: Supabase Auth infrastructure is part of the local setup (Task 1). Actual JWT handling in Vue, validation in FastAPI, and integration with the Game are planned for **Task 2 (User Authentication & Authorization)**.
 
-✅ **Result**: Only authenticated users can interact with the application, with strict session management
+✅ **Planned Result**: Only authenticated users can interact with the application.
 
 ### Optional: Two-Factor Authentication (2FA/MFA)
 
-* **Availability**: Supabase Auth supports Multi-Factor Authentication (MFA), typically via Time-based One-Time Passwords (TOTP) using authenticator apps (e.g., Google Authenticator, Authy).
-* **Implementation Status**: This feature is **currently optional** for the GHOSTLY+ dashboard.
-* **Rationale**:
-    * Given the highly controlled private VM environment and existing security layers (RLS, encryption, HTTPS), mandatory 2FA might add unnecessary friction for therapist users.
-    * However, it can be enabled on a per-user basis or enforced organization-wide if future security policies require it.
-* **Considerations**:
-    * **User Experience**: Requires users to install and use an authenticator app during login.
-    * **Developer Effort**: Requires UI elements for setup/enrollment and verification during login.
-    * **Recommendation**: Offer as an optional security enhancement, allowing users or administrators to enable it as needed. Use TOTP for better security than SMS.
+*   **Availability**: Supabase Auth supports MFA (e.g., TOTP via authenticator apps).
+*   **Implementation Status**: Optional feature, not planned for initial core functionality.
+*   **Recommendation**: Offer as an optional security enhancement later if required.
 
 ---
 
@@ -40,152 +35,145 @@ The GHOSTLY+ dashboard implements a multi-layered security approach to protect s
 
 ### Technology: **Self-hosted Supabase with Row Level Security (RLS)**
 
-* **Each database row** is protected by **custom security policies**
-* Examples:
-  * Therapists can only view their assigned patients' data
-  * Researchers can only access authorized cohorts
-  * Administrators have broader but still controlled access
-* RLS rules execute **at the database level**, so even if vulnerabilities exist elsewhere, data remains compartmentalized
-* **Benefit of local deployment**: Security policies remain within the private network
+*   Database access will be controlled using **custom RLS policies** defined directly in PostgreSQL.
+*   **Goal**: Ensure users can only access data they are explicitly permitted to see (e.g., therapists see assigned patients, researchers see authorized cohorts).
+*   RLS enforces rules at the database level, providing strong data isolation.
+*   **Benefit of local deployment**: Security policies remain within the private network.
+*   **Status**: Supabase DB infrastructure is set up (Task 1). Specific RLS policies need to be designed and implemented alongside the database schema and API endpoints in **Phase 2 (Core Functionality)**.
 
-✅ **Result**: No user can view another's data without explicit authorization, enforcing data isolation
+✅ **Planned Result**: Granular data access control based on user roles and permissions.
 
 ---
 
-## 3. 🔒 Encryption of Sensitive Data
+## 3. 🔒 Encryption of Sensitive Data (Planned)
 
-### Technology: **Fernet (Python Cryptography)**
+### Planned Technology: **Fernet (Python Cryptography)**
 
-* All **sensitive medical data** (e.g., EMG readings, patient notes) are **encrypted on the backend**
-* Encryption keys are **never transmitted to the frontend**
-* The backend encrypts data **before sending to local Supabase instance**, and decrypts it **before sending to Vue**
-* Implementation of secure key management practices
-* **Benefit of local deployment**: Encryption keys never leave the secure environment
+*   **Plan**: Sensitive medical data (e.g., specific assessment details, potentially parts of EMG metadata) **will be encrypted** by the FastAPI backend before being stored in the database.
+*   Encryption keys will be managed securely on the backend and **never exposed** to the frontend or stored insecurely.
+*   The backend will decrypt data only when authorized users request it.
+*   **Benefit of local deployment**: Encryption keys remain within the secure VUB VM environment.
+*   **Status**: This is a **planned feature** for **Phase 4 (Security & Compliance)**. Secure key management strategies must also be defined and implemented.
 
-✅ **Result**: Even if a third party accesses the database, they **cannot read sensitive information**
+✅ **Planned Result**: Sensitive data at rest is unreadable even if the database is compromised.
 
 ---
 
-## 4. 🔐 Pseudonymization
+## 4. 🔐 Pseudonymization (Planned)
 
-* Sensitive identifiers (patient IDs, names) are **pseudonymized** using cryptographic hashing (SHA-256)
-* This allows the use of **anonymous identifiers** without direct links to real identities
-* Implementation of consistent pseudonymization across the system
-* **Benefit of local deployment**: Pseudonymization mapping tables remain within the secure environment
+### Planned Technology: **Cryptographic Hashing (SHA-256)**
 
-✅ **Result**: Enhanced GDPR compliance, de-identified data storage
+*   **Plan**: Directly identifying patient information (e.g., names, specific IDs if not already opaque) **will be pseudonymized** by the FastAPI backend using irreversible hashing before storage or logging where appropriate.
+*   This allows for data analysis using anonymous identifiers.
+*   **Benefit of local deployment**: Pseudonymization processes and any mapping remain within the secure environment.
+*   **Status**: This is a **planned feature** for **Phase 4 (Security & Compliance)**. Specific fields and implementation details need definition.
+
+✅ **Planned Result**: Enhanced data privacy and GDPR compliance.
 
 ---
 
 ## 5. 📦 Database Access Security (Self-hosted Supabase)
 
-* Local Supabase instance uses the same security model:
-  * `anon` key: **limited read/write access** (frontend)
-  * `service_role` key: **full access**, **used only on the backend**
-* All critical operations (writing, decrypted reading) go **through the backend**, never directly from the frontend
-* Implementation of least privilege principle for database operations
-* **Benefit of local deployment**: Database is not exposed to the public internet, only accessible within VM network
+*   The self-hosted Supabase instance uses standard security keys:
+    *   `anon` key: **Limited access**, intended primarily for authentication calls or potentially very limited, safe frontend operations (if any).
+    *   `service_role` key: **Full database access**, restricted to the **FastAPI backend only**.
+*   **Principle**: Critical operations (data writing, reading sensitive data) MUST go through the FastAPI backend for validation, authorization checks, and encryption/decryption.
+*   **Benefit of local deployment**: Database access is restricted to the internal network of the VUB VM.
+*   **Status**: This access model is inherent to the Supabase/FastAPI architecture established in **Task 1**.
 
-✅ **Result**: The attack surface is significantly reduced
+✅ **Result**: Reduced database attack surface, enforcement of backend logic.
 
 ---
 
 ## 6. 📡 Transport Security (HTTPS)
 
-* All communication between:
-  * Browser and frontend (Vue)
-  * Vue and FastAPI (REST API)
-  * FastAPI and local Supabase
-  
-  ... occurs via **HTTPS/TLS** even for local services
-* Strong cipher suites and TLS 1.3 where possible
-* HTTP Strict Transport Security (HSTS) implementation
-* **Benefit of local deployment**: Internal service communication remains within trusted network boundaries
+*   **Goal**: All network communication will use **HTTPS/TLS** encryption.
+*   **Internal (Docker)**: Communication between Nginx, FastAPI, and Supabase containers within the Docker network should ideally be configured for TLS, though this might be deferred if the Docker network is considered sufficiently isolated within the VM.
+*   **External**: Access to the dashboard via the browser MUST be over HTTPS. Nginx is responsible for handling TLS termination.
+*   **Benefit of local deployment**: Internal traffic stays within the trusted VM network.
+*   **Status**: Nginx is set up (Task 1). Configuration of TLS certificates for external access on the VUB VM is required during **Phase 6 (Deployment)**. Internal TLS is a potential enhancement.
 
-✅ **Result**: Data in transit is **protected against eavesdropping (MITM attacks)**
+✅ **Planned Result**: Data in transit is protected against eavesdropping.
 
 ---
 
 ## 7. 🧪 Server and Infrastructure Isolation
 
-* The application runs on a **private virtual machine** (VUB VM)
-* Backend FastAPI and local Supabase are **isolated in separate Docker containers**
-* File storage (medical images, C3D files) is handled by local Supabase Storage within the private network
-* Docker containers provide additional isolation between services
-* **Benefit of local deployment**: Complete control over infrastructure security
+*   The application runs on a **private VUB virtual machine**.
+*   Backend (FastAPI) and Supabase services run in **separate Docker containers**, providing process isolation.
+*   File storage uses **local Supabase Storage** within the private network.
+*   **Benefit of local deployment**: Complete control over the infrastructure.
+*   **Status**: Docker environment established in **Task 1**.
 
-✅ **Result**: Closed architecture that is difficult to penetrate
+✅ **Result**: Secure, controlled, and isolated deployment environment.
 
 ---
 
-## 8. 🧾 Audit & Logging
+## 8. 🧾 Audit & Logging (Planned)
 
-* Sensitive access events (logins, medical record consultations) are logged
-* Logs are stored **separately** (with alerts for abnormal access)
-* No sensitive data is logged in plain text
-* Logs include timestamp, user ID, action type, and resource accessed
-* **Benefit of local deployment**: All logs remain within the controlled environment, easier to comply with data residency requirements
+*   **Plan**: Key security events (logins, data access, administrative changes) **will be logged** by the FastAPI application.
+*   Logs should be stored securely, potentially separate from application data, and should not contain sensitive data in plain text.
+*   **Benefit of local deployment**: Logs remain within the controlled environment.
+*   **Status**: This is a **planned feature** for **Phase 4/6**. Specific logging mechanisms and storage need definition.
 
-✅ **Result**: Traceability, compliance, and rapid response to anomalies
+✅ **Planned Result**: Traceability and monitoring capabilities.
 
 ---
 
 ## 9. 🛡️ C3D File Security
 
-* C3D files containing EMG data are transmitted securely via authenticated API endpoints
-* Files are stored in local Supabase Storage with access controls
-* Metadata is separated from the actual files for enhanced security
-* Processing of sensitive files occurs in memory with secure handling practices
-* **Benefit of local deployment**: EMG data files never leave the private network
+*   **Plan**: C3D files **will be uploaded** securely via authenticated FastAPI endpoints.
+*   Files **will be stored** in local Supabase Storage with access controlled via backend logic (verifying JWT and user permissions).
+*   Processing of C3D files will occur securely on the backend.
+*   **Benefit of local deployment**: EMG data files remain within the private network.
+*   **Status**: Supabase Storage is set up (Task 1). Specific upload endpoints, access control logic, and processing implementations are planned for **Phase 2/3**.
 
-✅ **Result**: Specialized EMG data remains secure throughout its lifecycle
+✅ **Planned Result**: Secure handling of raw EMG data files.
 
 ---
 
-## 🔁 Security by Layer
+## 🔁 Security by Layer (Planned Architecture)
 
-| Layer | Protection Measures |
-|-------|---------------------|
-| **Frontend (Vue 3)** | JWT implementation, no direct access to sensitive data, XSS protections |
-| **API (FastAPI)** | JWT verification, encryption/decryption, input validation, rate limiting |
-| **Database (Local Supabase)** | RLS policies, encrypted storage, pseudonymization, parametrized queries |
-| **Transport** | HTTPS/TLS between all services, secure headers |
-| **Infrastructure** | Isolated virtual machine, network controls, containerization |
+| Layer                    | Planned Protection Measures                                        |
+| ------------------------ | ------------------------------------------------------------------ |
+| **Frontend (Vue 3)**     | JWT handling, input sanitization (standard framework features)     |
+| **API (FastAPI)**        | JWT validation, input validation, rate limiting (optional), encryption, pseudonymization |
+| **Database (Local Supabase)** | RLS policies, backend-managed encryption, database-level security |
+| **Transport**            | HTTPS/TLS (external access mandatory, internal recommended)        |
+| **Infrastructure**       | Private VM, network controls, containerization (Docker)            |
 
 ---
 
 ## ✅ Conclusion
 
-The GHOSTLY+ application implements:
+The GHOSTLY+ application design incorporates:
 
-* **End-to-end security** (authentication → transport → storage)
-* Compliance with **healthcare data security best practices**
-* Easily maintainable and auditable security architecture
-* Robust protection even in case of partial compromise (e.g., raw DB access)
-* **Data sovereignty** through local self-hosting of all Supabase services
+*   A plan for **end-to-end security**.
+*   Alignment with **healthcare data security best practices**.
+*   Emphasis on **data sovereignty** through local self-hosting of Supabase.
 
-This security model aligns with the requirements outlined in the PRD (section 4.5) and follows industry best practices for applications handling sensitive healthcare data.
+This security model provides a strong foundation. The specific implementation details for features like encryption, pseudonymization, RLS, and logging will be addressed in their respective development phases.
 
 ---
 
 ## Local Supabase Deployment Notes
 
-* The project uses `docker-compose` to run Supabase services locally
-* Authentication, database, and storage all run within the private VM environment
-* Security configurations are version-controlled and consistent across deployments
-* Backups remain within the secure environment
-* No data is transmitted to external Supabase cloud services
+*   The project uses `docker-compose` to run Supabase services locally within the VUB VM.
+*   Authentication, database, and storage services are contained within this private environment.
+*   No data is transmitted to external Supabase cloud services.
 
 ---
 
 ## References
 
-* [GDPR Official Site](https://gdpr.eu/)
-* [OWASP Top 10](https://owasp.org/www-project-top-ten/)
-* [FastAPI Security Documentation](https://fastapi.tiangolo.com/tutorial/security/)
-* [Supabase Self-Hosting Guide](https://supabase.com/docs/guides/self-hosting)
+*   [GDPR Official Site](https://gdpr.eu/)
+*   [OWASP Top 10](https://owasp.org/www-project-top-ten/)
+*   [FastAPI Security Documentation](https://fastapi.tiangolo.com/tutorial/security/)
+*   [Supabase Self-Hosting Guide](https://supabase.com/docs/guides/self-hosting)
 
 ## Data Flow Diagrams
+
+*(These diagrams use Mermaid syntax and may require a compatible viewer or browser extension to render correctly.)*
 
 ### Authentication and Data Flow Overview
 
@@ -295,11 +283,11 @@ One of the core security features of the GHOSTLY+ system is the **unified authen
 
 ### Technical Implementation
 
-- The **Ghostly Game** (C#/MonoGame) implements authentication using REST API calls to the Supabase Auth endpoints.
+- The **Ghostly Game** (C#/MonoGame) **will need to implement** authentication using REST API calls to the Supabase Auth endpoints.
 
-- The **Web Dashboard** (Vue.js) uses the Supabase JavaScript client library to handle authentication.
+- The **Web Dashboard** (Vue.js) **will use** the Supabase JavaScript client library to handle authentication (Implementation in Task 2).
 
-- Both applications receive and store the **same type of JWT tokens** that are validated by the FastAPI backend.
+- Both applications **will receive and store** the same type of JWT tokens **to be validated** by the FastAPI backend (Implementation in Task 2).
 
 ### Key Security Benefits
 
@@ -428,4 +416,4 @@ These diagrams provide a clear visualization of:
 3. The security boundaries that protect sensitive patient data
 4. The encryption and decryption processes that ensure data privacy
 
-The implementation ensures that sensitive medical data is protected throughout its lifecycle, from collection on the Android tablet to viewing in the web dashboard, while maintaining proper authentication and authorization controls. 
+The implementation will ensure that sensitive medical data is protected throughout its lifecycle, from collection on the Android tablet to viewing in the web dashboard, while maintaining proper authentication and authorization controls. 
