@@ -2,38 +2,62 @@
 
 This document provides a **comprehensive explanation of the planned security architecture** for the GHOSTLY+ application, designed to handle **sensitive medical data** in a private environment (VUB virtual machine), using **Supabase (self-hosted/local), FastAPI, and Vue 3**.
 
-## Executive Summary
-
-The GHOSTLY+ dashboard is designed with a multi-layered security approach to protect sensitive EMG data and patient information. This document outlines the planned security measures to ensure GDPR compliance and protection of medical data. **All Supabase services are self-hosted locally on the VUB VM** for complete data sovereignty and control (Infrastructure established in Task 1).
-
 ## Table of Contents
 
 - [🔐 GHOSTLY+ Application Security Overview](#-ghostly-application-security-overview)
-  - [Executive Summary](#executive-summary)
   - [Table of Contents](#table-of-contents)
-  - [1. 🔑 User Authentication](#1--user-authentication)
+  - [1. Security by Layer (Planned Architecture)](#1-security-by-layer-planned-architecture)
+  - [2. Overview of Core Security Measures](#2-overview-of-core-security-measures)
+    - [2.1. 🔑 User Authentication](#21--user-authentication)
     - [Optional: Two-Factor Authentication (2FA/MFA)](#optional-two-factor-authentication-2famfa)
     - [Detailed Authentication and Data Access Flow](#detailed-authentication-and-data-access-flow)
-  - [2. 🧱 Authorization \& Access Control](#2--authorization--access-control)
-    - [Technology: **Self-hosted Supabase with Row Level Security (RLS)**](#technology-self-hosted-supabase-with-row-level-security-rls)
-  - [3. 🔒 Encryption of Sensitive Data (Planned)](#3--encryption-of-sensitive-data-planned)
-    - [Planned Technology: **Fernet (Python Cryptography)**](#planned-technology-fernet-python-cryptography)
-  - [4. 🔐 Pseudonymization (Planned)](#4--pseudonymization-planned)
-    - [Planned Technology: **Cryptographic Hashing (SHA-256)**](#planned-technology-cryptographic-hashing-sha-256)
-  - [5. 📦 Database Access Security (Self-hosted Supabase)](#5--database-access-security-self-hosted-supabase)
-  - [6. 📡 Transport Security (HTTPS)](#6--transport-security-https)
-  - [7. 🧪 Server and Infrastructure Isolation](#7--server-and-infrastructure-isolation)
+    - [2.2. 🧱 Authorization \& Access Control](#22--authorization--access-control)
+      - [Technology: **Self-hosted Supabase with Row Level Security (RLS)**](#technology-self-hosted-supabase-with-row-level-security-rls)
+    - [2.3. 🔒 Encryption of Sensitive Data (Planned)](#23--encryption-of-sensitive-data-planned)
+      - [Planned Technology: **Fernet (Python Cryptography)**](#planned-technology-fernet-python-cryptography)
+    - [2.4. 🔐 Pseudonymization (Planned)](#24--pseudonymization-planned)
+      - [Planned Technology: **Cryptographic Hashing (SHA-256)**](#planned-technology-cryptographic-hashing-sha-256)
+    - [2.5. 📦 Database Access Security (Self-hosted Supabase)](#25--database-access-security-self-hosted-supabase)
+    - [2.6. 📡 Transport Security (HTTPS)](#26--transport-security-https)
+    - [2.7. 🧪 Server and Infrastructure Isolation](#27--server-and-infrastructure-isolation)
       - [Visualizing Security Boundaries](#visualizing-security-boundaries)
-  - [8. 🧾 Audit \& Logging (Planned)](#8--audit--logging-planned)
-  - [9. 🛡️ C3D File Security](#9-️-c3d-file-security)
-  - [🔁 Security by Layer (Planned Architecture)](#-security-by-layer-planned-architecture)
-  - [✅ Conclusion](#-conclusion)
-  - [Local Supabase Deployment Notes](#local-supabase-deployment-notes)
-  - [References](#references)
+      - [Local Supabase Deployment Notes](#local-supabase-deployment-notes)
+    - [2.8. 🧾 Audit \& Logging (Planned)](#28--audit--logging-planned)
+    - [2.9. 🛡️ C3D File Security](#29-️-c3d-file-security)
+  - [3. Conclusion](#3-conclusion)
+  - [4. References](#4-references)
 
 ---
 
-## 1. 🔑 User Authentication
+## 1. Security by Layer (Planned Architecture)
+
+| Layer                    | Planned Protection Measures                                        |
+| ------------------------ | ------------------------------------------------------------------ |
+| **Frontend (Vue 3)**     | JWT handling, input sanitization (standard framework features)     |
+| **API (FastAPI)**        | JWT validation, input validation, rate limiting (optional), encryption, pseudonymization |
+| **Database (Local Supabase)** | RLS policies, backend-managed encryption, database-level security |
+| **Transport**            | HTTPS/TLS (external access mandatory, internal recommended)        |
+| **Infrastructure**       | Private VM, network controls, containerization (Docker)            |
+
+---
+
+## 2. Overview of Core Security Measures
+
+The GHOSTLY+ application security relies on a combination of measures, each addressing specific aspects of data protection and system integrity. The following key areas are detailed in this document:
+
+*   User Authentication
+*   Authorization & Access Control
+*   Encryption of Sensitive Data
+*   Pseudonymization
+*   Database Access Security
+*   Transport Security
+*   Server and Infrastructure Isolation
+*   Audit & Logging
+*   C3D File Security
+
+---
+
+### 2.1. 🔑 User Authentication
 
 **Core Technology**: **Self-hosted Supabase Auth** utilizing **JWT (JSON Web Tokens)**.
 
@@ -63,7 +87,8 @@ The GHOSTLY+ dashboard is designed with a multi-layered security approach to pro
 ### Optional: Two-Factor Authentication (2FA/MFA)
 
 *   **Availability**: Supabase Auth supports MFA (e.g., TOTP via authenticator apps).
-*   **Status**: Considered an optional enhancement, not part of initial core functionality.
+*   **Implementation Status**: Optional feature, not planned for initial core functionality.
+*   **Recommendation**: Offer as an optional security enhancement later if required.
 
 ### Detailed Authentication and Data Access Flow
 
@@ -122,9 +147,9 @@ sequenceDiagram
 
 ---
 
-## 2. 🧱 Authorization & Access Control
+### 2.2. 🧱 Authorization & Access Control
 
-### Technology: **Self-hosted Supabase with Row Level Security (RLS)**
+#### Technology: **Self-hosted Supabase with Row Level Security (RLS)**
 
 *   Database access will be controlled using **custom RLS policies** defined directly in PostgreSQL.
 *   **Goal**: Ensure users can only access data they are explicitly permitted to see (e.g., therapists see assigned patients, researchers see authorized cohorts).
@@ -136,9 +161,9 @@ sequenceDiagram
 
 ---
 
-## 3. 🔒 Encryption of Sensitive Data (Planned)
+### 2.3. 🔒 Encryption of Sensitive Data (Planned)
 
-### Planned Technology: **Fernet (Python Cryptography)**
+#### Planned Technology: **Fernet (Python Cryptography)**
 
 *   **Plan**: Sensitive medical data (e.g., specific assessment details, potentially parts of EMG metadata) **will be encrypted** by the FastAPI backend before being stored in the database.
 *   Encryption keys will be managed securely on the backend and **never exposed** to the frontend or stored insecurely.
@@ -150,9 +175,9 @@ sequenceDiagram
 
 ---
 
-## 4. 🔐 Pseudonymization (Planned)
+### 2.4. 🔐 Pseudonymization (Planned)
 
-### Planned Technology: **Cryptographic Hashing (SHA-256)**
+#### Planned Technology: **Cryptographic Hashing (SHA-256)**
 
 *   **Plan**: Directly identifying patient information (e.g., names, specific IDs if not already opaque) **will be pseudonymized** by the FastAPI backend using irreversible hashing before storage or logging where appropriate.
 *   This allows for data analysis using anonymous identifiers.
@@ -163,7 +188,7 @@ sequenceDiagram
 
 ---
 
-## 5. 📦 Database Access Security (Self-hosted Supabase)
+### 2.5. 📦 Database Access Security (Self-hosted Supabase)
 
 *   The self-hosted Supabase instance uses standard security keys:
     *   `anon` key: **Limited access**, intended primarily for authentication calls or potentially very limited, safe frontend operations (if any).
@@ -176,7 +201,7 @@ sequenceDiagram
 
 ---
 
-## 6. 📡 Transport Security (HTTPS)
+### 2.6. 📡 Transport Security (HTTPS)
 
 *   **Goal**: All network communication will use **HTTPS/TLS** encryption.
 *   **Internal (Docker)**: Communication between Nginx, FastAPI, and Supabase containers within the Docker network should ideally be configured for TLS, though this might be deferred if the Docker network is considered sufficiently isolated within the VM.
@@ -188,7 +213,7 @@ sequenceDiagram
 
 ---
 
-## 7. 🧪 Server and Infrastructure Isolation
+### 2.7. 🧪 Server and Infrastructure Isolation
 
 *   The application runs on a **private VUB virtual machine**.
 *   Backend (FastAPI) and Supabase services run in **separate Docker containers**, providing process isolation.
@@ -254,9 +279,15 @@ flowchart TD
     Decrypt -.->|"Only decrypts in\nmemory for\nauthorized users"| API
 ```
 
+#### Local Supabase Deployment Notes
+
+*   The project uses `docker-compose` to run Supabase services locally within the VUB VM.
+*   Authentication, database, and storage services are contained within this private environment.
+*   No data is transmitted to external Supabase cloud services.
+
 ---
 
-## 8. 🧾 Audit & Logging (Planned)
+### 2.8. 🧾 Audit & Logging (Planned)
 
 *   **Plan**: Key security events (logins, data access, administrative changes) **will be logged** by the FastAPI application.
 *   Logs should be stored securely, potentially separate from application data, and should not contain sensitive data in plain text.
@@ -267,7 +298,7 @@ flowchart TD
 
 ---
 
-## 9. 🛡️ C3D File Security
+### 2.9. 🛡️ C3D File Security
 
 *   **Plan**: C3D files **will be uploaded** securely via authenticated FastAPI endpoints.
 *   Files **will be stored** in local Supabase Storage with access controlled via backend logic (verifying JWT and user permissions).
@@ -279,19 +310,7 @@ flowchart TD
 
 ---
 
-## 🔁 Security by Layer (Planned Architecture)
-
-| Layer                    | Planned Protection Measures                                        |
-| ------------------------ | ------------------------------------------------------------------ |
-| **Frontend (Vue 3)**     | JWT handling, input sanitization (standard framework features)     |
-| **API (FastAPI)**        | JWT validation, input validation, rate limiting (optional), encryption, pseudonymization |
-| **Database (Local Supabase)** | RLS policies, backend-managed encryption, database-level security |
-| **Transport**            | HTTPS/TLS (external access mandatory, internal recommended)        |
-| **Infrastructure**       | Private VM, network controls, containerization (Docker)            |
-
----
-
-## ✅ Conclusion
+## 3. Conclusion
 
 The GHOSTLY+ application design incorporates:
 
@@ -303,15 +322,7 @@ This security model provides a strong foundation. The specific implementation de
 
 ---
 
-## Local Supabase Deployment Notes
-
-*   The project uses `docker-compose` to run Supabase services locally within the VUB VM.
-*   Authentication, database, and storage services are contained within this private environment.
-*   No data is transmitted to external Supabase cloud services.
-
----
-
-## References
+## 4. References
 
 *   [GDPR Official Site](https://gdpr.eu/)
 *   [OWASP Top 10](https://owasp.org/www-project-top-ten/)
