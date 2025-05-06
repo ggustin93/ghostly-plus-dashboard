@@ -110,6 +110,9 @@ instance/
 # Sphinx documentation
 _build/
 
+# Obsidian docs
+.obsidian/
+
 # PyBuilder
 target/
 
