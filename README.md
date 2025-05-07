@@ -28,11 +28,12 @@ The Web Dashboard will:
 
 ## 4. Development Setup
 
-This project uses Docker Compose for local development orchestration.
+This project uses Docker Compose for local development orchestration, managing both the application services (frontend, backend, Nginx) and a self-hosted Supabase instance.
 
 ### Prerequisites
 
 - Docker & Docker Compose
+- Git (for cloning Supabase configuration initially)
 - Node.js & npm (for frontend development outside Docker, if preferred)
 - Python & Poetry (for backend development outside Docker, if preferred)
 
@@ -40,24 +41,38 @@ This project uses Docker Compose for local development orchestration.
 
 Before running the application, you need to set up environment variables:
 
-1.  **Backend:**
-    - Copy `backend/.env.example` to `backend/.env`.
-    - Review `backend/.env` and fill in necessary values, especially `SECRET_KEY` and later, `DATABASE_URL` and any Supabase keys.
-2.  **Frontend:**
-    - Copy `frontend/.env.example` to `frontend/.env`.
-    - Review `frontend/.env` and adjust `VITE_API_BASE_URL` if needed (though the default should work with the Nginx setup).
+1.  **Root `.env` File (Main Configuration):**
+    -   A `.env` file is required at the project root. This file configures all services, including Supabase and your application's backend/frontend.
+    -   It was initially created by copying the content from Supabase's official `docker/.env.example` (see `supabase_config/` setup below or `docs/environments/` for more details).
+    -   **Crucial Supabase variables to set in this root `.env` file include:**
+        -   `POSTGRES_PASSWORD` (a strong, random password)
+        -   `JWT_SECRET` (a strong, random string of at least 32 characters)
+        -   `ANON_KEY` and `SERVICE_ROLE_KEY` (generate these from your `JWT_SECRET` as per Supabase docs)
+        -   `DASHBOARD_USERNAME` and `DASHBOARD_PASSWORD` (for Supabase Studio access)
+        -   `SITE_URL` (e.g., `http://localhost:YOUR_FRONTEND_PORT`)
+        -   `SUPABASE_PUBLIC_URL` (e.g., `http://localhost:8000` if Kong is on port 8000)
+        -   `DOCKER_SOCKET_LOCATION=/var/run/docker.sock` (especially for macOS/Linux)
+    -   Application-specific variables (e.g., backend `SECRET_KEY`, frontend `VITE_API_BASE_URL`) should also be defined in this root `.env` file. The `docker-compose.yml` for the application services will then pass these to the respective containers.
+    -   Example stubs `backend/.env.example` and `frontend/.env.example` can serve as a reference for application-specific variables but the root `.env` is the source of truth for Dockerized execution.
 
-### Running with Docker Compose
+### Supabase Local Instance Setup (One-time)
+
+The local Supabase instance is managed via a dedicated Docker Compose setup located in the `supabase_config/` directory. This was necessary to resolve M1 Mac compatibility issues.
+Refer to `memory-bank/techContext.md` (section 6.1) and `docs/environments/` for details on its one-time setup (cloning Supabase, copying files, creating the root `.env`).
+
+### Running the Full Stack with Docker Compose
 
 1.  Ensure Docker is running.
-2.  Ensure you have set up the `.env` files as described above.
+2.  Ensure your root `.env` file is correctly populated.
 3.  From the project root directory, run:
     ```bash
-    docker-compose up --build
+    docker compose -f docker-compose.yml -f supabase_config/docker-compose.yml up --build -d
     ```
 4.  The application should be accessible at `http://localhost` (Nginx on port 80).
     - The frontend (Vite dev server) is running internally on port 5173, proxied by Nginx.
     - The backend (FastAPI) is running internally on port 8000, proxied by Nginx under `/api`.
+5.  **Supabase Studio** should be accessible via the Kong gateway, typically at `http://localhost:8000` (or the port defined by `KONG_HTTP_PORT` in your `.env`). Use the `DASHBOARD_USERNAME` and `DASHBOARD_PASSWORD` from your `.env` to log in.
+6.  Supabase API endpoints (Auth, REST, Storage, Realtime) are also available via Kong on the same port (e.g., `http://localhost:8000/auth/v1`, `http://localhost:8000/rest/v1`).
 
 ### Running Manually (Optional)
 
@@ -91,6 +106,8 @@ The project structure is organized as follows:
 - `backend/`: Contains the backend code and dependencies.
 - `frontend/`: Contains the frontend code and dependencies.
 - `docs/`: Contains project documentation and setup instructions.
+- `supabase_config/`: Contains the Docker Compose setup for the self-hosted Supabase services.
 - `memory-bank/`: Contains AI-managed context files tracking project state, decisions, and technical details.
+- `.env`: (At project root, **not versioned**) Stores all necessary environment variables.
 
 The project is designed to be modular and scalable, with a focus on security and data privacy. 

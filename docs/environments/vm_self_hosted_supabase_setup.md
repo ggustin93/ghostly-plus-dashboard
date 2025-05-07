@@ -1,21 +1,23 @@
 # Full Application Deployment on VUB VM (Frontend, Backend, Supabase)
 
+> **Note:** This document outlines the planned deployment process for the GHOSTLY+ application on the VUB VM. As the project is in its early stages, some details or specific commands may evolve. Always refer to the latest version and cross-reference with the project's Memory Bank (`memory-bank/`) for the most current information and context.
+
 This guide provides a step-by-step tutorial for deploying the complete GHOSTLY+ application (frontend, backend, and self-hosted Supabase) on a VUB Virtual Machine using Docker and Nginx. This setup is intended for a production-like environment.
 
 **Key Technologies:** Docker, Docker Compose, Nginx, Supabase (Self-Hosted).
 
 ## 1. VM Prerequisites & Initial Setup
 
-Ensure the VUB VM meets these requirements before proceeding.
+The VUB VM should meet the following requirements prior to proceeding with the deployment.
 
 ### 1.1. Operating System
 *   **Recommendation:** Use the latest stable Ubuntu Server LTS release.
-    *   As of early 2024, **Ubuntu 24.04.2 LTS (“Noble Numbat”)** is a strong candidate (final point release expected Feb 2025, but current 24.04.x is stable).
+    *   As of early 2024, **Ubuntu 24.04.2 LTS ("Noble Numbat")** is a strong candidate (final point release expected Feb 2025, but current 24.04.x is stable).
     *   LTS versions offer long-term support (e.g., until April 2029 for 24.04) and up-to-date security.
-*   Verify your current OS version if the VM is already provisioned.
+*   The current OS version should be verified if the VM is already provisioned.
 
 ### 1.2. Install Essential Tools
-Update package lists and install Git, Docker, and Docker Compose.
+Package lists should be updated, followed by the installation of Git, Docker, and Docker Compose.
 ```bash
 sudo apt update
 sudo apt upgrade -y # Optional: upgrade existing packages
@@ -36,43 +38,43 @@ docker --version
 # If not, check Docker's official documentation for the latest Compose installation.
 docker compose version
 ```
-*   Ensure the Docker daemon is active: `sudo systemctl status docker` (should be active/running). Enable it to start on boot: `sudo systemctl enable docker`.
+*   The Docker daemon status can be verified using `sudo systemctl status docker` (it should be active/running). It is recommended to enable it to start on boot via `sudo systemctl enable docker`.
 
 ### 1.3. VM Access & Security
-*   **SSH Access:** You need SSH access to the VM with a user account that has `sudo` privileges.
-*   **User Privileges:** Ensure your user can run `docker` commands (either via `sudo` or by being in the `docker` group).
+*   **SSH Access:** SSH access to the VM is required with a user account that has `sudo` privileges.
+*   **User Privileges:** The user account should have the capability to run `docker` commands (either via `sudo` or by being in the `docker` group).
 
 ### 1.4. Network Configuration
-*   **Static IP:** The VM must have a static IP address assigned by VUB IT.
-*   **DNS Records:** Coordinate with VUB IT to configure DNS records pointing to the VM's static IP. Examples:
+*   **Static IP:** A static IP address for the VM, assigned by VUB IT, is a prerequisite.
+*   **DNS Records:** Coordination with VUB IT is necessary to configure DNS records pointing to the VM's static IP. Examples:
     *   `dashboard.yourproject.vub.be` (for Frontend)
     *   `api.yourproject.vub.be` (for Backend API)
     *   `supabase.yourproject.vub.be` (for Supabase services - Kong gateway, Studio)
-    *   Adjust these based on your project's naming scheme. These will be used in Nginx and application configurations.
+    *   These examples may be adjusted based on the project's specific naming scheme. These will be used in Nginx and application configurations.
 *   **Technical Steps:**
-    *   **Static IP:** Request from VUB IT, providing VM details. They will either configure it or provide network details (IP, subnet, gateway, DNS servers) for manual OS-level configuration (e.g., via `netplan` on Ubuntu).
-    *   **DNS Records:** After obtaining the static IP, request VUB IT to create 'A' records for your chosen hostnames pointing to this IP.
+    *   **Static IP:** A request should be made to VUB IT, providing VM details. They will either configure it or provide network details (IP, subnet, gateway, DNS servers) for manual OS-level configuration (e.g., via `netplan` on Ubuntu).
+    *   **DNS Records:** After obtaining the static IP, VUB IT should be requested to create 'A' records for the chosen hostnames pointing to this IP.
 
 ### 1.5. Firewall Configuration
-*   Coordinate with VUB IT to ensure the VM's firewall (e.g., `ufw` on Ubuntu or an external VUB firewall) allows inbound traffic on:
+*   Coordination with VUB IT is required to ensure the VM's firewall (e.g., `ufw` on Ubuntu or an external VUB firewall) allows inbound traffic on:
     *   **Port 22 (TCP):** For SSH access (ensure this is restricted to trusted IPs if possible).
     *   **Port 80 (TCP):** For HTTP (Nginx will handle this, initially for Let's Encrypt challenges).
     *   **Port 443 (TCP):** For HTTPS (Nginx will handle secure traffic).
 *   Internal Docker ports (e.g., Supabase's 8000, your app's internal ports) should generally *not* be directly exposed to the public internet by the VM's firewall; Nginx will manage public access.
 *   **Technical Steps:**
-    *   **VUB Perimeter Firewall:** Request VUB IT to open TCP ports 22 (SSH, restricted to trusted IPs), 80 (HTTP), and 443 (HTTPS) to your VM's static IP.
-    *   **Local VM Firewall (e.g., `ufw`):** On the VM, install `ufw` if not present. Allow necessary services (`sudo ufw allow ssh`, `sudo ufw allow http`, `sudo ufw allow https`) and then enable it (`sudo ufw enable`). Ensure SSH is allowed before enabling.
+    *   **VUB Perimeter Firewall:** A request should be submitted to VUB IT to open TCP ports 22 (SSH, which should ideally be restricted to trusted IPs), 80 (HTTP), and 443 (HTTPS) to the VM's static IP.
+    *   **Local VM Firewall (e.g., `ufw`):** If `ufw` is not present on the VM, it should be installed. Necessary services (`sudo ufw allow ssh`, `sudo ufw allow http`, `sudo ufw allow https`) can then be allowed, followed by enabling `ufw` (`sudo ufw enable`). It is important to ensure SSH is allowed before `ufw` is enabled.
 
 ### 1.6. VM Resource Allocation (Recommendations)
 For a full-stack application with Supabase, Nginx, frontend, and backend services:
 *   **CPU:** Minimum 2 vCPUs, **Recommended: 4+ vCPUs**.
 *   **RAM:** Minimum 8 GB, **Recommended: 16 GB** or more (PostgreSQL benefits greatly).
 *   **Storage:** Minimum 50-80 GB **SSD**, **Recommended: 100 GB+ SSD** (consider OS, Docker images, database growth, logs).
-*   When requesting the VM from VUB IT, provide these recommendations and explain your stack. Inquire about scalability.
+*   It is advisable to communicate these resource recommendations and the nature of the technical stack (full-stack application with database services) when liaising with VUB IT for VM provisioning. Inquiries regarding future scalability options for the allocated VM resources are also recommended at that stage.
 
 ## 2. Deploying GHOSTLY+ Application Components (Frontend & Backend)
 
-These steps assume your GHOSTLY+ application (frontend and backend) is containerized using Docker and managed with a `docker-compose.yml` file.
+The following steps outline the deployment process assuming the GHOSTLY+ application (frontend and backend) is containerized using Docker and managed with a `docker-compose.yml` file.
 
 ### 2.1. Clone Your Application Repository
 On the VUB VM, clone your main application repository (which includes frontend, backend, and their Docker configurations).
@@ -83,20 +85,21 @@ cd ghostly-plus-dashboard
 ```
 
 ### 2.2. Configure Application Environment Variables
-Your frontend and backend will likely require `.env` files. Create these from their respective `.env.example` files and populate them for the VUB VM environment.
+The frontend and backend components typically require `.env` files for configuration. These can be created by copying their respective `.env.example` files and populating them for the VUB VM environment.
 *   **Frontend `.env` (e.g., in `frontend/.env`):**
-    *   `VITE_API_BASE_URL=https://api.yourproject.vub.be` (or the appropriate public API URL served by Nginx)
+    *   `VITE_API_BASE_URL=https://api.yourproject.vub.be` (Public API URL via Nginx)
     *   `VITE_SUPABASE_URL=https://supabase.yourproject.vub.be`
-    *   `VITE_SUPABASE_ANON_KEY=your_supabase_anon_key_from_supabase_setup` (This will be set in Supabase's .env later)
+    *   `VITE_SUPABASE_ANON_KEY=your_supabase_anon_key` (This value must match `ANON_KEY` in the root project `.env` file)
 *   **Backend `.env` (e.g., in `backend/.env`):**
-    *   `DATABASE_URL="postgresql://postgres:[YOUR_SUPABASE_DB_PASSWORD]@[VM_IP_OR_LOCALHOST_IF_SAME_DOCKER_NETWORK_AS_SUPABASE]:5432/postgres"`
-        *   Note: If Supabase runs in a different Docker network accessible by IP, use VM IP. If you plan to put them on the same custom Docker network, you might be able to use the Supabase DB service name. For simplicity here, we assume Supabase DB might be accessed via `localhost` or its internal Docker IP if Nginx is proxying to it, but more typically the backend will directly connect to Supabase's PostgreSQL port. For now, plan to use `localhost` if Supabase DB is on the same VM. The Supabase DB password will be set later.
+    *   `DATABASE_URL="postgresql://postgres:[YOUR_SUPABASE_DB_PASSWORD_FROM_ROOT_ENV]@[SUPABASE_DB_SERVICE_NAME_OR_IP]:5432/postgres"`
+        *   Note: `[YOUR_SUPABASE_DB_PASSWORD_FROM_ROOT_ENV]` must match `POSTGRES_PASSWORD` in the root project `.env` file.
+        *   `[SUPABASE_DB_SERVICE_NAME_OR_IP]` will typically be `localhost` if the backend and Supabase run on the same VM (ports are mapped), or the Docker service name of the Supabase database (e.g., `db`) if the application and Supabase containers are on the same custom Docker network.
     *   `JWT_SECRET_KEY=your_application_specific_jwt_secret` (if your backend issues its own JWTs, distinct from Supabase's)
     *   Any other necessary API keys or configuration.
-*   **Security:** Never commit populated `.env` files with real secrets to Git. Use `.gitignore`.
+*   **Important:** The primary source for Supabase-related environment variables (`POSTGRES_PASSWORD`, `JWT_SECRET`, `ANON_KEY`, `SERVICE_ROLE_KEY`, etc.) is the root `.env` file of the `ghostly-plus-dashboard` project. Ensure consistency. Application-specific `.env` files (`frontend/.env`, `backend/.env`) might reference these or be used for variables not shared globally.
 
 ### 2.3. Build Application Docker Images (If Necessary)
-If your `docker-compose.yml` for the application builds images locally (e.g., from Dockerfiles):
+If the application's `docker-compose.yml` is configured to build images locally (e.g., from Dockerfiles):
 ```bash
 # Navigate to the directory containing your application's main docker-compose.yml
 cd /path/to/ghostly-plus-dashboard
@@ -105,48 +108,46 @@ docker compose build # Or: docker compose build frontend backend
 If you use pre-built images from a registry, this step can be skipped (Docker Compose will pull them).
 
 ### 2.4. Start Frontend & Backend Services
-Use your application's `docker-compose.yml` to start the frontend and backend services.
+The application's `docker-compose.yml` is used to start the frontend and backend services.
 ```bash
 # Ensure you are in the directory with your app's docker-compose.yml
 docker compose up -d frontend backend # Or simply 'docker compose up -d' if it defines all services
 ```
 
 ### 2.5. Verify Frontend & Backend Services (Internally)
-Check that your application containers are running.
+The status of the application containers can be checked to ensure they are running.
 ```bash
 docker compose ps
 # Check logs if needed
 docker compose logs frontend
 docker compose logs backend
 ```
-At this stage, they might not be publicly accessible until Nginx is configured. You can test internal connectivity if services expose ports on `localhost` (e.g., `curl http://localhost:INTERNAL_PORT`).
+At this stage, they might not be publicly accessible until Nginx is configured. Internal connectivity can be tested if services expose ports on `localhost` (e.g., `curl http://localhost:INTERNAL_PORT`).
 
 ## 3. Deploying Self-Hosted Supabase
 
-Follow these steps on the VUB VM to set up a separate Supabase instance.
+The Supabase self-hosted instance is managed via Docker Compose configuration files located within the `ghostly-plus-dashboard` project itself, under the `supabase_config/` directory. This setup was chosen to simplify deployment and manage M1 Mac compatibility issues during local development.
 
-### 3.1. Clone Supabase Docker Repository
-```bash
-git clone --depth 1 https://github.com/supabase/supabase
-```
+### 3.1. Navigate to Project Directory
+It should be ensured that the current working directory is the `ghostly-plus-dashboard` directory on the VUB VM (cloned in step 2.1).
 
-### 3.2. Set Up Supabase Configuration Directory
-It's good practice to keep Supabase Docker configurations separate.
-```bash
-mkdir ~/supabase-selfhosted
-cp -rf supabase/docker/* ~/supabase-selfhosted/
-cd ~/supabase-selfhosted
-```
+### 3.2. Critical: Configure Root Environment File (`.env`)
+All Supabase environment variables, along with application-specific ones, are managed in a single `.env` file at the root of the `ghostly-plus-dashboard` project directory on the VM.
 
-### 3.3. Critical: Configure Supabase Environment Variables
-Edit `~/supabase-selfhosted/.env` (copied from `.env.example`). **Replace ALL placeholders with strong, unique values.**
+1.  If it doesn't exist, create it by copying from `supabase_config/.env.example` (which should be present in your cloned `ghostly-plus-dashboard` repository):
+    ```bash
+    # In /path/to/ghostly-plus-dashboard directory on the VM
+    cp supabase_config/.env.example .env
+    ```
+2.  **This root `.env` file requires editing.** **ALL placeholders must be replaced with strong, unique values.**
+    *   This file will be used by both the application's `docker-compose.yml` and Supabase's `supabase_config/docker-compose.yml`.
 
 *   **PostgreSQL Settings:**
     *   `POSTGRES_PASSWORD`: A very strong, unique password. **Save this securely; your backend will need it.**
 *   **API Gateway & JWT:**
     *   `JWT_SECRET`: Cryptographically strong random string (min. 32 chars). **Generate a new one.**
     *   `ANON_KEY`: Public API key. Supabase docs explain how to generate this from `JWT_SECRET` (role: `anon`).
-    *   `SERVICE_ROLE_KEY`: Admin key. Generate from `JWT_SECRET` (role: `service_role`). **Keep highly secure.**
+    *   `SERVICE_ROLE_KEY`: Admin key. Generate from `JWT_SECRET` (role: `service_role`). **This key must be kept highly secure.**
 *   **Public URLs (Use your VUB DNS records):**
     *   `SITE_URL=https://dashboard.yourproject.vub.be` (Your main application's public URL)
     *   `SUPABASE_PUBLIC_URL=https://supabase.yourproject.vub.be` (Base URL for Supabase services, accessed via Nginx)
@@ -155,45 +156,48 @@ Edit `~/supabase-selfhosted/.env` (copied from `.env.example`). **Replace ALL pl
     *   `SMTP_ADMIN_EMAIL`, `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `SMTP_SENDER_NAME`, `SMTP_AUTH_METHOD`, `SMTP_SECURE_ENABLED`. Obtain details from VUB IT or your email provider.
 *   **Supabase Studio (Dashboard) Authentication:**
     *   `DASHBOARD_USERNAME`: Change from default `supabase`.
-    *   `DASHBOARD_PASSWORD`: Strong, unique password. **Do NOT use the default.**
-*   **Other Variables:** Review all defaults in `.env.example` and change if necessary.
+    *   `DASHBOARD_PASSWORD`: Strong, unique password. **The default password should not be used.**
+*   **Other Variables:** All default values in `.env.example` should be reviewed and modified if necessary.
 *   **Security Best Practices:**
-    *   Use a password manager.
-    *   Restrict read access to this `.env` file on the VM (`chmod 600 ~/supabase-selfhosted/.env`).
-    *   **Never commit the populated `.env` file to Git.**
+    *   Utilizing a password manager is recommended for storing sensitive credentials.
+    *   Read access to this `.env` file on the VM should be restricted (e.g., `chmod 600 .env`).
+    *   **The populated `.env` file must not be committed to Git.**
 
-### 3.4. Pull Supabase Docker Images
+### 3.3. Pull Supabase Docker Images
+From the root of the `ghostly-plus-dashboard` directory:
 ```bash
-# In ~/supabase-selfhosted directory
-docker compose pull
+# In /path/to/ghostly-plus-dashboard directory
+docker compose -f supabase_config/docker-compose.yml pull
 ```
 
-### 3.5. Start Supabase Services
+### 3.4. Start Supabase Services
+From the root of the `ghostly-plus-dashboard` directory:
 ```bash
-# In ~/supabase-selfhosted directory
-docker compose up -d
+# In /path/to/ghostly-plus-dashboard directory
+docker compose -f supabase_config/docker-compose.yml up -d
 ```
 
-### 3.6. Verify Supabase Services
+### 3.5. Verify Supabase Services
+From the root of the `ghostly-plus-dashboard` directory:
 ```bash
-# In ~/supabase-selfhosted directory
-docker compose ps
+# In /path/to/ghostly-plus-dashboard directory
+docker compose -f supabase_config/docker-compose.yml ps
 ```
-All Supabase services (db, kong, auth, studio, etc.) should be `running (healthy)`. Check logs if issues: `docker compose logs <service_name>`.
+All Supabase services (db, kong, auth, studio, etc.) should be `running (healthy)`. Logs can be consulted if issues arise: `docker compose -f supabase_config/docker-compose.yml logs <service_name>`.
 
-### 3.7. Initial Supabase Access (Verification)
-Before Nginx is set up, Supabase Studio is often accessible via the Kong gateway's default port (usually 8000, check Supabase's `docker-compose.yml`).
+### 3.6. Initial Supabase Access (Verification)
+Prior to Nginx setup, Supabase Studio is generally accessible via the Kong gateway's default port (usually 8000, as defined in Supabase's `docker-compose.yml`).
 *   URL: `http://<VM_STATIC_IP>:8000`
-*   Login with `DASHBOARD_USERNAME` and `DASHBOARD_PASSWORD` from Supabase's `.env`.
+*   Access is granted using the `DASHBOARD_USERNAME` and `DASHBOARD_PASSWORD` defined in the root `.env` file.
 *   API: `http://<VM_STATIC_IP>:8000/rest/v1/`, `http://<VM_STATIC_IP>:8000/auth/v1/`
 This is for initial verification; public access will be via Nginx over HTTPS.
 
 ## 4. Database Schema Migration to VM Supabase
 
-Apply your application's database schema (developed locally) to the new self-hosted Supabase instance.
+The application's database schema, previously developed locally, should be applied to the newly deployed self-hosted Supabase instance.
 
 ### 4.1. Apply Migrations
-*   Ensure Supabase CLI is installed (locally or on a machine that can access the VM's database port).
+*   Installation of the Supabase CLI is a prerequisite (locally or on a machine that can access the VM's database port).
 *   From your main application project directory (e.g., `ghostly-plus-dashboard`):
     ```bash
     # Replace placeholders with actual values from Supabase's .env on the VM
@@ -205,7 +209,7 @@ Apply your application's database schema (developed locally) to the new self-hos
 
 ## 5. Nginx Reverse Proxy & SSL for All Services
 
-Configure Nginx on the VUB VM to act as the single, secure entry point for your frontend, backend, and Supabase services.
+Nginx is to be configured on the VUB VM to serve as the single, secure entry point for the frontend, backend, and Supabase services.
 
 ### 5.1. Install Nginx
 If Nginx is not already installed on the VM (e.g., as part of your application's Docker setup or as a system service):
@@ -302,19 +306,19 @@ server {
     }
 }
 ```
-*   **Enable the site:** `sudo ln -s /etc/nginx/sites-available/ghostly_platform.conf /etc/nginx/sites-enabled/`
-*   **Test Nginx config:** `sudo nginx -t`
-*   **If successful, reload Nginx:** `sudo systemctl reload nginx`
+*   The site can be enabled using: `sudo ln -s /etc/nginx/sites-available/ghostly_platform.conf /etc/nginx/sites-enabled/`
+*   The Nginx configuration should be tested with: `sudo nginx -t`
+*   If the test is successful, Nginx can be reloaded using: `sudo systemctl reload nginx`
 
 ### 5.4. Implement SSL/TLS with Let's Encrypt (Certbot)
-Secure all your public domains with HTTPS.
+All public domains should be secured with HTTPS.
 
 1.  **Install Certbot and Nginx Plugin:**
     ```bash
     sudo apt install certbot python3-certbot-nginx -y
     ```
 2.  **Obtain SSL Certificates:**
-    Run Certbot for each domain group defined in your Nginx config. Certbot will automatically modify your Nginx configuration to include SSL settings and set up HTTPS.
+    Certbot should be run for each domain group defined in the Nginx config. Certbot will automatically modify the Nginx configuration to include SSL settings and set up HTTPS.
     ```bash
     # For frontend (dashboard)
     sudo certbot --nginx -d dashboard.yourproject.vub.be
@@ -323,9 +327,9 @@ Secure all your public domains with HTTPS.
     # For Supabase
     sudo certbot --nginx -d supabase.yourproject.vub.be
     ```
-    Follow the prompts (enter email, agree to ToS). Choose to redirect HTTP to HTTPS when asked.
+    The prompts provided by Certbot should be followed (e.g., entering an email address, agreeing to Terms of Service). It is recommended to choose the option to redirect HTTP traffic to HTTPS when prompted.
 3.  **Verify Auto-Renewal:**
-    Certbot should set up a cron job or systemd timer for automatic renewal. Test it:
+    Certbot typically configures a cron job or systemd timer for automatic certificate renewal. This can be tested using:
     ```bash
     sudo certbot renew --dry-run
     ```
@@ -340,23 +344,23 @@ sudo systemctl reload nginx # Or restart: sudo systemctl restart nginx
 
 ## 6. Final Application Testing
 
-Access your services via their public HTTPS URLs.
+The deployed services should be accessed and tested via their public HTTPS URLs.
 
 *   **Frontend:** `https://dashboard.yourproject.vub.be`
 *   **Backend API:** (e.g., a health check endpoint) `https://api.yourproject.vub.be/health`
 *   **Supabase:**
     *   Studio: `https://supabase.yourproject.vub.be` (should redirect to Studio login if SITE_URL/SUPABASE_PUBLIC_URL are set correctly for Kong to route to Studio) or verify specific paths like `/rest/v1/` or `/auth/v1/` through this domain.
-    *   Ensure your frontend application can connect to Supabase using `https://supabase.yourproject.vub.be` and the `ANON_KEY`.
-    *   Ensure your backend application can connect to the Supabase database.
+    *   Verification should be made that the frontend application can connect to Supabase using `https://supabase.yourproject.vub.be` and the `ANON_KEY`.
+    *   Verification should be made that the backend application can connect to the Supabase database.
 
 ## 7. Production Best Practices & Ongoing Management
 
 ### 7.1. Security Hardening
-*   **Strong Secrets:** Double-check all `.env` files and configurations for strong, unique passwords and secrets.
-*   **File Permissions:** Restrict access to sensitive files (e.g., `.env` files, Nginx SSL private keys).
-*   **OS & Package Updates:** Regularly update the VM's operating system and all installed packages: `sudo apt update && sudo apt upgrade -y`.
-*   **Docker Security:** Keep Docker and Docker Compose updated. Review Docker's security best practices.
-*   **Firewall:** Ensure VM firewall rules are strict, only allowing necessary inbound traffic (HTTPS on 443, SSH on 22).
+*   **Strong Secrets:** All `.env` files and configurations should be double-checked for strong, unique passwords and secrets.
+*   **File Permissions:** Access to sensitive files (e.g., `.env` files, Nginx SSL private keys) should be restricted.
+*   **OS & Package Updates:** The VM's operating system and all installed packages should be regularly updated: `sudo apt update && sudo apt upgrade -y`.
+*   **Docker Security:** Docker and Docker Compose should be kept updated, and Docker's security best practices reviewed.
+*   **Firewall:** VM firewall rules should be configured strictly, only allowing necessary inbound traffic (HTTPS on 443, SSH on 22).
 
 ### 7.2. Automated Backups
 *   **Supabase PostgreSQL Database:**
@@ -373,21 +377,21 @@ Access your services via their public HTTPS URLs.
         DATE=$(date +%Y-%m-%d_%H-%M-%S)
 
         mkdir -p $BACKUP_DIR
-        PGPASSWORD=$DB_PASSWORD pg_dump -h $DB_HOST -p $DB_PORT -U $DB_USER -d $DB_NAME -F c -b -v -f "$BACKUP_DIR/$DB_NAME-$DATE.backup"
+        PGPASSWORD=$DB_PASSWORD docker exec supabase-db pg_dump -U $DB_USER -d $DB_NAME -F c -b -v -f "/tmp/$DB_NAME-$DATE.backup" && docker cp supabase-db:/tmp/$DB_NAME-$DATE.backup "$BACKUP_DIR/$DB_NAME-$DATE.backup" && docker exec supabase-db rm "/tmp/$DB_NAME-$DATE.backup"
         # Remove old backups (e.g., older than 7 days)
         find $BACKUP_DIR -type f -mtime +7 -name '*.backup' -delete
         ```
     *   Schedule this script with `cron`.
 *   **Supabase Storage Volumes:**
-    *   The Supabase `docker-compose.yml` defines volumes (e.g., for database data, storage files). Identify these paths (`~/supabase-selfhosted/volumes/db/data`, `~/supabase-selfhosted/volumes/storage/`) and back them up regularly (e.g., using `rsync` or `tar`).
-*   **Application Data Volumes:** If your frontend/backend uses Docker volumes for persistent data, back these up too.
-*   **Backup Storage:** Store backups securely, preferably encrypted and off-VM (e.g., cloud storage bucket).
+    *   The Supabase `docker-compose.yml` defines volumes (e.g., for database data, storage files). These paths (e.g., within `supabase_config/volumes/`) should be identified and backed up regularly (e.g., using `rsync` or `tar`).
+*   **Application Data Volumes:** If the frontend/backend utilizes Docker volumes for persistent data, these should also be backed up.
+*   **Backup Storage:** Backups should be stored securely, preferably encrypted and off-VM (e.g., cloud storage bucket).
 
 ### 7.3. Monitoring & Logging
-*   **Nginx Logs:** `/var/log/nginx/access.log` and `/var/log/nginx/error.log` (and any custom logs you defined).
-*   **Application Logs:** Use `docker compose logs frontend` and `docker compose logs backend` (from your app's directory). Configure log rotation if needed.
-*   **Supabase Logs:** `docker compose logs <supabase_service_name>` (from `~/supabase-selfhosted`).
-*   **System Monitoring:** Use tools like `htop`, `vmstat`, `df` or set up a more comprehensive monitoring solution (e.g., Prometheus, Grafana) for CPU, memory, disk, and network usage.
+*   **Nginx Logs:** `/var/log/nginx/access.log` and `/var/log/nginx/error.log` (and any custom logs defined).
+*   **Application Logs:** Use `docker compose logs frontend` and `docker compose logs backend` (from the app's directory). Configure log rotation if needed.
+*   **Supabase Logs:** `docker compose -f supabase_config/docker-compose.yml logs <supabase_service_name>` (from the project root).
+*   **System Monitoring:** Tools such as `htop`, `vmstat`, `df` can be used, or a more comprehensive monitoring solution (e.g., Prometheus, Grafana) may be set up for CPU, memory, disk, and network usage.
 
 ### 7.4. Updating Application Components
 1.  `cd /path/to/ghostly-plus-dashboard`
@@ -398,24 +402,27 @@ Access your services via their public HTTPS URLs.
 6.  Monitor logs and test.
 
 ### 7.5. Updating Supabase
-1.  `cd ~/supabase-selfhosted`
+1.  `cd /path/to/ghostly-plus-dashboard` (Navigate to your project root)
 2.  Review Supabase release notes for breaking changes.
-3.  Optionally, update the `supabase/supabase` git repository clone itself if major changes to `docker-compose.yml` or `.env.example` are expected (less common for routine image updates).
-4.  Modify image versions in `~/supabase-selfhosted/docker-compose.yml` to desired new versions.
-5.  `docker compose pull` (to fetch the new image versions)
-6.  `docker compose up -d` (this will stop, remove, and recreate containers using the new images; usually involves brief downtime).
+3.  Optionally, update your project's `supabase_config/` files if there are structural updates from the official Supabase repository (less common for routine image updates).
+4.  Modify image versions in `supabase_config/docker-compose.yml` to desired new versions.
+5.  `docker compose -f supabase_config/docker-compose.yml pull` (to fetch the new image versions)
+6.  `docker compose -f supabase_config/docker-compose.yml up -d` (this will stop, remove, and recreate containers using the new images; usually involves brief downtime).
 7.  Monitor logs and test Supabase functionality.
 
 ### 7.6. Managing Docker Services
 *   **Application (Frontend/Backend):**
     *   `cd /path/to/ghostly-plus-dashboard`
-    *   `docker compose stop [service_name]`
+    *   `docker compose stop [service_name]` (uses `docker-compose.yml` in current dir)
     *   `docker compose start [service_name]`
     *   `docker compose restart [service_name]`
-    *   `docker compose down` (stops and removes containers, networks)
+    *   `docker compose down`
 *   **Supabase:**
-    *   `cd ~/supabase-selfhosted`
-    *   (Similar `docker compose` commands as above)
+    *   `cd /path/to/ghostly-plus-dashboard`
+    *   `docker compose -f supabase_config/docker-compose.yml stop [service_name]`
+    *   `docker compose -f supabase_config/docker-compose.yml start [service_name]`
+    *   `docker compose -f supabase_config/docker-compose.yml restart [service_name]`
+    *   `docker compose -f supabase_config/docker-compose.yml down`
 *   **Viewing all running containers:** `docker ps -a`
 *   **Removing unused Docker resources:** `docker system prune -a --volumes` (Use with caution, removes all stopped containers, unused networks, dangling images, and optionally volumes).
 
@@ -433,7 +440,7 @@ Access your services via their public HTTPS URLs.
     *   Verify `DATABASE_URL` in your backend's `.env`.
     *   Ensure the Supabase PostgreSQL container is running and its port (e.g., 5432) is accessible from your backend container (either via `localhost` if mapped, or via Docker network service name).
     *   Check Supabase DB logs.
-*   **Permission Denied:** For Docker commands, ensure your user is in the `docker` group or use `sudo`. For file access, check permissions.
-*   **Port Conflicts:** Ensure no other services on the VM are using ports 80, 443 (for Nginx) or other ports intended for Docker services' internal use if you're mapping them directly to the host (which is generally avoided when Nginx is the entry point).
+*   **Permission Denied:** For Docker commands, ensure the user is in the `docker` group or use `sudo`. For file access, check permissions.
+*   **Port Conflicts:** Ensure no other services on the VM are using ports 80, 443 (for Nginx) or other ports intended for Docker services' internal use if mapping them directly to the host (which is generally avoided when Nginx is the entry point).
 
-This guide provides a comprehensive approach. Always adapt paths, service names, and configurations to your specific project setup. Refer to official documentation for each technology (Docker, Nginx, Supabase) for further details. 
+This guide provides a comprehensive approach. Paths, service names, and configurations should always be adapted to the specific project setup. Reference to the official documentation for each technology (Docker, Nginx, Supabase) is recommended for further details. 

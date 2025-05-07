@@ -194,9 +194,9 @@ sequenceDiagram
     *   `service_role` key: **Full database access**, restricted to the **FastAPI backend only**.
 *   **Principle**: Critical operations (data writing, reading sensitive data) MUST go through the FastAPI backend for validation, authorization checks, and encryption/decryption.
 *   **Benefit of local deployment**: Database access is restricted to the internal network of the VUB VM.
-*   **Status**: This access model is inherent to the Supabase/FastAPI architecture established in **Task 1**.
+*   **Status**: The architectural *intent* is for this access model, leveraging the Supabase/FastAPI tools whose initial infrastructure was set up in **Task 1** (Project Setup) and **Task 2.2** (Supabase Service Deployment). Full implementation and validation of backend-only `service_role` key usage and frontend `anon` key restrictions will occur during the development of authentication mechanisms (**Task 2.3**: Supabase Configuration) and subsequent API endpoint development (**Phase 2 & beyond**).
 
-✅ **Result**: Reduced database attack surface, enforcement of backend logic.
+✅ **Planned Result**: Reduced database attack surface, enforcement of backend logic through centralized API control.
 
 ---
 
@@ -220,7 +220,7 @@ sequenceDiagram
 *   **Benefit of local deployment**: Complete control over the infrastructure.
 *   **Status**: Docker environment established in **Task 1**.
 
-✅ **Result**: Secure, controlled, and isolated deployment environment.
+✅ **Planned Result**: Secure, controlled, and isolated deployment environment.
 
 #### Visualizing Security Boundaries
 
@@ -317,7 +317,7 @@ The GHOSTLY+ application design incorporates:
 *   Alignment with **healthcare data security best practices**.
 *   Emphasis on **data sovereignty** through local self-hosting of Supabase.
 
-This security model provides a strong foundation. The specific implementation details for features like encryption, pseudonymization, RLS, and logging will be addressed in their respective development phases.
+This planned security model *aims to provide* a strong foundation, which will be built upon and validated throughout the project's development phases. The specific implementation details for features like encryption, pseudonymization, RLS, and logging will be addressed in their respective development phases as outlined.
 
 ---
 
