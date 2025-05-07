@@ -251,4 +251,7 @@ backend/build/
 
 # Supabase Docker Compose specific
 supabase_config/volumes/
-supabase_cli_config_backup/ 
+supabase_cli_config_backup/
+
+# Backup files
+*.bak 
