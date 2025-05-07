@@ -66,8 +66,9 @@ source_documents: [docs/prd.md](mdc:docs/prd.md) (Section 4), [docs/security.md]
 
 -   **Containerization**: **Docker** & **Docker Compose**
     -   Separate Dockerfiles for backend (FastAPI) and frontend (Vue.js - multi-stage builds).
-    -   `docker-compose.yml` for local development orchestration.
-    (Source: [docs/prd.md](mdc:docs/prd.md) 4.6.1, 4.10)
+    -   `docker-compose.yml` for local development orchestration of application services (backend, frontend, nginx).
+    -   Local Supabase services (PostgreSQL, Auth, Storage, Studio, etc.) are managed via a separate `supabase_config/docker-compose.yml` and a root `.env` file, due to M1 compatibility issues with `npx supabase start`.
+    (Source: [docs/prd.md](mdc:docs/prd.md) 4.6.1, 4.10, and project experience)
 -   **Version Control**: **Git**
 -   **Web Server/Reverse Proxy (Production)**: **Nginx**
     (Source: [docs/prd.md](mdc:docs/prd.md) 4.10)
@@ -106,6 +107,12 @@ source_documents: [docs/prd.md](mdc:docs/prd.md) (Section 4), [docs/security.md]
 
 -   **Context7**: Consider using the Context7 MCP tool (`resolve-library-id` followed by `get-library-docs`) to fetch up-to-date, version-specific documentation and code examples for libraries. This is particularly helpful for ensuring AI assistants have accurate information and for verifying library usage against the latest official sources.
 
+### Environment Setup Guides
+
+Detailed setup instructions for different project environments are available:
+- [Local CLI Development Setup](mdc:docs/environments/local_cli_development_setup.md)
+- [VM Self-Hosted Supabase Setup](mdc:docs/environments/vm_self_hosted_supabase_setup.md)
+
 ## Outstanding Technical Questions 
 
 -   **Example (Shadcn/UI Button with Tailwind):**
@@ -119,4 +126,30 @@ source_documents: [docs/prd.md](mdc:docs/prd.md) (Section 4), [docs/security.md]
         Click Me
       </Button>
     </template>
-    ``` 
+    ```
+
+## 6. Known Issues & Troubleshooting
+
+### 6.1. Supabase CLI on M1 Macs (`exec format error` / Studio Unhealthy) - RESOLVED
+
+-   **Problem**: When running `npx supabase start` on M1 Macs, users might encounter `exec format error` for the `postgrest` container and an `unhealthy` status for the `supabase_studio` container. This prevents Supabase Studio from being accessible and can indicate issues with other Supabase services.
+-   **Cause**: This is often due to Docker images used by the Supabase CLI not being fully compatible with the ARM64 architecture of M1 Macs, even with Rosetta 2 installed. Specific services like PostgREST or Supabase Studio might pull images that cause an `exec format error`.
+-   **Attempted Solutions (as of 2025-05-07 for GHOSTLY+ Dashboard project)**:
+    -   Multiple attempts with `npx supabase start` after ensuring Docker Desktop was running, disk space cleared, Rosetta 2 installed, Supabase CLI updated, and Docker system pruned.
+    -   These attempts consistently failed with `exec format error` for `postgrest`.
+-   **Resolution (2025-05-07)**:
+    -   Switched to a manual Docker Compose setup for Supabase services.
+    -   Cloned the official `supabase/supabase` repository to obtain their `docker/` configuration files.
+    -   Copied `supabase/docker/*` files (specifically `docker-compose.yml` and others from the `docker` directory) to a project directory `supabase_config/`.
+    -   Created a root `.env` file from `supabase/docker/.env.example` (obtained from the cloned repo) and populated it with necessary secrets and configurations (including `DOCKER_SOCKET_LOCATION=/var/run/docker.sock`).
+    -   Ensured shell environment variables did not override the `.env` file by unsetting them for the session where necessary.
+    -   Modified `supabase_config/docker-compose.yml` to add platform specification to the `rest` (PostgREST) service definition. Initially tried `platform: linux/arm64`, which still resulted in `postgrest` restarting. Successfully resolved by using `platform: linux/amd64`, forcing x86_64 emulation for `postgrest`.
+    -   Successfully launched all Supabase services, including a stable `postgrest`, using `docker compose -f supabase_config/docker-compose.yml up -d` from the project root.
+-   **Key Takeaway**: For M1 Mac users experiencing `exec format error` with `npx supabase start` for `postgrest`, a manual Docker Compose setup is a viable workaround. Explicitly setting `platform: linux/amd64` for the `postgrest` service in the `docker-compose.yml` can force successful emulation when native ARM64 or `platform: linux/arm64` fails. Ensure the root `.env` file is correctly configured and not overridden by shell environment variables.
+
+-   **Next Steps / Potential Solutions (To Investigate Further)**:
+    -   Reset Docker Desktop to factory settings (Caution: will remove all existing images/containers/volumes).
+    -   Search for specific GitHub issues on Supabase CLI or related Docker image repositories regarding M1 `exec format error`.
+    -   Investigate Docker Desktop settings on M1, particularly "Use Virtualization framework" and Rosetta emulation options.
+    -   Consider manually defining Supabase services in the project's main `docker-compose.yml` using known ARM64-compatible images as an alternative to the Supabase CLI's local management, though this increases setup complexity.
+    -   **Update (2025-05-07)**: A more targeted Perplexity search for GitHub issues or specific Docker Desktop M1 settings related to "exec format error" for PostgREST or "Supabase Studio unhealthy" did not immediately yield a definitive, simple fix. The issue appears rooted in Docker image compatibility on ARM64/M1 architecture. Further investigation into Docker Desktop settings (e.g., "Use Virtualization framework," ensuring "Use Rosetta for x86_64/amd64 emulation on Apple Silicon" is enabled) or deeper dives into Supabase GitHub issues threads are needed. 

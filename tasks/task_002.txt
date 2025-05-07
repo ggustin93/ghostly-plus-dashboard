@@ -1,6 +1,6 @@
 # Task ID: 2
 # Title: Supabase Infrastructure Setup
-# Status: pending
+# Status: in-progress
 # Dependencies: 1
 # Priority: high
 # Description: Set up and configure Supabase infrastructure in two phases: first locally for immediate development, then on a VUB VM for production. Both setups will provide authentication, database, and storage services, ensuring complete data sovereignty and GDPR compliance. This task focuses specifically on the technical infrastructure setup, ending with functional Supabase endpoints ready for application integration.
@@ -118,3 +118,180 @@
 - Verify GDPR compliance of the infrastructure deployment
 - Test migration path from local to production environment
 - Create a basic endpoint verification checklist for handover to Task 3
+
+# Subtasks:
+## 1. Set up local development environment [done]
+### Dependencies: None
+### Description: Install and configure the necessary tools for local Supabase development
+### Details:
+Install Docker and Docker Compose on developer machines. Install Supabase CLI for local development management. Create setup scripts for consistent developer environments. Document resource requirements for local development. Configure environment variables in docker-compose.yml. Generate and securely store JWT keys for local development.
+<info added on 2025-05-07T08:34:23.496Z>
+This subtask involves setting up a complete local development environment for Supabase with proper documentation:
+
+1. Document Docker prerequisites in docs/DEVELOPMENT_SETUP.md:
+   - Confirm Docker Desktop/Rancher Desktop is installed and running
+   - Explain Docker's role in running Supabase services locally
+
+2. Document Supabase CLI installation:
+   - Add instructions for installing CLI as a dev dependency: `npm install supabase --save-dev`
+   - Include verification command: `npx supabase --version`
+
+3. Document Supabase project initialization:
+   - Add instructions for running `npx supabase init` in project root
+   - Explain the resulting `supabase` directory and its importance
+
+4. Document local Supabase stack management:
+   - Detail the `npx supabase start` command and expected output
+   - Include information about API URL, DB URL, Studio URL, and default keys
+   - Add instructions for stopping services with `npx supabase stop`
+
+5. Document Supabase Studio access:
+   - Highlight Studio availability at http://localhost:54323
+   - Explain its role in managing database, auth, and other services
+
+6. Clarify environment variables and JWT keys:
+   - Explain that CLI-managed local development uses default keys
+   - Note that supabase/config.toml is the main configuration point
+   - Distinguish between CLI approach and manual self-hosting
+
+7. Document resource requirements:
+   - Add notes about Docker system requirements
+   - Include basic troubleshooting advice for performance issues
+
+8. Create setup scripts (optional future enhancement):
+   - Consider developing a shell script to automate initialization and startup
+   - Focus on documentation first, with scripting as a potential follow-up
+
+The primary deliverable will be a comprehensive docs/DEVELOPMENT_SETUP.md file with all necessary instructions for developers to set up their local Supabase environment.
+</info added on 2025-05-07T08:34:23.496Z>
+<info added on 2025-05-07T08:45:00.607Z>
+Based on the revised plan for setting up the local Supabase development environment, I'll create comprehensive documentation in docs/DEVELOPMENT_SETUP.md that clearly explains the relationship between the application's Docker setup and the Supabase CLI's Docker management.
+
+The documentation will include:
+
+1. Prerequisites section emphasizing Docker Desktop/Rancher Desktop installation as a fundamental requirement, explaining that the Supabase CLI relies on Docker to run its services.
+
+2. Supabase CLI installation instructions using npm as a project dev dependency with the command `npm install supabase --save-dev`, including verification steps with `npx supabase --version`.
+
+3. Supabase project initialization instructions for the project root, detailing the `npx supabase init` command and explaining the purpose of the generated `supabase` directory that should be version controlled.
+
+4. A critical section on Docker environments that clarifies:
+   - The project's root docker-compose.yml manages the application stack (backend, frontend, nginx)
+   - The Supabase CLI manages a separate set of Docker containers specifically for Supabase services
+   - Both Docker environments run concurrently during local development
+   - The application connects to Supabase via localhost URLs (e.g., http://localhost:54321)
+   - This CLI approach differs from manually integrating Supabase into the main docker-compose.yml
+
+5. Instructions for starting the local Supabase stack with `npx supabase start`, explaining how the CLI orchestrates Docker containers and documenting the expected output (API URL, DB URL, Studio URL, etc.).
+
+6. Information on accessing and using the Supabase Studio UI for local development.
+
+7. Instructions for properly stopping the Supabase stack with `npx supabase stop`.
+
+8. Clarification that the CLI-driven setup uses default keys and configurations suitable for local development, primarily managed through supabase/config.toml.
+
+9. Notes on Docker resource requirements and potential troubleshooting for performance issues.
+
+The documentation will serve as a comprehensive guide for developers to set up their local Supabase environment, with clear distinction between the application's Docker setup and the Supabase CLI's Docker management.
+</info added on 2025-05-07T08:45:00.607Z>
+<info added on 2025-05-07T08:45:28.855Z>
+I'll create a comprehensive documentation file at docs/DEVELOPMENT_SETUP.md that clearly explains the local Supabase development environment setup process. This documentation will focus on using the Supabase CLI with Docker and will explicitly clarify the relationship between the application's Docker setup and the Supabase CLI's Docker management.
+
+The documentation will include:
+
+1. Prerequisites section
+   - Clear instructions for Docker Desktop/Rancher Desktop installation
+   - Explanation that Supabase CLI relies on Docker to run its services
+   - Verification steps to ensure Docker is properly configured
+
+2. Supabase CLI installation section
+   - Instructions for installing as a project dev dependency: `npm install supabase --save-dev`
+   - Verification command: `npx supabase --version`
+   - Explanation of why we're using the CLI approach for local development
+
+3. Supabase project initialization section
+   - Command details: `npx supabase init` (to be run in project root)
+   - Explanation of the generated `supabase` directory structure
+   - Version control considerations for the supabase directory
+
+4. Docker environments clarification section (critical)
+   - Explanation that the project's root docker-compose.yml manages the application stack
+   - Clarification that Supabase CLI manages a separate set of Docker containers
+   - Details on how both Docker environments run concurrently during development
+   - Information on how the application connects to Supabase via localhost URLs
+   - Distinction between this approach and manually integrating Supabase into docker-compose.yml
+
+5. Local Supabase stack management section
+   - Starting the stack: `npx supabase start` with expected output details
+   - Accessing services via provided URLs (API, DB, Studio, Inbucket)
+   - Default keys explanation (anon key, service_role key)
+   - Stopping the stack: `npx supabase stop`
+
+6. Supabase Studio usage section
+   - Accessing Studio at http://localhost:54323
+   - Overview of key Studio features for local development
+
+7. Configuration and keys section
+   - Explanation of default keys and configurations for local development
+   - Overview of supabase/config.toml as the main configuration point
+   - Distinction between CLI approach and manual self-hosting
+
+8. Resource requirements and troubleshooting section
+   - Docker system requirements notes
+   - Common issues and their solutions
+   - Performance optimization tips
+
+The documentation will serve as a comprehensive guide that developers can follow to set up their local Supabase environment, with special attention to clarifying the relationship between the application's Docker setup and the Supabase CLI's Docker management.
+</info added on 2025-05-07T08:45:28.855Z>
+
+## 2. Deploy local Supabase services [done]
+### Dependencies: 2.1
+### Description: Configure and deploy core Supabase services locally
+### Details:
+Start the local Supabase stack using CLI commands. Configure PostgreSQL database with proper security parameters and data encryption for sensitive information. Set up database schema initialization scripts. Configure Supabase Auth service (GoTrue) with appropriate JWT settings and token lifetimes. Set up Storage service with initial bucket structure and security parameters.
+<info added on 2025-05-07T08:57:30.550Z>
+This subtask focuses on deploying and verifying the local Supabase services. The goal is to ensure all core services are running and accessible for local development.
+
+1. Prerequisites:
+   - Confirm that `npx supabase init` has been executed (should be completed in subtask 2.1)
+   - Ensure Docker is running on the local machine
+
+2. Deployment Steps:
+   - Run `npx supabase start` from the project root directory
+   - This command will deploy all necessary Supabase Docker containers locally
+   - Wait for all services to initialize (may take a few minutes on first run)
+
+3. Verification Process:
+   - Access Supabase Studio at http://localhost:54323 to confirm the interface loads properly
+   - Verify API gateway accessibility at http://localhost:54321 (should receive a response, even if it's an error message)
+   - Within Supabase Studio, perform basic operational checks:
+     * Database: Verify visibility of the default 'public' schema
+     * Auth: Navigate to Auth section and confirm default settings are visible
+     * Storage: Access Storage section and verify functionality
+
+4. Important Notes:
+   - This subtask uses default local development credentials (e.g., postgres:postgres for DB)
+   - Detailed schema initialization, custom auth settings, and storage bucket configuration will be addressed in subsequent feature-driven tasks
+   - The focus here is on verifying the operational status of the local environment, not customizing it
+
+The successful completion of this subtask provides the foundation for the next subtask (2.3) which will focus on configuring the local API and security parameters.
+</info added on 2025-05-07T08:57:30.550Z>
+
+## 3. Configure local API and security [pending]
+### Dependencies: 2.2
+### Description: Set up API endpoints and security configurations for local development
+### Details:
+Generate and configure API keys for service access. Set up secure JWT secrets and configurations. Configure CORS settings to allow access from both Ghostly Game and Web Dashboard. Document all API endpoints (http://localhost:54321) and access methods. Create comprehensive setup guide for developers highlighting all configuration settings.
+
+## 4. Prepare VUB VM for production deployment [pending]
+### Dependencies: 2.3
+### Description: Set up the production environment on VUB VM for self-hosted Supabase
+### Details:
+Install Docker and Docker Compose on the VM. Configure appropriate VM resources (CPU, RAM, storage). Set up network security groups and firewall rules. Clone the Supabase Docker repository. Adapt environment variables from local setup to production. Generate and securely store production JWT keys. Set up proper container isolation and resource limits.
+
+## 5. Deploy and verify production Supabase infrastructure [pending]
+### Dependencies: 2.4
+### Description: Deploy Supabase services to production and verify functionality
+### Details:
+Migrate database schema, Auth service, and Storage service configurations from local environment to production. Implement enhanced security measures, backup procedures, and data retention policies for GDPR compliance. Generate production API keys with appropriate restrictions. Deploy the complete infrastructure and verify all services start correctly. Test basic connectivity to all endpoints. Document all production configuration settings, deployment procedures, maintenance guides, and security measures. Ensure infrastructure restarts properly after VM reboot.
+

@@ -41,7 +41,7 @@ Familiarity with Task Master's concepts is crucial for understanding project pro
 
 ## Development Environment Setup
 
-(Details on configuring the local development environment, Docker setup, Supabase local instance, etc. - To be defined based on [docs/prd.md](mdc:docs/prd.md) Section 4.10 and 5.1)
+Detailed instructions for configuring the local development environment, including Docker setup and the local Supabase CLI instance, can be found in the [Local CLI Development Setup Guide](mdc:docs/environments/local_cli_development_setup.md).
 
 ## Coding Standards & Conventions
 

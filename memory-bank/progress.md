@@ -32,9 +32,25 @@ description: Tracks what works, what's left to build, current status, known issu
     -   Updated `memory-bank/techContext.md` to specify Tailwind CSS v4.
 -   All changes related to Task 1 and subsequent fixes have been committed.
 
+## Documentation Efforts (as of 2025-05-07)
+
+-   Completed documentation for local Supabase CLI development environment setup: `[docs/environments/local_cli_development_setup.md](mdc:docs/environments/local_cli_development_setup.md)` (Note: this method proved problematic on M1 Mac).
+-   Drafted initial documentation for VUB VM self-hosted Supabase setup based on official guides: `[docs/environments/vm_self_hosted_supabase_setup.md](mdc:docs/environments/vm_self_hosted_supabase_setup.md)`.
+-   Organized environment-specific setup guides into the `docs/environments/` directory.
+-   Updated `[docs/development_workflow.md](mdc:docs/development_workflow.md)` to link to the new local setup guide.
+
+## Supabase Local Deployment (as of 2025-05-07)
+
+-   **Successfully deployed local Supabase services (Task 2.2) using a manual Docker Compose setup.**
+    -   Encountered persistent `exec format error` with `postgrest` service on M1 Mac when using `npx supabase start`.
+    -   Switched to manual configuration by cloning `supabase/supabase` repo, copying `docker/*` files to `supabase_config/`, and creating a root `.env` file.
+    -   Resolved `postgrest` issue by first trying `platform: linux/arm64` and then successfully using `platform: linux/amd64` in its service definition in `supabase_config/docker-compose.yml` to force x86_64 emulation.
+    -   Ensured root `.env` file variables (esp. `DOCKER_SOCKET_LOCATION`) were correctly read by Docker Compose by addressing shell variable overrides.
+    -   All Supabase services, including `postgrest`, started successfully via `docker compose -f supabase_config/docker-compose.yml up -d`.
+
 ## What's Left to Build / Immediate Next Steps
 
--   Await user direction for the next task (e.g., using `task-master next` or specifying a task ID).
+-   Proceed with **Task 2.3: Configure local API and security** for the newly deployed Supabase instance.
 -   Likely proceed to Task 2: User Authentication & Authorization (Supabase Integration).
 -   Address open questions in `docs/prd.md` (Section 8) as they become relevant.
 
