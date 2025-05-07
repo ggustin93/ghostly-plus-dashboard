@@ -247,4 +247,8 @@ supabase/generated/
 
 # Backend specific build/dist if any
 backend/dist/
-backend/build/ 
+backend/build/
+
+# Supabase Docker Compose specific
+supabase_config/volumes/
+supabase_cli_config_backup/ 
