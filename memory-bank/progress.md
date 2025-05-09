@@ -2,69 +2,172 @@
 description: Tracks what works, what's left to build, current status, known issues, and the evolution of project decisions for the GHOSTLY+ Dashboard.
 ---
 
-# GHOSTLY+ Dashboard: Progress Log
+# GHOSTLY+ Dashboard: Project Progress
 
-## Current Overall Status: Phase 1 - Infrastructure Setup COMPLETE
+## What Works:
 
-- **Date**: 2025-05-06 (Updated after Task 1 completion and subsequent fixes)
+### Infrastructure and Setup:
+1. ✅ **Complete project scaffolding** with Docker, Poetry (backend), Vite/Vue 3/TypeScript (frontend), Supabase, and NGINX reverse proxy.
+2. ✅ **Local development environment** via Docker Compose with hot-reloading for frontend and backend.
+3. ✅ **Local Supabase instance** running on Docker (M1-compatible) with required services (database, auth, storage, etc.).
+4. ✅ **NGINX configuration** properly proxying requests to frontend, backend, and Supabase services.
+5. ✅ **Storage buckets** created in Supabase for different data categories (c3d-files, avatars, reports, temp-...).
+6. ✅ **Auth API verification** with successful backend authentication via direct API requests (`curl`).
+7. ✅ **Authentication system now working properly** (as of May 9, 2025)
+  - Supabase authentication through Nginx proxy resolved
+  - Custom fetch implementation in authStore bypasses Supabase client header issues
+  - Simplified Nginx configuration for auth endpoints
+  - Detailed documentation added in `docs/supabase-auth-fix.md`
 
-## What Works / Completed Milestones
+### Features and Components:
+1. ✅ **Base UI components** (shadcn-vue) installed and configured.
+2. ✅ **Authentication UI** created with login form using shadcn-vue components.
+3. ✅ **Pinia store** for authentication state management.
 
--   Initial project documentation (`docs/prd.md`, `docs/task-summary.md`, `docs/security.md`) reviewed.
--   Decision made to include optional 2FA/MFA; relevant documents and Taskmaster task (ID 3) updated.
--   Memory Bank core files (`projectbrief.md`, `productContext.md`, `systemPatterns.md`, `techContext.md`, `activeContext.md`, `progress.md`) created and updated.
--   **Task 1: Project Setup and Repository Configuration - FULLY COMPLETED.**
-    -   Subtask 1.1: Git & Base Structure (repo init, core docs, .gitignore, LICENSE, Task #26).
-    -   Subtask 1.2: Backend Environment with FastAPI (Poetry, dependencies, app structure, .env, /health endpoint).
-    -   Subtask 1.3: Frontend with Vue.js 3, TS, Tailwind (Vite, dependencies, Tailwind CSS v4, shadcn/ui, Pinia, .env).
-        - Explicitly documented TypeScript usage in memory bank and PRD.
-        - Migrated ESLint to v9 with flat config (`eslint.config.js`), resolving compatibility issues.
-    -   Subtask 1.4: Docker Configuration (Dockerfiles for backend/frontend, .dockerignore files, initial `docker-compose.yml`).
-    -   Subtask 1.5: Nginx as Reverse Proxy (Nginx Dockerfile, `default.conf`, `docker-compose.yml` update).
-    -   Subtask 1.6: Finalize Development Environment (Frontend lint/format scripts, Backend Makefile, dev dependencies, README updates, `docker-compose.override.yml`, basic GitHub Actions CI).
--   **Post-Task 1 Fixes & Refinements COMPLETED:**
-    -   Resolved Docker build issues in `backend/Dockerfile` related to Poetry install flags, user permissions, and COPY paths.
-    -   Updated `frontend/Dockerfile` and `frontend/postcss.config.js` for Tailwind CSS v4 compatibility.
-    -   Corrected Nginx `default.conf` rewrite rule for proper API proxying.
-    -   Addressed and fixed all frontend linting errors after ESLint v9 migration (type definitions, ESLint configuration details).
-    -   Applied Prettier (frontend) and Ruff (backend) formatting to codebase.
-    -   Verified complete Docker environment (`docker-compose up --build`) with all services (backend, frontend, nginx) running and accessible correctly.
-    -   Updated `memory-bank/techContext.md` to specify Tailwind CSS v4.
--   All changes related to Task 1 and subsequent fixes have been committed.
+### Documentation:
+1. ✅ **Development workflow** documentation established.
+2. ✅ **Environment setup guides** created for local CLI development and VM self-hosted Supabase.
+3. ✅ **API and security configuration** documented in detail.
+4. ✅ **Memory Bank** established for contextual documentation.
 
-## Documentation Efforts (as of 2025-05-07)
+## What's Left to Build:
 
--   Completed documentation for local Supabase CLI development environment setup: `[docs/environments/local_cli_development_setup.md](mdc:docs/environments/local_cli_development_setup.md)` (Note: this method proved problematic on M1 Mac).
--   Drafted initial documentation for VUB VM self-hosted Supabase setup based on official guides: `[docs/environments/vm_self_hosted_supabase_setup.md](mdc:docs/environments/vm_self_hosted_supabase_setup.md)`.
--   Organized environment-specific setup guides into the `docs/environments/` directory.
--   Updated `[docs/development_workflow.md](mdc:docs/development_workflow.md)` to link to the new local setup guide.
+### Phase 3: Authentication and Authorization System (In Progress)
+1. ⏳ Integrate password reset functionality and UpdatePasswordPage into Vue router.
+2. ⏳ Add user registration functionality.
+3. ⏳ Implement JWT-based session management.
+4. ⏳ Set up role-based access control (RBAC) for different user types.
+5. ⏳ Develop admin interface for user management.
 
-## Supabase Local Deployment (as of 2025-05-07)
+### Phase 4: Basic Dashboard Components
+1. 🔄 Create responsive dashboard layout.
+2. 🔄 Implement navigation menu.
+3. 🔄 Design and build dashboard homepage.
+4. 🔄 Develop user profile page.
 
--   **Successfully deployed local Supabase services (Task 2.2) using a manual Docker Compose setup.**
-    -   Encountered persistent `exec format error` with `postgrest` service on M1 Mac when using `npx supabase start`.
-    -   Switched to manual configuration by cloning `supabase/supabase` repo, copying `docker/*` files to `supabase_config/`, and creating a root `.env` file.
-    -   Resolved `postgrest` issue by first trying `platform: linux/arm64` and then successfully using `platform: linux/amd64` in its service definition in `supabase_config/docker-compose.yml` to force x86_64 emulation.
-    -   Ensured root `.env` file variables (esp. `DOCKER_SOCKET_LOCATION`) were correctly read by Docker Compose by addressing shell variable overrides.
-    -   All Supabase services, including `postgrest`, started successfully via `docker compose -f supabase_config/docker-compose.yml up -d`.
+### Phase 5: Data Processing and Visualization
+1. 🔄 Create API for C3D file processing.
+2. 🔄 Implement file upload functionality.
+3. 🔄 Develop 3D visualization components.
+4. 🔄 Create data analysis and reporting modules.
 
-## What's Left to Build / Immediate Next Steps
+### Phase 6: Integration with Existing Game
+1. 🔄 Establish API endpoints for game data exchange.
+2. 🔄 Implement user progress synchronization.
+3. 🔄 Develop game session management.
 
--   Proceed with **Task 2.3: Configure local API and security** for the newly deployed Supabase instance.
--   Likely proceed to Task 2: User Authentication & Authorization (Supabase Integration).
--   Address open questions in `docs/prd.md` (Section 8) as they become relevant.
+### Phase 7: Advanced Features
+1. 🔄 Implement data export functionality.
+2. 🔄 Create therapist annotation tools.
+3. 🔄 Develop patient progress tracking.
 
-## Known Issues / Blockers
+### Phase 8: Testing and Optimization
+1. 🔄 Set up automated testing framework.
+2. 🔄 Perform security audit.
+3. 🔄 Optimize performance.
+4. 🔄 Conduct user acceptance testing.
 
--   (Resolved) Global Git ignore settings on user's machine initially prevented creation of `.env.example` files; workaround was manual creation by user.
--   (Resolved) ESLint v9 upgrade required migration to flat config (`eslint.config.js`) and careful resolution of plugin/parser compatibility issues.
--   (Resolved) Docker build and runtime errors required iterative debugging of Dockerfiles (Poetry flags, COPY paths, user permissions) and Nginx configuration.
+### Phase 9: Deployment and Documentation
+1. 🔄 Create deployment scripts.
+2. 🔄 Prepare user and administrator documentation.
+3. 🔄 Develop maintenance procedures.
 
-## Evolution of Project Decisions
+## Project Status & Progress Notes:
 
--   **[Date of 2FA discussion]**: Decided to implement 2FA/MFA as an optional feature.
--   **2025-05-06**: Selected Apache 2.0 as a placeholder license, pending VUB TTO consultation (Task #26).
--   **2025-05-06**: Migrated frontend linting from ESLint v8 (legacy config) to ESLint v9 (flat config) due to compatibility issues and to align with current best practices.
--   **2025-05-06**: Confirmed Tailwind CSS v4 usage and updated relevant configurations and documentation.
+### Task 1: Project Setup and Repository Configuration
+- ✅ **COMPLETED**
+- Created repository structure with appropriate .gitignore, LICENSE, and README.
+- Set up Docker configuration for development environment.
+- Configured Poetry for backend dependency management.
+- Established frontend project with Vue 3, TypeScript, and Vite.
+- Set up Supabase for local development.
+- Configured NGINX as reverse proxy.
+- Updated ESLint to v9 with flat config structure.
+- Applied proper formatting with Prettier (frontend) and Ruff (backend).
 
-*(This section will be updated as major decisions are made or plans evolve.)* 
+### Task 2: Local Development Environment
+- ✅ Subtask 2.1: **COMPLETED** - Set up local development environment
+- ✅ Subtask 2.2: **COMPLETED** - Deploy local Supabase services
+- ✅ Subtask 2.3: **COMPLETED** - Configure local API and security
+  - Successfully configured CORS for Supabase services
+  - Created storage buckets for different data types
+  - Resolved M1 Mac compatibility issues
+  - Established proper JWT configuration for secure authentication
+
+### Task 3: Authentication and Authorization System
+- ⏳ **IN PROGRESS**
+- ✅ Supabase authentication backend configured and tested
+- ✅ Basic login UI implemented with shadcn-vue components
+- ✅ Pinia store for authentication state management created
+- ✅ Authentication debugging & resolution implemented:
+  - 🔍 **Problem diagnosed**: Browser sends duplicate authentication headers (`Authorization: Bearer <anon_key>` and `apikey: <anon_key>`) causing GoTrue to reject login requests
+  - ✅ **Solution implemented**: Created custom fetch-based authentication implementation that:
+    1. Bypasses Supabase client's signIn method completely
+    2. Uses direct fetch API with controlled headers (only apikey, no Authorization)
+    3. Processes authentication response and updates Supabase client with received tokens
+    4. Leverages existing session management once authentication is complete
+  - ⚠️ Solution testing interrupted by Docker issues requiring system restart
+
+## Known Issues:
+
+1. **Docker Stability**: Occasional issues with Docker restarts, may require system reboot to resolve.
+2. **Authentication Flow**: Custom implementation complete but not yet verified working due to Docker restart issues.
+3. **Frontend Auth Persistence**: Need to integrate router navigation guards and session persistence after authentication is verified.
+
+## Evolution of Project Decisions:
+
+### Supabase Authentication Approach:
+- **Initial implementation**: Used standard Supabase client for authentication
+- **Problem identified**: Duplicate authentication headers (Authorization and apikey) causing 401 errors
+- **Attempted solutions**:
+  1. ⚠️ **Direct connection**: Updating Supabase URL to connect directly to port 8000 (bypassing Nginx) - CORS issues
+  2. ⚠️ **Nginx header management**: Configuring Nginx to strip Authorization header - Not effective with browser-generated requests
+  3. ✅ **Custom fetch implementation**: Bypassing Supabase client's auth methods for complete header control - Implementation complete
+- **Current approach**: Custom fetch-based login function in authStore that only sends apikey header
+
+## Project Decision Timeline:
+
+### 2025-05-05
+- Decided to use Docker Compose for local development environment
+- Selected Poetry for backend dependency management
+- Chose Vue 3 with TypeScript and Vite for frontend
+- Adopted Supabase for authentication, database, and storage
+- Implemented NGINX as reverse proxy
+- Selected Apache 2.0 as placeholder license (pending TTO consultation)
+
+### 2025-05-06
+- Established folder structure and Docker configuration
+- Set up backend with FastAPI
+- Created frontend with Vue 3 and shadcn-vue components
+- Configured Supabase services with Docker Compose
+
+### 2025-05-07
+- Set up Supabase authentication
+- Created storage buckets for different data types
+- Configured CORS for API access
+- Developed auth UI components with shadcn-vue
+
+### 2025-05-08
+- Organized documentation into separate guides
+- Created comprehensive API and security documentation
+- Developed utility scripts for environment setup
+- Updated Memory Bank with detailed technical context
+
+### 2025-05-09
+- Diagnosed and fixed authentication issues:
+  - Identified header management issues with Nginx proxy
+  - Implemented direct Supabase connection for auth operations
+  - Modified Supabase client configuration to prevent automatic header management
+  - Updated Nginx configuration to explicitly remove Authorization header for auth endpoints
+  - Documented two viable architectural approaches for authentication flow
+
+## Next Actions:
+
+1. Complete password reset functionality with router integration
+2. Implement user registration flow
+3. Develop role-based access control
+4. Build out dashboard layout and navigation
+5. Create user profile management
+
+---
+**Last Updated**: 2025-05-09 (Updated) 

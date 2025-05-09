@@ -67,11 +67,20 @@ source_documents: [docs/prd.md](mdc:docs/prd.md) (Section 4), [docs/security.md]
 -   **Containerization**: **Docker** & **Docker Compose**
     -   Separate Dockerfiles for backend (FastAPI) and frontend (Vue.js - multi-stage builds).
     -   `docker-compose.yml` for local development orchestration of application services (backend, frontend, nginx).
+        -   The `nginx` service is configured to be part of the `default` and `supabase_network` to allow proxying to Supabase services.
+        -   The `frontend` service's `VITE_API_BASE_URL` is set to `http://localhost/api` to ensure API calls are routed through NGINX.
     -   Local Supabase services (PostgreSQL, Auth, Storage, Studio, etc.) are managed via a separate `supabase_config/docker-compose.yml` and a root `.env` file, due to M1 compatibility issues with `npx supabase start`.
+        -   **Active Supabase services (as of 2025-05-09):** `studio`, `kong`, `auth`, `rest`, `storage`, `db`, `meta`, `supavisor`.
+        -   **Inactive Supabase services (commented out):** `realtime`, `functions`, `imgproxy`, `analytics`, `vector`.
     (Source: [docs/prd.md](mdc:docs/prd.md) 4.6.1, 4.10, and project experience)
 -   **Version Control**: **Git**
--   **Web Server/Reverse Proxy (Production)**: **Nginx**
-    (Source: [docs/prd.md](mdc:docs/prd.md) 4.10)
+-   **Web Server/Reverse Proxy (Local Development & Production)**: **Nginx**
+    -   In local development (`nginx/conf.d/default.conf`):
+        -   Proxies `/` to `http://ghostly_frontend:5173` (frontend dev server).
+        -   Proxies `/api` to `http://ghostly_backend:8000` (backend service, with path rewrite).
+        -   Proxies Supabase paths (`/auth/v1`, `/rest/v1`, `/storage/v1`, etc.) to `http://supabase-kong:8000`.
+        -   Uses Docker's internal DNS resolver (`127.0.0.11`).
+    (Source: [docs/prd.md](mdc:docs/prd.md) 4.10, `nginx/conf.d/default.conf`)
 -   **Development Proxy**: Vite dev server proxy (`server.proxy` in `vite.config.ts`) to forward API requests to backend container during local development. (Source: [docs/prd.md](mdc:docs/prd.md) 4.10 Notes)
 -   **Package Management**:
     -   Backend (Python): **Poetry** (recommended) or `requirements.txt`.

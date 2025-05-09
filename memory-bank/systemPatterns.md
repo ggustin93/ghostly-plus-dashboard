@@ -28,7 +28,9 @@ Refer to the architecture diagram in [docs/prd.md](mdc:docs/prd.md) (Section 4.8
 -   **Application-Level Encryption**: Sensitive medical data will be encrypted by the FastAPI backend using Fernet before storage in Supabase and decrypted upon retrieval for authorized users. (Source: [docs/prd.md](mdc:docs/prd.md) 4.5.1, [docs/security.md](mdc:docs/security.md) Section 3)
 -   **Pseudonymization**: Patient identifiers will be pseudonymized (e.g., using SHA-256) to enhance privacy. (Source: [docs/prd.md](mdc:docs/prd.md) 4.5.1, [docs/security.md](mdc:docs/security.md) Section 4)
 -   **API-Driven Architecture**: The Vue.js frontend interacts with the backend exclusively through the FastAPI REST API.
--   **Containerization**: Docker will be used for packaging the frontend and backend applications, orchestrated with Docker Compose for development and simplifying deployment. (Source: [docs/prd.md](mdc:docs/prd.md) 4.6.1)
+-   **Containerization**: Docker will be used for packaging the frontend and backend applications, orchestrated with Docker Compose for development and simplifying deployment.
+    -   For local development, Supabase services are also containerized using a dedicated `supabase_config/docker-compose.yml`. Currently, core services like `studio`, `kong`, `auth`, `rest`, `storage`, `db`, `meta`, and `supavisor` are active, while others (`realtime`, `functions`, etc.) are commented out to streamline the local environment.
+    (Source: [docs/prd.md](mdc:docs/prd.md) 4.6.1)
 -   **Modular Project Structure**: The codebase will follow a recommended structure separating backend, frontend, Docker configs, etc. (Source: [docs/prd.md](mdc:docs/prd.md) 4.10)
 
 ## 3. Component Relationships
