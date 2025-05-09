@@ -1,38 +1,61 @@
 <script setup lang="ts">
-import HelloWorld from './components/HelloWorld.vue'
+import { useAuthStore } from '@/stores/authStore';
+import Auth from '@/components/Auth.vue';
+import UserProfile from '@/components/UserProfile.vue';
+
+const authStore = useAuthStore();
+
+// The initializeAuthListener is already called in main.ts
+// so the store should be up-to-date with the auth state.
 </script>
 
 <template>
-  <div class="min-h-screen bg-gradient-to-b from-background to-muted/20">
-    <div class="container mx-auto px-4 py-10">
-      <!-- Header with logos -->
-      <div class="flex justify-center mb-10">
-        <div class="flex items-center space-x-6">
-          <a href="https://vitejs.dev" target="_blank" class="transition-transform hover:scale-110">
-            <img src="/vite.svg" class="logo h-16 w-16" alt="Vite logo" />
-          </a>
-          <div class="h-10 w-px bg-border"></div>
-          <a href="https://vuejs.org/" target="_blank" class="transition-transform hover:scale-110">
-            <img src="./assets/vue.svg" class="logo h-14 w-14" alt="Vue logo" />
-          </a>
-          <div class="h-10 w-px bg-border"></div>
-          <a href="https://shadcn-vue.com/" target="_blank" class="transition-transform hover:scale-110">
-            <span class="font-bold text-lg">shadcn/vue</span>
-          </a>
-        </div>
+  <div id="app-container">
+    <header>
+      <h1>GHOSTLY+ Dashboard</h1>
+    </header>
+    <main>
+      <div v-if="authStore.isAuthenticated">
+        <UserProfile />
       </div>
-      
-      <!-- Main content -->
-      <HelloWorld msg="Modern Vue Application" />
-      
-      <!-- Footer -->
-      <footer class="mt-16 text-center text-sm text-muted-foreground">
-        <p>Built with Vue 3, Vite, Tailwind CSS and shadcn/ui</p>
-      </footer>
-    </div>
+      <div v-else>
+        <Auth />
+      </div>
+    </main>
+    <footer>
+      <p>&copy; 2025 GHOSTLY+ Project</p>
+    </footer>
   </div>
 </template>
 
-<style>
-/* Global styles can go here */
+<style scoped>
+#app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  font-family: Arial, sans-serif;
+}
+
+header {
+  background-color: #333;
+  color: white;
+  padding: 1rem;
+  text-align: center;
+}
+
+main {
+  flex-grow: 1;
+  padding: 1rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+footer {
+  background-color: #333;
+  color: white;
+  padding: 1rem;
+  text-align: center;
+  margin-top: auto;
+}
 </style>
