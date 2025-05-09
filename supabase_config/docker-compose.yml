@@ -133,6 +133,8 @@ services:
       GOTRUE_SMTP_USER: ${SMTP_USER}
       GOTRUE_SMTP_PASS: ${SMTP_PASS}
       GOTRUE_SMTP_SENDER_NAME: ${SMTP_SENDER_NAME}
+      # Allow GoTrue to connect to Inbucket over unencrypted SMTP (yet another attempt with a different flag)
+      GOTRUE_SMTP_ENCRYPTION: "none"
       GOTRUE_MAILER_URLPATHS_INVITE: ${MAILER_URLPATHS_INVITE}
       GOTRUE_MAILER_URLPATHS_CONFIRMATION: ${MAILER_URLPATHS_CONFIRMATION}
       GOTRUE_MAILER_URLPATHS_RECOVERY: ${MAILER_URLPATHS_RECOVERY}
@@ -525,5 +527,19 @@ services:
         "/app/bin/migrate && /app/bin/supavisor eval \"$$(cat /etc/pooler/pooler.exs)\" && /app/bin/server"
       ]
 
+  inbucket:
+    container_name: supabase-inbucket
+    image: inbucket/inbucket:latest
+    restart: unless-stopped
+    ports:
+      - "54324:9000" # Web UI on host port 54324, container port 9000
+      - "54325:2500" # SMTP listener on host port 54325
+    networks:
+      - supabase_default # Ensure this matches the network name used by your other Supabase services
+
 volumes:
   db-config:
+
+networks:
+  supabase_default:
+    external: true

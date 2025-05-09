@@ -9,5 +9,4 @@
 #       - DEBUG=True
 
 # Currently empty, as development settings are included in the main docker-compose.yml
-version: '3.8'
 services: {} 

@@ -1,4 +1,4 @@
-version: '3.8'
+# Removing the obsolete version attribute
 
 services:
   backend:
@@ -16,6 +16,9 @@ services:
       - ./backend/.env
     environment:
       - PYTHONUNBUFFERED=1 # Ensures Python logs appear without delay
+    networks:
+      - default
+      - supabase_network
 
   frontend:
     build:
@@ -38,6 +41,9 @@ services:
       - ./frontend/.env
     environment:
       - NODE_ENV=development
+    networks:
+      - default
+      - supabase_network
 
   nginx:
     build:
@@ -53,6 +59,17 @@ services:
     depends_on:
       - backend
       - frontend
+    networks:
+      - default
+      - supabase_network
+
+# Define the networks
+networks:
+  default:
+    driver: bridge
+  supabase_network:
+    external: true
+    name: supabase_default # Corrected network name based on docker network ls
 
 # Note: This basic setup doesn't include Supabase yet.
 # Supabase would be added as another service. 
