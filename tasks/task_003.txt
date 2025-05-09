@@ -1,20 +1,20 @@
 # Task ID: 3
 # Title: Authentication and Authorization System
-# Status: pending
+# Status: in-progress
 # Dependencies: 2
 # Priority: high
 # Description: Implement a secure multi-level login system with role management for therapists, researchers, and administrators, ensuring unified authentication between the Ghostly Game (OpenFeasyo/C#) and the Web Dashboard (Vue.js) using the pre-configured Supabase Auth infrastructure. Include optional Two-Factor Authentication (2FA/MFA) using TOTP authenticator apps for enhanced security.
 # Details:
-This task focuses specifically on the application-level implementation of authentication, not the infrastructure setup (covered in Task 2):
+This task focuses specifically on the application-level implementation of authentication, not the infrastructure setup (covered in Task 2). Leverage the completed Supabase API and security configuration documentation in `docs/environments/supabase_api_security_config.md`.
 
 1. Implement Supabase Auth clients for both applications:
-   - JavaScript Supabase client integration for Vue.js dashboard
-   - REST API authentication implementation for C# OpenFeasyo game
+   - JavaScript Supabase client integration for Vue.js dashboard (follow client integration examples in the documentation)
+   - REST API authentication implementation for C# OpenFeasyo game (use the C# integration examples provided)
    - Ensure both clients connect to the same Supabase Auth instance
 
 2. Implement secure JWT management in both environments:
    - Dashboard: Implement frontend authentication store using Pinia
-     - JWT secure storage and management
+     - JWT secure storage and management (following JWT configuration best practices from documentation)
      - User session persistence
      - Automatic token refresh
    - Game: Create equivalent authentication management in C#
@@ -23,7 +23,7 @@ This task focuses specifically on the application-level implementation of authen
      - Token refresh mechanism
 
 3. Implement FastAPI backend middleware for authentication:
-   - JWT validation using python-jose
+   - JWT validation using python-jose (reference the FastAPI integration examples)
    - Role-based access control based on token claims
    - Session validation
    - Error handling for authentication failures
@@ -31,7 +31,7 @@ This task focuses specifically on the application-level implementation of authen
 4. Create authentication UI components:
    - Dashboard: Login form with validation
      - Password reset flow
-     - User profile management
+     - User profile management (including avatar uploads to the 'avatars' storage bucket)
    - Game: Implement appropriate login interface for OpenFeasyo
      - Game-specific authentication screens
      - Session persistence appropriate for game context
@@ -45,6 +45,7 @@ This task focuses specifically on the application-level implementation of authen
    - Ensure login state is properly synchronized between applications
    - Handle edge cases like session expiration gracefully
    - Implement secure logout across all platforms
+   - Utilize CORS settings from `supabase_cors_config.sh` for cross-application access
 
 7. Implement optional Two-Factor Authentication (2FA/MFA):
    - Integrate TOTP (Time-based One-Time Password) authentication as per security.md
@@ -54,6 +55,11 @@ This task focuses specifically on the application-level implementation of authen
    - Add 2FA verification step to login flow when enabled
    - Ensure authentication system works seamlessly with or without 2FA
    - Implement backup/recovery codes for 2FA-enabled accounts
+
+8. Integrate with storage buckets:
+   - Configure access permissions for the four storage buckets ('c3d-files', 'reports', 'avatars', 'temp-uploads')
+   - Implement file upload/download functionality with appropriate authentication checks
+   - Ensure proper handling of temporary uploads using the 'temp-uploads' bucket
 
 # Test Strategy:
 - Test authentication flow end-to-end in both applications:
@@ -70,16 +76,19 @@ This task focuses specifically on the application-level implementation of authen
 - Test cross-platform authentication consistency:
   - Verify login state is maintained appropriately across applications
   - Test logout functionality clears session in both environments
+  - Verify CORS configuration allows proper cross-application communication
 
 - Security testing:
   - Verify JWT is stored securely in both environments
   - Test token expiration and refresh mechanisms
   - Verify authentication failures are handled gracefully with appropriate user feedback
+  - Test with the secure JWT token generated for local development
 
 - Integration testing:
   - Verify both applications successfully communicate with the Supabase Auth infrastructure
   - Test API endpoints with valid and invalid authentication tokens
   - Verify middleware correctly validates tokens and enforces permissions
+  - Test API endpoints according to the reference in the documentation
 
 - Two-Factor Authentication testing:
   - Test enabling/disabling 2FA functionality
@@ -88,3 +97,121 @@ This task focuses specifically on the application-level implementation of authen
   - Verify backup/recovery codes functionality
   - Test 2FA across both web dashboard and game environments
   - Ensure graceful handling of edge cases (clock drift, lost authenticator)
+
+- Storage bucket integration testing:
+  - Test file uploads to appropriate buckets with authentication
+  - Verify access permissions are enforced correctly for each bucket
+  - Test avatar uploads and display in user profiles
+  - Verify temporary upload functionality works correctly
+
+# Subtasks:
+## 1. Implement Supabase Auth clients [in-progress]
+### Dependencies: None
+### Description: Integrate Supabase authentication clients for both the Vue.js dashboard and C# OpenFeasyo game applications
+### Details:
+Set up the JavaScript Supabase client in the Vue.js dashboard following the documentation examples. Implement REST API authentication for the C# OpenFeasyo game using the provided C# integration examples. Ensure both clients connect to the same Supabase Auth instance for unified authentication. Configure client initialization with appropriate environment variables and connection settings.
+<info added on 2025-05-08T09:26:52.891Z>
+Set up the JavaScript Supabase client in the Vue.js dashboard following the documentation examples. Implement REST API authentication for the C# OpenFeasyo game using the provided C# integration examples. Ensure both clients connect to the same Supabase Auth instance for unified authentication. Configure client initialization with appropriate environment variables and connection settings.
+
+Implementation Plan:
+
+Phase 1: Vue.js Dashboard Integration
+1. Create a Supabase Client Plugin/Service:
+   - File: frontend/src/plugins/supabase.ts (or frontend/src/services/supabaseClient.ts)
+   - Initialize Supabase client (createClient from @supabase/supabase-js) using VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY from import.meta.env
+   - Export the initialized supabase client
+   - Ensure frontend/.env.local and frontend/.env.example contain the necessary environment variables:
+     VITE_SUPABASE_URL=http://localhost:8000
+     VITE_SUPABASE_ANON_KEY=your_anon_key_from_supabase_config_env
+
+2. Create a Pinia Auth Store:
+   - File: frontend/src/stores/authStore.ts
+   - Uses the Supabase client
+   - State: user: User | null, session: Session | null, loading: boolean, error: Error | null
+   - Actions:
+     - initializeAuthListener(): Calls supabase.auth.getSession() and sets up supabase.auth.onAuthStateChange() to update store state
+     - signInWithPassword(email, password): Calls supabase.auth.signInWithPassword()
+     - signUpWithPassword(email, password, options?): Calls supabase.auth.signUp()
+     - signOut(): Calls supabase.auth.signOut()
+     - sendPasswordResetEmail(email): Calls supabase.auth.resetPasswordForEmail()
+     - updatePassword(newPassword): Calls supabase.auth.updateUser()
+   - Getters: isAuthenticated: boolean
+
+3. Integrate Store in App:
+   - In frontend/src/main.ts or App.vue, call authStore.initializeAuthListener() on app mount
+
+Phase 2: C# OpenFeasyo Game Integration
+1. Create SupabaseAuthService.cs:
+   - Encapsulate REST API calls to Supabase auth endpoints (/auth/v1/...)
+   - Store SUPABASE_URL ("http://localhost:8000") and ANON_KEY as constants/config
+   - Methods (Async):
+     - SignInWithPasswordAsync(email, password)
+     - SignUpWithPasswordAsync(email, password, jsonData?)
+     - SignOutAsync(accessToken)
+     - SendPasswordResetEmailAsync(email)
+     - GetUserAsync(accessToken)
+     - RefreshTokenAsync(refreshToken)
+     - UpdateUserAsync(accessToken, jsonData)
+   - Define request/response DTOs (AuthResponse, UserResponse)
+   - Implement JSON serialization/deserialization and error handling
+
+2. Secure Token Management in C#:
+   - Implement secure storage for JWTs (access & refresh tokens) using OS-level APIs (Windows Data Protection, macOS Keychain, Android Keystore, iOS Keychain) or encrypted local files as a fallback
+   - SupabaseAuthService.cs will receive/return tokens, not store them internally
+
+Cross-cutting Concerns:
+- Ensure correct access to environment variables (Supabase URL, Anon Key) in both apps
+- Implement user-friendly error display based on Supabase/API responses
+- Refer to docs/environments/supabase_api_security_config.md for endpoint details and C# examples
+- Use Supabase JS client documentation for Vue/Pinia best practices
+</info added on 2025-05-08T09:26:52.891Z>
+<info added on 2025-05-09T10:14:56.220Z>
+The Nginx proxy configuration has been successfully fixed to properly handle authentication requests between the frontend and Supabase Kong. The solution addressed several key issues:
+
+1. The Nginx configuration for auth endpoints was simplified to ensure proper request routing
+2. Header passthrough was corrected to maintain authentication context when proxying to Supabase Kong
+3. The Host header is now correctly set for Supabase Kong to properly process authentication requests
+4. Environment variables in the frontend were fixed:
+   - VITE_SUPABASE_URL was updated to http://localhost (removed trailing slash)
+   - Removed an erroneous trailing % character from the ANON_KEY value
+
+Comprehensive documentation of the fix has been created at `docs/supabase-auth-fix.md` for future reference.
+
+The next implementation phase will focus on developing the password reset functionality for both the Vue.js dashboard and C# OpenFeasyo applications, building on the now-working authentication foundation.
+
+This resolves the proxy-related authentication issues that were blocking progress on the authentication implementation. Both clients can now successfully communicate with the Supabase Auth instance.
+</info added on 2025-05-09T10:14:56.220Z>
+
+## 2. Implement JWT management and storage [pending]
+### Dependencies: 3.1
+### Description: Create secure JWT token handling systems in both the Vue.js dashboard and C# game environments
+### Details:
+For the dashboard: Implement a Pinia authentication store to manage JWT tokens, handle secure storage in browser, maintain user session persistence, and perform automatic token refresh. For the game: Create equivalent C# authentication management with secure JWT storage, session management, and token refresh mechanisms. Follow JWT configuration best practices from the documentation.
+
+## 3. Create authentication UI components [pending]
+### Dependencies: 3.1, 3.2
+### Description: Develop user interfaces for authentication in both applications with complete user management flows
+### Details:
+For the dashboard: Build login form with validation, password reset flow, and user profile management including avatar uploads to the 'avatars' storage bucket. For the game: Implement appropriate login interface within OpenFeasyo, game-specific authentication screens, and session persistence appropriate for the game context. Ensure consistent branding and user experience across both platforms.
+<info added on 2025-05-09T10:15:17.972Z>
+For the dashboard: Build login form with validation, password reset flow, and user profile management including avatar uploads to the 'avatars' storage bucket. For the game: Implement appropriate login interface within OpenFeasyo, game-specific authentication screens, and session persistence appropriate for the game context. Ensure consistent branding and user experience across both platforms.
+
+The password reset flow will consist of two main components: ForgotPasswordPage.vue with email input and validation, and UpdatePasswordPage.vue for setting a new password with appropriate validation. The Auth.vue component will be enhanced with a forgot password link and password strength indicator. The authStore.ts will be updated to include sendPasswordResetEmail and updatePassword methods using the Supabase client with proper error handling.
+
+For user profile management, a UserProfilePage.vue component will be created to handle user information updates, avatar uploads to the 'avatars' storage bucket, and password changes for logged-in users. Vue Router configuration will include routes for forgot-password and update-password pages with proper authentication state handling and token parameter passing.
+
+Email templates in Supabase will be customized for password reset notifications. Comprehensive testing will include unit tests for form validations and error handling, plus integration testing for the complete password reset flow with both valid and invalid tokens.
+</info added on 2025-05-09T10:15:17.972Z>
+
+## 4. Implement role-based access control [pending]
+### Dependencies: 3.2
+### Description: Create a multi-level authorization system for therapists, researchers, and administrators
+### Details:
+Implement FastAPI backend middleware for authentication with JWT validation using python-jose. Create role-based access control based on token claims. Develop session validation and error handling for authentication failures. Configure dashboard route guards in Vue Router for protected routes. Implement authentication checks for protected game features. Ensure role-based feature access in both applications.
+
+## 5. Implement Two-Factor Authentication (2FA/MFA) [pending]
+### Dependencies: 3.3, 3.4
+### Description: Add optional TOTP-based two-factor authentication for enhanced security
+### Details:
+Integrate TOTP (Time-based One-Time Password) authentication as specified in security.md. Create configuration options for users/administrators to enable 2FA. Implement QR code generation for authenticator app setup. Develop UI flow for 2FA enrollment including QR code scanning and verification. Add 2FA verification step to login flow when enabled. Ensure authentication system works seamlessly with or without 2FA. Implement backup/recovery codes for 2FA-enabled accounts.
+
