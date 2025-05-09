@@ -2,6 +2,8 @@
 import { useAuthStore } from '@/stores/authStore';
 import Auth from '@/components/Auth.vue';
 import UserProfile from '@/components/UserProfile.vue';
+import AppHeader from '@/components/ui/AppHeader.vue';
+import AppFooter from '@/components/ui/AppFooter.vue';
 
 const authStore = useAuthStore();
 
@@ -10,11 +12,12 @@ const authStore = useAuthStore();
 </script>
 
 <template>
-  <div id="app-container">
-    <header>
-      <h1>GHOSTLY+ Dashboard</h1>
-    </header>
-    <main>
+  <div id="app-container" class="font-primary">
+    <!-- Use the AppHeader component -->
+    <AppHeader :isAuthenticated="authStore.isAuthenticated" />
+
+    <!-- Main Content -->
+    <main class="bg-gradient-to-b from-white to-gray-50">
       <div v-if="authStore.isAuthenticated">
         <UserProfile />
       </div>
@@ -22,40 +25,46 @@ const authStore = useAuthStore();
         <Auth />
       </div>
     </main>
-    <footer>
-      <p>&copy; 2025 GHOSTLY+ Project</p>
-    </footer>
+
+    <!-- Use the AppFooter component -->
+    <AppFooter />
   </div>
 </template>
 
-<style scoped>
+<style>
+/* These styles will be applied to this component */
 #app-container {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  font-family: Arial, sans-serif;
-}
-
-header {
-  background-color: #333;
-  color: white;
-  padding: 1rem;
-  text-align: center;
+  font-family: var(--font-primary);
 }
 
 main {
   flex-grow: 1;
-  padding: 1rem;
+  padding: 1.5rem;
   max-width: 1200px;
   margin: 0 auto;
   width: 100%;
 }
 
-footer {
-  background-color: #333;
-  color: white;
-  padding: 1rem;
-  text-align: center;
-  margin-top: auto;
+/* Custom link styles */
+a {
+  position: relative;
+  text-decoration: none;
+}
+
+/* Animated underline effect for footer links */
+.hover\:underline:hover::after {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 1px;
+  bottom: -2px;
+  left: 0;
+  background-color: currentColor;
+  transform: scaleX(1);
+  transform-origin: bottom left;
+  transition: transform 0.3s ease-out;
 }
 </style>

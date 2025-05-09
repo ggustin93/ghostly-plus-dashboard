@@ -33,7 +33,7 @@
               <Label for="new-password">New Password</Label>
               <Input id="new-password" type="password" v-model="newPassword" required />
             </div>
-            <Button type="submit" :disabled="authStore.loading" class="w-full">
+            <Button type="submit" variant="default" :disabled="authStore.loading" class="w-full !bg-blue-600 text-white shadow-xs !hover:bg-blue-700">
               {{ authStore.loading ? 'Updating...' : 'Update Password' }}
             </Button>
           </form>
@@ -61,7 +61,7 @@
         <!-- Sign Out -->
         <div>
            <h3 class="text-lg font-semibold mb-3">Sign Out</h3>
-           <Button @click="handleSignOut" :disabled="authStore.loading" variant="destructive" class="w-full">
+           <Button @click="handleSignOut" :disabled="authStore.loading" class="w-full bg-red-600 text-white hover:bg-red-700">
              {{ authStore.loading ? 'Signing Out...' : 'Sign Out' }}
            </Button>
         </div>

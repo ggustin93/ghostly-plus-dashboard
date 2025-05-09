@@ -13,11 +13,13 @@ interface Props extends /* @vue-ignore */ PrimitiveProps {
 
 const props = withDefaults(defineProps<Props>(), {
   as: 'button',
+  asChild: false,
 })
 </script>
 
 <template>
   <Primitive
+    v-bind="$attrs"
     data-slot="button"
     :as="as"
     :as-child="asChild"
