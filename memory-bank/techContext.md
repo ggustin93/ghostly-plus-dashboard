@@ -162,3 +162,126 @@ Detailed setup instructions for different project environments are available:
     -   Investigate Docker Desktop settings on M1, particularly "Use Virtualization framework" and Rosetta emulation options.
     -   Consider manually defining Supabase services in the project's main `docker-compose.yml` using known ARM64-compatible images as an alternative to the Supabase CLI's local management, though this increases setup complexity.
     -   **Update (2025-05-07)**: A more targeted Perplexity search for GitHub issues or specific Docker Desktop M1 settings related to "exec format error" for PostgREST or "Supabase Studio unhealthy" did not immediately yield a definitive, simple fix. The issue appears rooted in Docker image compatibility on ARM64/M1 architecture. Further investigation into Docker Desktop settings (e.g., "Use Virtualization framework," ensuring "Use Rosetta for x86_64/amd64 emulation on Apple Silicon" is enabled) or deeper dives into Supabase GitHub issues threads are needed. 
+
+## 7. Frontend Component Patterns
+
+### 7.1. shadcn-vue Button Component Event Handling
+
+When working with `shadcn-vue` Button components, especially those built upon `Primitive` from `reka-ui` (or similar primitive libraries), proper event handling is crucial. If click events (or other events) are not firing as expected, consider the following:
+
+-   **Attribute & Event Forwarding (`v-bind="$attrs"`)**:
+    -   Ensure that the custom Button component (e.g., `frontend/src/components/ui/button/Button.vue`) correctly forwards all attributes and event listeners to the underlying `Primitive` component.
+    -   This is achieved by adding `v-bind="$attrs"` to the `<Primitive>` tag.
+    -   **Example (`Button.vue`):**
+        ```vue
+        <template>
+          <Primitive
+            v-bind="$attrs"
+            data-slot="button"
+            :as="as"
+            :as-child="asChild"
+            :class="cn(buttonVariants({ variant, size }), props.class)"
+          >
+            <slot />
+          </Primitive>
+        </template>
+        ```
+    -   Without `v-bind="$attrs"`, Vue doesn't automatically inherit non-prop attributes (like event listeners) for custom components when there are multiple root nodes or when using render functions/scoped slots extensively, which can be the case with primitive-based components.
+
+-   **Direct Click Handlers vs. Form Submission**:
+    -   In forms, if a `Button` with `type="submit"` is not triggering the form's `@submit.prevent` handler as expected, or if click events on the button itself are being missed, switch to a direct click handler on the `Button`.
+    -   Change the button's type from `submit` to `button`.
+    -   Attach the event handler directly using `@click` on the `<Button>` component.
+    -   Remove the `@submit.prevent` from the `<form>` tag if the button click now directly handles the intended action.
+    -   **Example (`Auth.vue` - Sign In Button):**
+        ```vue
+        <form ...>
+          <Button 
+            type="button"
+            @click="handleSignIn"
+            ...
+          >
+            Sign In
+          </Button>
+        </form>
+        ```
+
+-   **Props Initialization (`asChild`)**:
+    -   Ensure all props used by the `Primitive` component, such as `asChild`, are correctly initialized with default values in the custom `Button` component's script setup if they are not explicitly passed.
+    -   **Example (`Button.vue`):**
+        ```typescript
+        const props = withDefaults(defineProps<Props>(), {
+          as: 'button',
+          asChild: false,
+        })
+        ```
+
+-   **Server Restart**: After making changes to component logic or `.env` files, always restart the development server (e.g., Vite) to ensure all changes are loaded correctly.
+
+**Reasoning**: Primitive-based components often rely on explicit attribute and event forwarding. Issues can arise if `$attrs` is not used, or if form submission mechanics interfere with the expected event flow of the custom button component. Direct event binding on the component instance, combined with correct prop initialization and attribute forwarding, ensures more reliable behavior.
+
+### 7.2. Shadcn UI Vue Component Variant Styling with Tailwind 4
+
+-   **Variant Detection Issue**: When using Shadcn UI Vue components with Tailwind 4, variant styling may not be properly detected, resulting in all buttons appearing black regardless of the specified variant.
+
+-   **Potential Causes**:
+    -   Tailwind 4's migration from HSL to OKLCH color format causes incompatibility with Shadcn UI's variant definitions
+    -   Misconfigurations in the Tailwind setup for handling the new `@theme` directive
+    -   Missing or misconfigured `data-slot` attributes required for proper styling
+    -   Deprecated styles or components not updated for Tailwind 4's new syntax and color system
+
+-   **Solution Approach**: (Task #27 created to address this)
+    -   Update Tailwind configuration to properly support Shadcn UI Vue component variants
+    -   Refactor component styling to use the latest recommended patterns for Tailwind 4
+    -   Ensure proper conversion of HSL color definitions to OKLCH format
+    -   Add appropriate `data-slot` attributes to component primitives
+    -   Implement consistent theming that works correctly with both Shadcn UI Vue and Tailwind 4
+
+-   **Example Fix Pattern**:
+    ```vue
+    <!-- Updated Button.vue with proper Tailwind 4 variant handling -->
+    <script setup lang="ts">
+    import { cva } from 'class-variance-authority'
+    
+    // Updated buttonVariants with proper Tailwind 4 color format
+    const buttonVariants = cva(
+      "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50",
+      {
+        variants: {
+          variant: {
+            default: "bg-primary text-primary-foreground hover:bg-primary/90",
+            destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90",
+            outline: "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
+            secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
+            ghost: "hover:bg-accent hover:text-accent-foreground",
+            link: "text-primary underline-offset-4 hover:underline",
+          },
+          size: {
+            default: "h-9 px-4 py-2",
+            sm: "h-8 rounded-md px-3 text-xs",
+            lg: "h-10 rounded-md px-8",
+            icon: "h-9 w-9",
+          },
+        },
+        defaultVariants: {
+          variant: "default",
+          size: "default",
+        },
+      }
+    )
+    </script>
+    
+    <template>
+      <Primitive
+        v-bind="$attrs"
+        data-slot="button"
+        :as="as"
+        :asChild="asChild"
+        :class="cn(buttonVariants({ variant, size }), props.class)"
+      >
+        <slot />
+      </Primitive>
+    </template>
+    ```
+
+-   **Reference**: See Task #27 "Fix Shadcn UI Vue Variant Styling Issues with Tailwind 4" for detailed implementation steps.

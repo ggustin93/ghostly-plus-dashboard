@@ -195,6 +195,7 @@ description: Tracks the current work focus, recent changes, next steps, active d
 - Setup of authentication and authorization system with Supabase
 - Implementing test harness features
 - Preparing initial researcher portal functionality
+- Addressing styling issues with Shadcn UI Vue and Tailwind 4 components
 
 ## Recent Changes
 - **Authentication Fix (May 9, 2025)**: Resolved an issue with Supabase authentication through Nginx proxy. Key fixes included:
@@ -203,11 +204,18 @@ description: Tracks the current work focus, recent changes, next steps, active d
   - Fixed environment variables in frontend
   - Detailed documentation added at `docs/supabase-auth-fix.md`
 
+- **UI Component Issues (May 10, 2025)**: Identified styling issues with Shadcn UI Vue components and Tailwind 4:
+  - Button variants not being properly detected, causing all buttons to appear black
+  - Created Task #27 to fix the styling issues
+  - Documented potential causes in techContext.md section 7.2
+  - Issue is likely related to Tailwind 4's migration from HSL to OKLCH color format and component slot attributes
+
 - **Dashboard Design**: Working on UI/UX for patient monitoring dashboard
 - **Data Structures**: Implemented preliminary data structures for patient tracking
 - **API Integration**: Connected frontend components with backend API endpoints
 
 ## Next Steps
+- Fix Shadcn UI Vue component styling issues with Tailwind 4 (Task #27)
 - Finish implementing core authentication flows (registration, password reset)
 - Set up role-based access control using Supabase policies
 - Complete researcher portal basic features
@@ -218,6 +226,12 @@ description: Tracks the current work focus, recent changes, next steps, active d
   - Signups disabled - admin will register therapists and researchers
   - Authentication must pass through Nginx proxy (now working)
   - Auth tokens stored in browser local storage
+
+- **Component Styling and Architecture**: 
+  - Need to update Shadcn UI Vue components to work properly with Tailwind 4
+  - Will review and update the theming system for consistent styling
+  - May need to add proper data-slot attributes for component variant styling
+  - Should consider updating color definitions to use OKLCH format instead of HSL
 
 - **Architecture**: 
   - Vue.js frontend with Pinia state management
@@ -235,15 +249,18 @@ description: Tracks the current work focus, recent changes, next steps, active d
 - API endpoint structure `/api/{version}/{resource}/{id?}/{action?}`
 - Protected routes require JWT validation
 - Progressive enhancement for offline functionality
+- UI component variants should be consistently applied across the application
 
 ## Current Blockers
 - ~~Supabase authentication through Nginx proxy (needs fixing)~~ RESOLVED
+- **Shadcn UI Vue component styling** with Tailwind 4 (Task #27 created to address)
 - Realtime update implementation for patient metrics
 
 ## Performance Considerations
 - Minimize API calls to Supabase by caching where appropriate
 - Optimize image uploads and storage for patient uploads
 - Use connection pooling for database connections
+- Ensure styled components are optimized for performance
 
 ## Security Considerations
 - Ensuring secure handling of patient data

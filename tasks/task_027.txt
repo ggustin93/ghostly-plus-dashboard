@@ -1,0 +1,43 @@
+# Task ID: 27
+# Title: Fix Shadcn UI Vue Variant Styling Issues with Tailwind 4
+# Status: pending
+# Dependencies: 1
+# Priority: high
+# Description: Investigate and resolve the issue where Shadcn UI Vue component variants are not detected correctly with Tailwind 4, causing all buttons to appear black. Implement a robust solution for variant styling and ensure consistent theming across the application.
+# Details:
+Begin by reviewing the current integration of Shadcn UI Vue with Tailwind 4, focusing on how variant classes are generated and applied to components, especially buttons. Investigate recent changes in Tailwind 4 and Shadcn UI Vue, such as the introduction of the @theme directive, data-slot attributes, and updates to color handling (e.g., HSL to OKLCH) that may affect variant detection and styling. Check for deprecated styles (like 'default') and ensure the theme configuration aligns with the new 'new-york' style if applicable. Update the Tailwind and Shadcn UI Vue configurations to ensure variant classes are recognized and applied correctly. Refactor component code to use the latest recommended patterns for variant styling. Test all button and component variants throughout the application to confirm correct appearance. Document the root cause, solution, and any configuration changes for future reference.
+
+# Test Strategy:
+1. Manually inspect all button and component variants in the application UI to verify that variant-specific styles are applied and no buttons appear black unless intended. 2. Review the Tailwind and Shadcn UI Vue configuration files to ensure proper theme and variant setup. 3. Run automated visual regression tests (if available) to catch any styling regressions. 4. Confirm that the documentation clearly explains the issue, the solution, and any required steps for future upgrades or troubleshooting.
+
+# Subtasks:
+## 1. Review current Shadcn UI Vue and Tailwind 4 integration [pending]
+### Dependencies: None
+### Description: Analyze the existing codebase to understand how Shadcn UI Vue components are currently integrated with Tailwind 4, focusing on variant styling implementation.
+### Details:
+Examine the current CSS configuration files, component usage patterns, and theme setup. Check if the project is using the new @theme directive and @theme inline option introduced in Tailwind 4. Verify if components have the required data-slot attributes for styling. Document the current approach to variant styling, particularly for buttons, and identify where styling is breaking down.
+
+## 2. Identify color handling and theme configuration issues [pending]
+### Dependencies: 27.1
+### Description: Investigate color handling changes in Tailwind 4, particularly the conversion from HSL to OKLCH, and verify theme configuration alignment.
+### Details:
+Check if the application is using deprecated styles like 'default' instead of the recommended 'new-york' style. Review how color variables are defined in the CSS and if they're properly converted from HSL to OKLCH format as required by Tailwind 4. Examine the theme configuration to ensure it's compatible with the new Tailwind 4 approach. Document any misalignments between the current implementation and Tailwind 4 requirements.
+
+## 3. Update Tailwind and Shadcn UI Vue configurations [pending]
+### Dependencies: 27.2
+### Description: Modify the Tailwind CSS and Shadcn UI Vue configurations to properly support variant styling in Tailwind 4.
+### Details:
+Update the globals.css file to use the proper @theme directive syntax for Tailwind 4. Ensure all color variables are correctly defined using the appropriate format. Configure PostCSS plugins if needed. Update or create a tailwind.config.js file if required, or implement a configuration-free approach using CSS variables and Tailwind CSS v4 directives. Ensure the Shadcn UI Vue components are properly configured to work with the updated Tailwind setup.
+
+## 4. Refactor component code for variant styling [pending]
+### Dependencies: 27.3
+### Description: Update component implementation to use the latest recommended patterns for variant styling in Tailwind 4.
+### Details:
+Add data-slot attributes to all component primitives that need styling. Update component templates and scripts to use the correct class application methods for Tailwind 4. Ensure variant classes are properly defined and applied. Replace any deprecated components (like 'toast') with recommended alternatives (like 'sonner'). Update button styling to use the default cursor as per the new guidelines. Test each component individually to ensure variants are correctly applied.
+
+## 5. Test and document the solution [pending]
+### Dependencies: 27.4
+### Description: Perform comprehensive testing of all component variants and document the implemented solution for future reference.
+### Details:
+Test all button and component variants throughout the application to confirm correct appearance. Verify that variant styling works consistently across different components and in different contexts. Create a detailed documentation of the root cause of the styling issues, the implemented solution, and any configuration changes made. Include examples of correct component usage with variants for future reference. Add comments in the code where necessary to explain the styling approach.
+

@@ -113,6 +113,7 @@ description: Tracks what works, what's left to build, current status, known issu
 1. **Docker Stability**: Occasional issues with Docker restarts, may require system reboot to resolve.
 2. **Authentication Flow**: Custom implementation complete but not yet verified working due to Docker restart issues.
 3. **Frontend Auth Persistence**: Need to integrate router navigation guards and session persistence after authentication is verified.
+4. **UI Component Styling**: Shadcn UI Vue component variants not being properly detected with Tailwind 4, causing all buttons to appear black (Task #27 created to address this).
 
 ## Evolution of Project Decisions:
 
@@ -124,6 +125,16 @@ description: Tracks what works, what's left to build, current status, known issu
   2. ⚠️ **Nginx header management**: Configuring Nginx to strip Authorization header - Not effective with browser-generated requests
   3. ✅ **Custom fetch implementation**: Bypassing Supabase client's auth methods for complete header control - Implementation complete
 - **Current approach**: Custom fetch-based login function in authStore that only sends apikey header
+
+### UI Component Styling Approach:
+- **Initial implementation**: Used Shadcn UI Vue components with default Tailwind 4 configuration
+- **Problem identified**: Component variants (especially buttons) not being detected correctly, all appearing black
+- **Planned solutions** (Task #27):
+  1. Review Tailwind 4 and Shadcn UI Vue integration, focusing on theme configuration
+  2. Update color handling from HSL to OKLCH format where needed
+  3. Ensure proper data-slot attributes on component primitives
+  4. Refactor component code to use latest recommended variant styling patterns
+  5. Test extensively to ensure consistent styling across all components
 
 ## Project Decision Timeline:
 
@@ -161,13 +172,21 @@ description: Tracks what works, what's left to build, current status, known issu
   - Updated Nginx configuration to explicitly remove Authorization header for auth endpoints
   - Documented two viable architectural approaches for authentication flow
 
+### 2025-05-10
+- Identified styling issues with Shadcn UI Vue components and Tailwind 4:
+  - Component variants (especially buttons) not being detected correctly
+  - Created Task #27 to fix styling issues
+  - Added documentation to techContext.md explaining the issue and planned solutions
+  - Determined issue is likely related to Tailwind 4's color format changes and component slot attributes
+
 ## Next Actions:
 
-1. Complete password reset functionality with router integration
-2. Implement user registration flow
-3. Develop role-based access control
-4. Build out dashboard layout and navigation
-5. Create user profile management
+1. Fix Shadcn UI Vue component styling issues with Tailwind 4 (Task #27)
+2. Complete password reset functionality with router integration
+3. Implement user registration flow
+4. Develop role-based access control
+5. Build out dashboard layout and navigation
+6. Create user profile management
 
 ---
-**Last Updated**: 2025-05-09 (Updated) 
+**Last Updated**: 2025-05-10 (Updated) 
