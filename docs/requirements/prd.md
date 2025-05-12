@@ -64,73 +64,148 @@ The current system:
 
 ### 3.1 Primary Functional Objectives
 
-### 3.1.1 For Therapists
+### 3.1.1 Therapist-Focused Features
 
-- View results of their patients' sessions
+**Essential for MVP**:
+- View results of patients' therapy sessions
 - Visualize EMG signals and game metrics
-- Track patient progress
-- Configure exercise programs
-- Compare patient cohorts
-- Generate clinical reports
+- Track individual patient progress with basic trend visualization
+- Configure exercise programs and game parameters
+- Manage patient profiles and demographic information
 
-### 3.1.2 For Researchers
+**Future Releases**:
+- Generate comprehensive clinical reports
+- Compare patient cohorts with advanced analytics
+- Create and share treatment templates
+- Access detailed longitudinal progress tracking
+- Collaborate with other therapists on treatment plans
 
-- Comparative data analysis
-- Export data for external analyses
-- Generate multi-site statistics
-- Filter and segment data
+### 3.1.2 Researcher-Focused Features
+
+**Essential for MVP**:
+- Access pseudonymized patient data for analysis
+- Export data for external statistical analysis
+- Create and manage basic patient cohorts
+- Generate simple multi-site statistics
+- Filter and segment data based on key parameters
+
+**Future Releases**:
+- Perform advanced comparative data analysis
+- Access sophisticated statistical tools directly in the platform
+- Create custom research dashboards
+- Generate publication-ready visualizations
+- Define complex cohort criteria with multiple parameters
+
+### 3.1.3 Administrator-Focused Features
+
+**Essential for MVP**:
+- Manage user accounts and role-based permissions
+- Basic system monitoring and troubleshooting
+- Data backup and restoration capabilities
+- Security and access control management
+- Patient data pseudonymization enforcement
+
+**Future Releases**:
+- Detailed system analytics and usage reporting
+- Advanced audit logging and compliance reporting
+- Institution-specific settings and customization
+- Bulk user and data management operations
+- System optimization and performance tuning
 
 ### 3.2 Detailed Functional Requirements
 
+> **Implementation Mapping**: For a detailed mapping of these requirements to specific UI screens, please see the [Requirements Traceability Matrix](ui_ux_screens.md#requirements-traceability-matrix) in the UI/UX Screens document.
+
 ### 3.2.1 Authentication and Authorization
 
-- Secure multi-level login system
-- Role management (therapist, researcher, administrator)
-- Granular data permissions
-- GDPR compliance with explicit consent
+**Essential for MVP**:
+- Role-based authentication system (therapist, researcher, administrator)
+- Secure login with email/password using Supabase Auth
+- Basic password management and account recovery
+- Permission system controlling access to patient data
+- Row-level security implementation for data access control
+
+**Future Releases**:
+- Multi-factor authentication (MFA)
+- Single Sign-On (SSO) integration
+- Advanced permission management with granular access controls
+- Institutional access management
+- Session management with automatic timeouts and lockouts
+- Enhanced audit logging of all authentication events
 
 ### 3.2.2 Patient Management
 
-- Patient registration and profile (demographic data, medical history)
-- Assignment to therapists and centers
-- Program adherence tracking
-- Intervention history
+**Essential for MVP**:
+- Basic patient registration and profile creation
+- Assignment of patients to therapists
+- Simple program adherence tracking
+- Core intervention history recording
+- Fundamental demographic data management
+
+**Future Releases**:
+- Advanced medical history integration
+- Treatment outcome prediction
+- Detailed protocol compliance analytics
+- Patient self-service portal access
+- Inter-institutional patient transfers
 
 ### 3.2.3 Cohort Management
 
-- Create and manage patient cohorts
-- Assign therapists to cohorts
-- Compare metrics across cohorts
-- Generate cohort-level reports
+**Essential for MVP**:
+- Create and manage basic patient cohorts
+- Simple assignment of therapists to cohorts
+- Fundamental cohort-level metrics
+- Basic cohort comparison functionality
+
+**Future Releases**:
+- Advanced cohort analytics and statistical tools
+- Sophisticated multi-parameter cohort definition
+- Detailed cohort-level reports with customizable templates
+- Inter-institutional cohort comparisons
+- Longitudinal cohort tracking with predictive modeling
 
 ### 3.2.4 EMG Data Visualization
 
-- Temporal graphs of EMG signals
-- Muscle strength analysis
-- Muscle contraction detection
-- Muscle fatigue analysis
-- Session comparison
+**Essential for MVP**:
+- Temporal graphs showing basic EMG signals
+- Fundamental muscle strength analysis visualization
+- Basic muscle contraction detection display
+- Simple session-to-session comparison
+
+**Future Releases**:
+- Advanced muscle fatigue analysis with predictive indicators
+- Multi-dimensional EMG visualization with 3D mapping
+- Machine learning assisted pattern recognition
+- Real-time collaborative visualization review
+- Custom visualization parameters for research applications
 
 ### 3.2.5 Game Performance Analysis
 
-- Scores and progressions in the game
-- Session duration and frequency
-- Correlation between EMG activity and game performance
-- Long-term trends
+**Essential for MVP**:
+- Basic scores and progressions in the game
+- Session duration and frequency tracking
+- Simple correlation between EMG activity and game performance
+- Short-term performance tracking
 
-### 3.2.6 Session Management
+**Future Releases**:
+- Advanced long-term trend analysis with predictive modeling
+- Detailed game-EMG correlation with machine learning insights
+- Performance benchmarking against similar patient profiles
+- Adaptive difficulty recommendations based on performance
+- Multi-factor analysis incorporating clinical variables
 
-- Session scheduling
-- Results recording
-- Therapist comments
-- Notifications and reminders
+### 3.2.6 Reports and Exports
 
-### 3.2.7 Reports and Exports
+- **Essential for MVP**:
+  - Basic data export capabilities for researchers (CSV, Excel)
+  - Session summary views for therapists
+  - Fundamental EMG visualization exports for clinical documentation
 
-- PDF clinical report generation
-- Raw data export (CSV, Excel)
-- Printable dashboards
-- Summary reports by medical center
+- **Future Releases**:
+  - PDF clinical report generation with customizable templates
+  - Printable comprehensive dashboards
+  - Summary reports by medical center
+  - Advanced visualization exports with annotations
 
 ### 3.3 Non-Functional Requirements
 
@@ -151,8 +226,7 @@ The current system:
 
 ### 3.3.3 Accessibility
 
-- WCAG 2.1 level AA compliance
-- Support for screen readers
+- WCAG 2.1 level AA compliance (?)
 - Multilingual support (English, Dutch, French)
 
 ### 3.3.4 Availability and Reliability
@@ -185,75 +259,26 @@ The GHOSTLY+ project is structured into six distinct work packages that together
     - The upload request must include the user's valid JWT for authentication and association with the correct patient/session.
 - Define fallback mechanism (e.g., manual dashboard upload) in case of direct upload failure.
 
-### 4.2 WORK PACKAGE 2: Web Dashboard
-*This package covers the design and development of the user-facing web application using Vue.js 3, focusing on a responsive interface for therapists and researchers.*
+### 4.2 WORK PACKAGE 2: Web Dashboard (Frontend)
+*This package covers the development of the user-facing web application using **Next.js/React**. It includes UI/UX design, component development, state management, and routing.*
 
-#### 4.2.1 Frontend (Web Dashboard)
-- **Technology**:
-    - **Framework**: Vue.js 3 (Composition API)
-    - **UI Library**: Tailwind CSS with **shadcn/ui** components for a modern, customizable interface.
-    - **State Management**: Pinia
-    - **Routing**: Vue Router
-    - **Charting**: Chart.js or potentially D3.js for complex EMG visualizations.
-    - **Build Tool**: Vite
-    - **Language**: TypeScript
-- **UI Features**:
-    - Responsive interface (mobile, tablet, desktop).
-    - Dynamic data visualizations for EMG signals and game metrics.
-    - Role-based interfaces adapting content for therapists and researchers.
-    - Potential for PWA features for partial offline access (e.g., viewing cached data).
+-   **Technology**: Next.js (v14+, App Router), React (v19+), TypeScript, Tailwind CSS, shadcn/ui.
+-   **Key Responsibilities**: Role-based interfaces (Therapist, Researcher, Admin), data visualization, interaction with backend services.
+-   **Supabase Interaction**: Uses `@supabase/js` and `@supabase/ssr` client libraries primarily for **user authentication** and interacting with Supabase Database/Storage **within the user's security context (respecting RLS)**. It **does not** use the `service_role` key.
 
-#### 4.2.2 User Interfaces
-- Therapist dashboard: Patient management, session scheduling, progress tracking.
-- Researcher dashboard: Cohort management, comparative analytics, data export.
-- Shared components: EMG data visualization, session analysis tools, report generation interface.
-- Secure login/authentication interface using Supabase Auth.
+### 4.3 WORK PACKAGE 3: Service Layer (Backend API)
+*This package focuses on the **dedicated Python backend service** built with **FastAPI**. It handles core business logic, data processing detached from the frontend framework, and future advanced analytics.*
 
-### 4.3 WORK PACKAGE 3: Service Layer
-*This package details the backend API built with FastAPI (Python) and core services responsible for business logic, secure data processing, C3D handling, EMG analysis, and communication.*
-
-#### 4.3.1 Backend API
-- **Technology**:
-    - **Framework**: FastAPI (Python 3.10+)
-    - **Data Validation**: Pydantic
-    - **Database Interaction**: SQLAlchemy Core or ORM (aligned with Supabase/PostgreSQL)
-    - **Authentication**: JWT verification (using `python-jose` or similar library) validating tokens issued by Supabase Auth.
-    - **Asynchronous Processing**: Leverage FastAPI's async capabilities; potentially use Celery for long-running background tasks (e.g., complex report generation).
-- **Core Services**:
-    - Authentication and authorization (verifying JWT, checking roles/permissions).
-    - **Secure endpoint for receiving authenticated C3D uploads from the game client.**
-    - Session and patient management CRUD operations.
-    - EMG signal processing and analysis (NumPy, Pandas, SciPy).
-    - Report generation (e.g., using libraries like `reportlab` or rendering HTML to PDF).
-    - Data import/export (processing C3D files, generating CSV/Excel).
-    - Advanced EMG analytics (muscle fatigue analysis, progress tracking).
-
-#### 4.3.2 Business Logic
-
-- Patient and therapist management
-- Session recording and analysis
-- C3D file parsing and transformation
-- Statistical analysis of EMG signals
+-   **Technology**: FastAPI, Python 3.11+, Pydantic, SQLAlchemy (potentially), appropriate analytics libraries (e.g., Pandas, NumPy later).
+-   **Key Responsibilities**: Secure C3D file processing, complex business logic, EMG analysis (potentially), application-level encryption/decryption, pseudonymization, advanced analytics.
+-   **Supabase Interaction**: Primarily **verifies JWTs** issued by Supabase Auth. For data access, it often interacts **directly with the PostgreSQL database** for complex operations. May use `supabase-py` client optionally for simple utility tasks.
 
 ### 4.4 WORK PACKAGE 4: Data Infrastructure
-*This package defines the data storage strategy using Supabase, encompassing the PostgreSQL database for structured data and Supabase Storage for files.*
+*This package covers the setup, configuration, and management of the **self-hosted Supabase instance**, including the database, authentication service, storage, and edge functions.*
 
-#### 4.4.1 Database
-- **Technology**: Supabase (PostgreSQL 15+)
-- **Characteristics**:
-    - Deployment potentially on a private VM (VUB server) or Supabase Cloud (pending VUB regulations).
-    - Optimized relational schema designed for EMG/session data and user management.
-    - Row-level security (RLS) enforced rigorously based on user roles and patient assignments.
-    - Encryption of sensitive data columns (e.g., patient PII) using `pgcrypto` or application-level encryption.
-    - Utilization of PostgreSQL features like JSONB for flexible data storage where appropriate.
-
-#### 4.4.2 File Storage
-- **Technology**: Supabase Storage
-- **File types**:
-    - Raw C3D files (uploaded directly from the game or via fallback).
-    - Generated PDF reports.
-    - Data exports (CSV, Excel).
-- **Security**: Access controlled via Supabase Storage policies integrated with user authentication and RLS.
+-   **Technology**: Supabase (Self-Hosted), PostgreSQL (v15+), Supabase Auth (GoTrue), Supabase Storage, Supabase Edge Functions (Deno).
+-   **Key Responsibilities**: Data persistence (PostgreSQL), file storage, user authentication/JWT issuance (Auth), enforcing Row-Level Security (RLS), providing secure environment for privileged backend logic (Edge Functions).
+-   **Supabase Edge Functions**: Provide serverless backend logic capability within the Supabase ecosystem. They are the designated place to use the Supabase JS client **with the `service_role` key** for **privileged operations** that need to bypass RLS.
 
 ### 4.5 WORK PACKAGE 5: Security and Compliance
 *This package outlines the critical measures for data privacy, security, GDPR compliance, and ethical handling of patient data throughout the system.*
@@ -302,7 +327,17 @@ The GHOSTLY+ project is structured into six distinct work packages that together
 - Hybrid model: core data at VUB with local processing at each site
 - Distributed model: independent instances with anonymized data sharing
 
-### 4.7 Data Flow
+### 4.7 Architecture Summary & Interaction Patterns
+
+*(This section summarizes the hybrid approach)*
+
+-   The **Next.js frontend (`frontend-2`)** handles user presentation and interacts directly with **Supabase Auth** (using client libraries like `@supabase/ssr`) for authentication. For data, it can fetch directly from Supabase (respecting RLS) or call the FastAPI backend or Edge Functions.
+-   **Next.js server-side features** (Route Handlers, Server Actions) provide backend logic tightly coupled to the frontend, also using `@supabase/ssr` to interact with Supabase within the user's RLS context.
+-   **Supabase Edge Functions** provide secure, isolated endpoints for operations requiring **privileged access** (using the `service_role` key via the JS client).
+-   The **dedicated FastAPI backend** handles **complex Python-specific logic**, advanced analytics, and tasks decoupled from the primary web UI. It verifies JWTs and typically interacts **directly with the PostgreSQL database**.
+-   **Supabase** acts as the central BaaS platform providing Auth, Database (with RLS), Storage, and Edge Functions.
+
+### 4.8 Data Flow
 *This section illustrates how data moves through the system, prioritizing the authenticated flow from the game.*
 
 #### 4.7.1 Data Acquisition (Primary Flow)
@@ -329,102 +364,6 @@ The GHOSTLY+ project is structured into six distinct work packages that together
 3. Backend verifies permissions
 4. Encrypted data is retrieved and decrypted
 5. Data is returned and visualized in the dashboard
-
-### 4.8 Proposed Architecture Diagram
-*Diagram updated to reflect direct game-to-API upload as primary.*
-```mermaid
-flowchart TD
-    %% Cohesive color scheme with clearer distinctions
-    classDef existing fill:#D4F1F9,stroke:#2E86C1,stroke-width:2px
-    classDef newSystem fill:#E8DAEF,stroke:#7D3C98,stroke-width:2px
-    classDef frontend fill:#FDEBD0,stroke:#333,stroke-width:1px
-    classDef backend fill:#D5F5E3,stroke:#333,stroke-width:1px
-    classDef api fill:#D6EAF8,stroke:#3498DB,stroke-width:1.5px
-    classDef database fill:#F5B7B1,stroke:#C0392B,stroke-width:1.5px
-    classDef security fill:#FEF9E7,stroke:#333,stroke-width:1px
-    classDef supabase fill:#3ECF8E30,stroke:#3ECF8E,stroke-width:2px
-    classDef option1 stroke:#E74C3C,stroke-width:2.5px,stroke-dasharray: 5 5
-    classDef option2 stroke:#3498DB,stroke-width:2.5px,stroke-dasharray: 5 5
-    classDef legend fill:none,stroke:none
-    classDef docker fill:#F5F5F580,stroke:#2C3E50,stroke-width:2px,stroke-dasharray: 5 5
-
-    subgraph CurrentSystem["🏥 EXISTING SYSTEM (Client-Side)"]
-        direction LR
-        Android["📱 Android Tablet"]:::existing
-        Sensors["💪 EMG Sensors<br>Delsys Trigno"]:::existing
-        Ghostly["🎮 Ghostly Game<br>(OpenFeasyo / MonoGame C#)<br>**MODIFIABLE**"]:::existing
-        %% LocalFiles["📄 C3D Files (Temporary)"]:::existing
-    end
-
-    subgraph DockerEnv["🐳 DOCKER ENVIRONMENT (Server-Side)"]
-      subgraph NewSystem["🌐 GHOSTLY+ EXTENSION"]
-          subgraph UserDashboard["📊 WEB DASHBOARD"]
-              Dashboard["Vue.js 3 / Tailwind / shadcn/ui<br>👨‍⚕️ Therapists (Multi-center)<br>🧪 Researchers (Analytics)"]:::frontend
-          end
-
-          API["🔌 REST API<br>(FastAPI)"]:::api
-
-          subgraph CoreServices["⚙️ SERVICES"]
-              direction TB
-              PythonServices["🔄 Core Services<br>FastAPI/SQLAlchemy (Python)"]:::backend
-              Analytics["📈 Analytics Services<br>(Python/NumPy/Pandas)"]:::backend
-          end
-
-          subgraph SupabaseCloud["☁️ SUPABASE PLATFORM"]
-              Database["💾 PostgreSQL<br>Database (RLS)"]:::database
-              FileStore["📁 Supabase Storage<br>(Reports/C3D)"]:::database
-              Auth["🔑 Supabase Auth<br>(JWT)"]:::supabase
-          end
-
-          subgraph GDPRCompliance["🔒 GDPR COMPLIANCE"]
-              direction TB
-              Pseudonymization["👤 Pseudonymization<br>of Patient Data"]:::security
-              DataEncryption["🔐 End-to-End<br>Encryption"]:::security
-              AccessControl["📝 Patient Access<br>& Deletion Rights"]:::security
-              AuditLogs["📋 Audit Logs<br>& Traceability"]:::security
-          end
-      end
-    end
-    class DockerEnv docker
-
-
-    %% Connections
-    Sensors --> Android
-    Android --> Ghostly
-
-    %% Authentication Flow
-    Ghostly --> |"1. Authenticate User"| Auth
-    Dashboard --> |"1. Authenticate User"| Auth
-    Auth -.-> |"Issues JWT"| Ghostly
-    Auth -.-> |"Issues JWT"| Dashboard
-    API --> |"Validates JWT"| Auth
-
-    %% Primary Data Flow (Game Upload)
-    Ghostly --> |"2. Upload C3D (Authenticated)"| API
-
-    %% Fallback Data Flow (Manual Upload)
-    Ghostly -.-> |"Alt: Save Locally"| Android
-    Android --> |"3. Manual Upload via Dashboard (Fallback)"| Dashboard
-    Dashboard --> |"Upload C3D (Authenticated)"| API
-
-    %% Backend Processing
-    API --> PythonServices
-    PythonServices --> Database
-    PythonServices --> Analytics
-    API --> |"Store C3D"| FileStore
-    Analytics --> Database
-    Analytics --> FileStore
-
-    %% Dashboard Interaction
-    Dashboard --> |"Request Data"| API
-    FileStore --> |"Serve Files"| Dashboard
-    %% Or via signed URLs from API
-
-    %% GDPR links remain the same
-    PythonServices --> GDPRCompliance
-    Database --> GDPRCompliance
-    API --> GDPRCompliance
-```
 
 ### 4.9 Data Flow Diagram
 *Sequence diagram updated for primary authenticated game upload.*
@@ -696,7 +635,7 @@ To finalize this PRD, we would need to clarify the following points:
 ### 8.2 Functional Questions
 
 1. **Specific Therapist Needs**:
-    - Which EMG metrics are most clinically relevant?
+    - Which EMG metrics are most clinically relevant? *(Preliminary analysis completed in [technical/emg_analysis.md](../technical/emg_analysis.md) - pending final validation with therapists)*
     - What type of reports would be most useful?
     - How to structure comparisons between patients?
 2. **Research Needs**:

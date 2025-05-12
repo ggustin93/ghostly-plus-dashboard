@@ -62,9 +62,10 @@ The GHOSTLY+ application security relies on a combination of measures, each addr
 
 *   **Mechanism**:
     *   Users authenticate via email + password.
+    *   Clients (Vue.js Dashboard, C# Game) initiate this authentication process *directly* with the self-hosted Supabase Auth service.
     *   Supabase Auth issues a signed JWT upon successful login.
-    *   Clients (Vue.js Dashboard, C# Game) send the JWT with each API request.
-    *   FastAPI backend verifies JWT validity (via Supabase public keys) before authorizing access.
+    *   Clients (Vue.js Dashboard, C# Game) send the JWT with each API request to the FastAPI backend.
+    *   FastAPI backend verifies JWT validity (e.g., using `python-jose` library and Supabase public keys) before authorizing access. FastAPI's role is JWT *verification*, not handling the initial credential exchange for login.
     *   Client-side token expiration and refresh mechanisms are required.
 *   **Key Principle: Unified Authentication**:
     *   **Single Source of Truth**: Both Game and Dashboard use the same self-hosted Supabase Auth instance.
