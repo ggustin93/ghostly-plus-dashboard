@@ -19,10 +19,15 @@ description: Tracks what works, what's left to build, current status, known issu
   - Simplified Nginx configuration for auth endpoints
   - Detailed documentation added in `docs/supabase-auth-fix.md`
 
-### Features and Components:
-1. ✅ **Base UI components** (shadcn-vue) installed and configured.
-2. ✅ **Authentication UI** created with login form using shadcn-vue components.
-3. ✅ **Pinia store** for authentication state management.
+### Features and Components (`frontend-2` - Next.js):
+1. ✅ Base UI components (shadcn/ui for React) installed and configured.
+2. ✅ Authentication UI (`AuthForm.tsx`) created using shadcn/ui components.
+3. ✅ Auth Context API (`AuthContext.tsx`) for authentication state management.
+4. ✅ Login Page (`/login`) with redirection logic.
+5. ✅ Account Page (`/account`) displaying basic user info and logout.
+6. ✅ Root Page (`/`) protected, redirects to `/login` or `/account` based on auth state.
+
+*(Previous Vue (`frontend`) components are now archived/obsolete)*
 
 ### Documentation:
 1. ✅ **Development workflow** documentation established.
@@ -33,23 +38,24 @@ description: Tracks what works, what's left to build, current status, known issu
 ## What's Left to Build:
 
 ### Phase 3: Authentication and Authorization System (In Progress)
-1. ⏳ Integrate password reset functionality and UpdatePasswordPage into Vue router.
-2. ⏳ Add user registration functionality.
-3. ⏳ Implement JWT-based session management.
-4. ⏳ Set up role-based access control (RBAC) for different user types.
-5. ⏳ Develop admin interface for user management.
+1. ✅ Implement basic email/password login (Done in `frontend-2`).
+2. ✅ Implement session management (Done via Supabase client/Context in `frontend-2`).
+3. ⏳ Integrate password reset functionality (Requires UI form and potentially Supabase Edge Function/backend logic).
+4. ⏳ Add user registration functionality (If needed, likely requires admin action or separate form).
+5. ⏳ Set up role-based access control (RBAC) - Requires defining roles (e.g., in a `profiles` table) and checking them.
+6. ⏳ Develop admin interface for user management (Current focus - `/admin` page).
 
-### Phase 4: Basic Dashboard Components
-1. 🔄 Create responsive dashboard layout.
-2. 🔄 Implement navigation menu.
-3. 🔄 Design and build dashboard homepage.
-4. 🔄 Develop user profile page.
+### Phase 4: Basic Dashboard Components (`frontend-2` - Next.js)
+1. 🔄 Create responsive dashboard layout (e.g., using Shadcn components, potentially a sidebar/header).
+2. 🔄 Implement navigation menu (within the dashboard layout).
+3. 🔄 Design and build dashboard homepage (main content area after login).
+4. ✅ Develop user profile page (`/account` - basic version done).
 
-### Phase 5: Data Processing and Visualization
-1. 🔄 Create API for C3D file processing.
-2. 🔄 Implement file upload functionality.
-3. 🔄 Develop 3D visualization components.
-4. 🔄 Create data analysis and reporting modules.
+### Phase 5: Data Processing and Visualization (`frontend-2` & Backend)
+1. 🔄 Create API (FastAPI or Edge Function) for C3D file processing.
+2. 🔄 Implement file upload functionality (in `frontend-2`, calling the API).
+3. 🔄 Develop 3D visualization components (in `frontend-2`, possibly using libraries like Three.js).
+4. 🔄 Create data analysis and reporting modules (potentially leveraging the separate Python analytics service).
 
 ### Phase 6: Integration with Existing Game
 1. 🔄 Establish API endpoints for game data exchange.
@@ -86,6 +92,7 @@ description: Tracks what works, what's left to build, current status, known issu
 - Applied proper formatting with Prettier (frontend) and Ruff (backend).
 
 ### Task 2: Local Development Environment
+- ✅ **COMPLETED**
 - ✅ Subtask 2.1: **COMPLETED** - Set up local development environment
 - ✅ Subtask 2.2: **COMPLETED** - Deploy local Supabase services
 - ✅ Subtask 2.3: **COMPLETED** - Configure local API and security
@@ -94,26 +101,21 @@ description: Tracks what works, what's left to build, current status, known issu
   - Resolved M1 Mac compatibility issues
   - Established proper JWT configuration for secure authentication
 
-### Task 3: Authentication and Authorization System
+### Task 3: Authentication and Authorization System (`frontend-2` Focus)
 - ⏳ **IN PROGRESS**
-- ✅ Supabase authentication backend configured and tested
-- ✅ Basic login UI implemented with shadcn-vue components
-- ✅ Pinia store for authentication state management created
-- ✅ Authentication debugging & resolution implemented:
-  - 🔍 **Problem diagnosed**: Browser sends duplicate authentication headers (`Authorization: Bearer <anon_key>` and `apikey: <anon_key>`) causing GoTrue to reject login requests
-  - ✅ **Solution implemented**: Created custom fetch-based authentication implementation that:
-    1. Bypasses Supabase client's signIn method completely
-    2. Uses direct fetch API with controlled headers (only apikey, no Authorization)
-    3. Processes authentication response and updates Supabase client with received tokens
-    4. Leverages existing session management once authentication is complete
-  - ⚠️ Solution testing interrupted by Docker issues requiring system restart
+- ✅ Supabase authentication backend configured and tested.
+- ✅ Basic login UI implemented (`AuthForm.tsx` in `frontend-2`).
+- ✅ Auth Context API for state management (`AuthContext.tsx` in `frontend-2`).
+- ✅ Login/Account pages with routing protection implemented in `frontend-2`.
+- ✅ Resolved module resolution issues related to dependencies in `frontend-2`.
+- ⏳ *Previous Vue (`frontend`) auth implementation efforts are archived.* 
+- ⏳ Next: Implement Admin page, RBAC, Password Reset, Registration (if applicable).
 
 ## Known Issues:
 
-1. **Docker Stability**: Occasional issues with Docker restarts, may require system reboot to resolve.
-2. **Authentication Flow**: Custom implementation complete but not yet verified working due to Docker restart issues.
-3. **Frontend Auth Persistence**: Need to integrate router navigation guards and session persistence after authentication is verified.
-4. **UI Component Styling**: Shadcn UI Vue component variants not being properly detected with Tailwind 4, causing all buttons to appear black (Task #27 created to address this).
+1. **Docker Stability**: Occasional issues with Docker restarts, may require system reboot to resolve. *(Seems less frequent now?)*
+2. **Frontend (`frontend-2`)**: Need to implement Role-Based Access Control (RBAC) checks for admin page.
+3. **UI Component Styling**: *(Verify if Tailwind 4 / Shadcn UI issues from Vue project persist in Next.js/React setup. Assume resolved unless specified otherwise)*.
 
 ## Evolution of Project Decisions:
 
@@ -135,6 +137,20 @@ description: Tracks what works, what's left to build, current status, known issu
   3. Ensure proper data-slot attributes on component primitives
   4. Refactor component code to use latest recommended variant styling patterns
   5. Test extensively to ensure consistent styling across all components
+
+### **Frontend Framework Choice:**
+- **Initial Choice**: Vue.js (`frontend`) selected for reactivity and component model.
+- **Switch Decision ([Current Date])**: Switched to **Next.js/React (`frontend-2`)**.
+  - **Rationale**: 
+    - Leverage the broader React ecosystem and component libraries (like Shadcn UI, which has robust React support).
+    - Utilize Next.js's integrated full-stack capabilities, including App Router, Server Components, Route Handlers (API routes), and built-in optimizations (image optimization, etc.).
+    - Align with potential team familiarity or preference for the React/Next.js stack (verify if needed).
+    - Simplify routing and server-side rendering/fetching patterns compared to implementing them separately with Vue.
+    - Address challenges encountered with specific Vue component library integrations (e.g., Shadcn UI Vue styling issues).
+
+### **Backend Strategy Choice:**
+- **Decision ([Current Date])**: Adopted a **Hybrid Backend Approach**.
+  - **Rationale**: Utilize Next.js server-side features for standard web backend tasks integrated with the frontend. Use Supabase Edge Functions for specific privileged/isolated tasks (like admin actions, transformations). Plan for a *separate* FastAPI service dedicated to future advanced Python analytics, keeping concerns separated.
 
 ## Project Decision Timeline:
 
@@ -179,14 +195,18 @@ description: Tracks what works, what's left to build, current status, known issu
   - Added documentation to techContext.md explaining the issue and planned solutions
   - Determined issue is likely related to Tailwind 4's color format changes and component slot attributes
 
+### [Insert Current Date]
+- Decided to switch frontend framework from Vue.js (`frontend`) to Next.js/React (`frontend-2`).
+- Decided on a Hybrid Backend Strategy (Next.js server + Edge Functions + separate FastAPI for analytics).
+- Started implementation of core auth flow in `frontend-2`.
+
 ## Next Actions:
 
-1. Fix Shadcn UI Vue component styling issues with Tailwind 4 (Task #27)
-2. Complete password reset functionality with router integration
-3. Implement user registration flow
-4. Develop role-based access control
-5. Build out dashboard layout and navigation
-6. Create user profile management
+1.  Create Supabase Edge Function (`get-all-users`) for admin page user fetching.
+2.  Build `/admin` page in `frontend-2` to display users (using Shadcn Table).
+3.  Implement RBAC check for accessing `/admin` page.
+4.  Continue with other pending tasks (Password Reset, Registration, Dashboard Layout etc. in `frontend-2`).
+5.  Review/update other docs (README, PRD) for framework change.
 
 ---
-**Last Updated**: 2025-05-10 (Updated) 
+**Last Updated**: [Insert Current Date] 

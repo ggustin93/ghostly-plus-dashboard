@@ -7,139 +7,146 @@ source_documents: [docs/prd.md](mdc:docs/prd.md) (Section 4), [docs/security.md]
 
 ## 1. Core Technologies
 
--   **Frontend (Web Dashboard)**:
-    -   Framework: **Vue.js 3** (Composition API)
-    -   UI Library: **Tailwind CSS v4** with **shadcn/ui** components
-    -   State Management: **Pinia**
-    -   Routing: **Vue Router**
-    -   Charting: **Chart.js** (primary, D3.js as potential for complex visualizations)
-    -   Build Tool: **Vite**
-    -   Language: **TypeScript**
-    -   **Component Notes**:
-        - Shadcn/UI components require `/* @vue-ignore */` directive for interface extensions in Vue 3.5+
-        - Example: `interface Props extends /* @vue-ignore */ PrimitiveProps { ... }`
-        - This is an intentional Vue 3.5+ compiler behavior for type safety ([GitHub issue](https://github.com/vuejs/core/issues/10504))
-        - Use consistently across all Shadcn components
-    
-    -   **Example (Shadcn/UI Button with Tailwind):**
-        ```vue
-        <script setup lang="ts">
-        import { Button } from '@/components/ui/button'
-        </script>
+### 1.1. Frontend (Web Dashboard - WP2)
 
-        <template>
-          <Button variant="outline" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-            Click Me
-          </Button>
-        </template>
-        ```
-    (Source: [docs/prd.md](mdc:docs/prd.md) 4.2.1, 4.10)
+- **Framework:** **Next.js (v14+ with App Router)** using **React (v19+)**
+- **Language:** TypeScript
+- **UI Components:** shadcn/ui (built on Radix UI primitives)
+- **Styling:** Tailwind CSS (v3.4+)
+- **State Management:** React Context API (initially, potentially Zustand or others later if complexity increases)
+- **Routing:** Next.js App Router
+- **Build Tool:** Next.js CLI (using Webpack or Turbopack)
+- **Package Manager:** npm
+- **Rationale for Switch**: Moved from Vue.js to leverage the React ecosystem, Next.js's integrated full-stack features (App Router, Server Components, API Routes, optimizations), improve developer experience, and address specific UI library integration challenges encountered with Vue.
 
--   **Backend (API & Services)**:
-    -   Framework: **FastAPI** (Python 3.10+)
-    -   Data Validation: **Pydantic**
-    -   Database Interaction: **SQLAlchemy Core or ORM**
-    -   Authentication (JWT Verification): **python-jose** or similar
-    -   Async Processing: FastAPI native, potentially **Celery** for long tasks.
-    -   Data Analysis: **NumPy, Pandas, SciPy**
-    -   Report Generation: **reportlab** or HTML-to-PDF rendering.
-    (Source: [docs/prd.md](mdc:docs/prd.md) 4.3.1)
+*(Previous Stack: Vue.js 3, Vite, Pinia, Vue Router, shadcn-vue)*
 
--   **Data Infrastructure (Self-Hosted)**:
-    -   Platform: **Supabase**
-    -   Database: **PostgreSQL 15+** (with RLS, `pgcrypto` or app-level encryption)
-    -   Authentication: **Supabase Auth** (JWT-based, optional 2FA/MFA with TOTP)
-    -   File Storage: **Supabase Storage** (for C3D, PDF reports, data exports)
-    (Source: [docs/prd.md](mdc:docs/prd.md) 4.4.1, 4.4.2; [docs/security.md](mdc:docs/security.md))
+### 1.2. Backend (Service Layer - WP3)
 
--   **Existing System Components**: (to integrate with)
-    -   Game: **OpenFeasyo** (MonoGame/C# on Android Tablets) - *Modifiable*
-    -   Sensors: **Delsys Trigno Avanti EMG sensors**
-    (Source: [docs/prd.md](mdc:docs/prd.md) 4.1.1)
+- **Framework:** FastAPI
+- **Language:** Python 3.11+
+- **Data Validation:** Pydantic
+- **Database Interaction:** SQLAlchemy (for potential future DB interactions beyond Supabase direct access)
+- **Package Manager:** Poetry
 
--   **Security Specific**: 
-    -   Encryption: **Fernet** (Python Cryptography library for application-level encryption)
-    -   Hashing for Pseudonymization: **SHA-256**
-    (Source: [docs/prd.md](mdc:docs/prd.md) 4.5.1; [docs/security.md](mdc:docs/security.md) Sections 3, 4)
+### 1.3. Database & BaaS (Data Infrastructure - WP4)
 
-## 2. Development & Deployment Environment
+- **Platform:** Supabase (Self-Hosted on VUB Private VM)
+- **Core Database:** PostgreSQL (v15+)
+- **Authentication:** Supabase Auth (GoTrue)
+- **Storage:** Supabase Storage
+- **API Gateway:** Supabase Kong
+- **Realtime:** Supabase Realtime (Currently disabled in local dev)
+- **Edge Functions:** Supabase Edge Functions (Deno Runtime) - *Used for specific privileged operations or transformations.*
 
--   **Containerization**: **Docker** & **Docker Compose**
-    -   Separate Dockerfiles for backend (FastAPI) and frontend (Vue.js - multi-stage builds).
-    -   `docker-compose.yml` for local development orchestration of application services (backend, frontend, nginx).
-        -   The `nginx` service is configured to be part of the `default` and `supabase_network` to allow proxying to Supabase services.
-        -   The `frontend` service's `VITE_API_BASE_URL` is set to `http://localhost/api` to ensure API calls are routed through NGINX.
-    -   Local Supabase services (PostgreSQL, Auth, Storage, Studio, etc.) are managed via a separate `supabase_config/docker-compose.yml` and a root `.env` file, due to M1 compatibility issues with `npx supabase start`.
-        -   **Active Supabase services (as of 2025-05-09):** `studio`, `kong`, `auth`, `rest`, `storage`, `db`, `meta`, `supavisor`.
-        -   **Inactive Supabase services (commented out):** `realtime`, `functions`, `imgproxy`, `analytics`, `vector`.
-    (Source: [docs/prd.md](mdc:docs/prd.md) 4.6.1, 4.10, and project experience)
--   **Version Control**: **Git**
--   **Web Server/Reverse Proxy (Local Development & Production)**: **Nginx**
-    -   In local development (`nginx/conf.d/default.conf`):
-        -   Proxies `/` to `http://ghostly_frontend:5173` (frontend dev server).
-        -   Proxies `/api` to `http://ghostly_backend:8000` (backend service, with path rewrite).
-        -   Proxies Supabase paths (`/auth/v1`, `/rest/v1`, `/storage/v1`, etc.) to `http://supabase-kong:8000`.
-        -   Uses Docker's internal DNS resolver (`127.0.0.11`).
-    (Source: [docs/prd.md](mdc:docs/prd.md) 4.10, `nginx/conf.d/default.conf`)
--   **Development Proxy**: Vite dev server proxy (`server.proxy` in `vite.config.ts`) to forward API requests to backend container during local development. (Source: [docs/prd.md](mdc:docs/prd.md) 4.10 Notes)
--   **Package Management**:
-    -   Backend (Python): **Poetry** (recommended) or `requirements.txt`.
-    -   Frontend (Node.js): **npm** or **yarn** (via `package.json`).
-    (Source: [docs/prd.md](mdc:docs/prd.md) 4.10)
+### 1.4. Containerization & Orchestration (Deployment - WP6)
 
-## 3. Technical Constraints & Considerations
+- **Containerization:** Docker
+- **Orchestration (Local Dev):** Docker Compose
+- **Reverse Proxy (Local Dev & Prod):** Nginx
 
--   **Deployment Target**: VUB Private Virtual Machine. This dictates self-hosting for Supabase and overall infrastructure control.
--   **Data Sensitivity**: Handling of EMG data and patient PII requires strict adherence to GDPR and robust security measures (encryption, pseudonymization, RLS, secure authentication).
--   **Existing Game Modification**: The OpenFeasyo game (C#) needs to be modified to integrate Supabase Auth (likely via REST API calls to Supabase Auth endpoints) and implement direct authenticated C3D file uploads to the FastAPI backend.
--   **C3D File Processing**: Efficient parsing and processing of potentially large C3D files.
--   **Interoperability**: Ensuring smooth communication between the C# game, Python backend, Vue.js frontend, and Supabase services.
+### 1.5. Game Client Integration (WP1)
 
-## 4. Key Tool Usage Patterns
+- **Platform:** Android
+- **Framework:** MonoGame (via OpenFeasyo)
+- **Language:** C#
+- **Sensors:** Delsys Trigno EMG
 
--   **Supabase Auth**: Centralized authentication for both the game and web dashboard, issuing JWTs. Supports optional 2FA/MFA.
--   **Supabase Database (PostgreSQL)**: Stores structured application data. RLS is critical for access control. Data encryption is managed at the application layer (FastAPI) or via `pgcrypto`.
--   **Supabase Storage**: Securely stores C3D files and generated reports, with access controlled via policies integrated with user authentication.
--   **FastAPI**: Serves as the main API gateway, handling all business logic, data transformation (encryption/decryption, pseudonymization), and interactions with Supabase.
--   **Vue.js (with Pinia & Vue Router)**: Manages frontend state (including auth token), navigation, and component-based UI rendering.
--   **Docker**: Standardizes development and deployment environments, ensuring consistency.
--   **Nginx**: In production, acts as a reverse proxy, serves static frontend assets, and forwards API requests to the FastAPI backend.
+## 2. Development Setup
 
-## 5. Dependencies (Examples from PRD)
+- **Environment:** Dockerized setup using Docker Compose for local development, encompassing frontend, backend, Supabase services, and Nginx.
+- **Source Control:** Git (Hosted on GitHub)
+- **Package Managers:** npm (frontend), Poetry (backend)
+- **Linters/Formatters:**
+    - Frontend: ESLint (v9+ with flat config), Prettier
+    - Backend: Ruff
+- **IDE/Editor:** Visual Studio Code recommended, with relevant extensions (Docker, Python, Vue/Volar, TypeScript, Tailwind CSS IntelliSense, Prettier, ESLint, Ruff).
+- **Task Management:** Task Master CLI / MCP Tools (using `tasks.json` and generated markdown files).
 
--   **Frontend**: `vue`, `vue-router`, `pinia`, `tailwindcss`, `chart.js`, `axios` (or `fetch` for API calls), `shadcn-ui` related packages.
--   **Backend**: `fastapi`, `uvicorn`, `pydantic`, `sqlalchemy`, `python-jose` (or similar for JWT), `numpy`, `pandas`, `scipy`, `cryptography` (for Fernet), `reportlab` (or similar for PDF generation), Supabase Python client (if used directly, though often interaction is via SQLAlchemy/direct DB connection for self-hosted).
+## 3. Technical Constraints
 
-(Refer to [docs/prd.md](mdc:docs/prd.md) Section 4.10 for recommended project structure which implies these dependencies.)
+- **Self-Hosted Supabase:** The entire Supabase instance runs on a private VUB VM, not Supabase Cloud. This impacts deployment, maintenance, and potentially available Supabase features/extensions.
+- **GDPR Compliance:** Strict adherence required due to handling sensitive medical (EMG) data. Pseudonymization and encryption are key requirements.
+- **Existing Game Client:** The dashboard must integrate with the existing C#/MonoGame Android application.
+- **M1 Mac Compatibility:** Local Supabase setup requires specific Docker configurations (`platform: linux/arm64` for some services, manual Docker Compose preferred over `npx supabase start`).
 
-## Development Tooling & Resources
+## 4. Key Dependencies & Libraries
 
--   **Context7**: Consider using the Context7 MCP tool (`resolve-library-id` followed by `get-library-docs`) to fetch up-to-date, version-specific documentation and code examples for libraries. This is particularly helpful for ensuring AI assistants have accurate information and for verifying library usage against the latest official sources.
+### 4.1. Frontend (`frontend-2/package.json`)
 
-### Environment Setup Guides
+- `next`: Core Next.js framework
+- `react`, `react-dom`: React library
+- `@supabase/supabase-js`: Client-side Supabase interactions
+- `@supabase/ssr`: Server-side Supabase helpers for Next.js
+- `tailwindcss`: Utility-first CSS framework
+- `shadcn-ui`, `@radix-ui/*`: UI components and primitives
+- `lucide-react`: Icon library
+- `typescript`, `@types/*`: TypeScript support
+- `eslint`, `prettier`: Linting and formatting
+- `next-themes`: Dark mode / theme handling
 
-Detailed setup instructions for different project environments are available:
-- [Local CLI Development Setup](mdc:docs/environments/local_cli_development_setup.md)
-- [VM Self-Hosted Supabase Setup](mdc:docs/environments/vm_self_hosted_supabase_setup.md)
+*(Dependencies reflect the switch to Next.js/React. Previous Vue-specific dependencies like `vue`, `vite`, `pinia`, `vue-router`, `shadcn-vue`, `lucide-vue-next` are no longer relevant for `frontend-2`.)*
 
-## Outstanding Technical Questions 
+### 4.2. Backend (`backend/pyproject.toml`)
 
--   **Example (Shadcn/UI Button with Tailwind):**
-    ```vue
-    <script setup lang="ts">
-    import { Button } from '@/components/ui/button'
-    </script>
+- `fastapi`: Web framework
+- `uvicorn`: ASGI server
+- `pydantic`: Data validation
+- `sqlalchemy`: ORM (for potential future use)
+- `python-jose[cryptography]`: JWT handling
+- `supabase-py`: Python client for Supabase (if needed by FastAPI directly)
+- `python-dotenv`: Environment variable management
+- `py-bcrypt`: Password hashing (if needed outside Supabase Auth)
+- `ruff`: Linter/Formatter
 
-    <template>
-      <Button variant="outline" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-        Click Me
-      </Button>
-    </template>
-    ```
+### 4.3. Supabase / Infrastructure
 
-## 6. Known Issues & Troubleshooting
+- Docker Engine & Docker Compose
+- Nginx
+- PostgreSQL (`pgsodium` extension recommended for encryption)
+- Deno (for Edge Functions)
 
-### 6.1. Supabase CLI on M1 Macs (`exec format error` / Studio Unhealthy) - RESOLVED
+## 5. Tool Usage Patterns
+
+- **Docker Compose:** Used for starting/stopping the entire local development stack (`docker-compose up --build`, `docker-compose down`). Specific Supabase services managed via `docker compose -f supabase_config/docker-compose.yml up -d`.
+- **npm:** Used for all frontend dependency management, running scripts (`npm run dev`, `npm run build`, `npm run lint`).
+- **Poetry:** Used for all backend dependency management and running scripts (`poetry install`, `poetry run ...`).
+- **Supabase CLI:** Used for managing migrations, generating types, interacting with the local/remote Supabase instance (`supabase login`, `supabase link`, `supabase migration`, `supabase functions new/deploy`, `supabase gen types typescript`). **Note:** `supabase start` avoided due to M1 issues; manual compose used instead.
+- **Task Master:** Used via MCP server tools or `task-master` CLI for managing project tasks defined in `tasks/tasks.json`.
+- **Git:** Standard Git workflow (feature branches, commits, PRs).
+- **Shadcn UI CLI:** (`npx shadcn@latest add ...`) used to add UI components to the `frontend-2` project.
+
+## 6. API & Security Configuration
+
+- **Authentication:** JWT-based via Supabase Auth. Tokens issued by Supabase are validated by backend services (FastAPI, Edge Functions).
+- **Authorization:** Primarily handled by RLS policies in Supabase PostgreSQL. Role-based logic can be implemented in backend services or Edge Functions where needed.
+- **CORS:** Configured in Supabase Kong (via `supabase_cors_config.sh` or Studio) and potentially in FastAPI if needed. Nginx proxy configuration also handles routing.
+- **Secrets Management:** API keys, JWT secrets, service keys stored in `.env` files (root for Docker Compose/Supabase, `frontend-2` for Next.js build-time vars, `backend` for FastAPI). **SERVICE_ROLE_KEY and other sensitive keys MUST NOT be exposed client-side.** Edge Functions provide a secure environment for using `service_role`.
+- **Environment Variables:**
+    - `frontend-2`: Uses `NEXT_PUBLIC_` prefix for browser-accessible vars (e.g., `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`). Server-side logic in Next.js can access non-prefixed vars.
+    - `backend`: Loaded via `python-dotenv`.
+    - `supabase_config`: Loaded via root `.env` file by Docker Compose.
+
+## 6.1. Role of Supabase Client Libraries
+
+- **`@supabase/js` & `@supabase/ssr` (Frontend / Next.js Server):**
+    - Used primarily for **user authentication** (login, logout, session management, auth state changes) within the browser and on the Next.js server.
+    - Enables direct interaction with Supabase Database and Storage **respecting Row Level Security (RLS)** policies based on the authenticated user's JWT.
+    - `@supabase/ssr` provides helpers for securely managing sessions and client instances across Next.js rendering environments (Client Components, Server Components, Route Handlers, Middleware).
+    - **Crucially, these libraries are NEVER used with the `service_role` key in the frontend or standard Next.js backend logic due to security risks.**
+
+- **`supabase-js` (Edge Functions):**
+    - Used within the secure Deno runtime of Supabase Edge Functions.
+    - This is the designated place to use the Supabase client **with the `service_role` key** (securely provided by the environment) to perform **privileged operations** that bypass RLS (e.g., fetching all users for an admin panel, running admin tasks).
+
+- **`supabase-py` (FastAPI Backend - Optional Use):**
+    - The FastAPI service primarily **verifies JWTs** (using `python-jose` or potentially helpers from `supabase-py`) to authorize requests.
+    - For data interaction, FastAPI will often connect **directly to the PostgreSQL database** (e.g., using SQLAlchemy) for complex queries, analytics, and operations where its own logic dictates access.
+    - `supabase-py` *might* be used for convenience for simpler interactions like basic storage access or auth utility functions, but it's not the primary data access method for the dedicated backend.
+
+## 7. Known Issues & Troubleshooting
+
+### 7.1. Supabase CLI on M1 Macs (`exec format error` / Studio Unhealthy) - RESOLVED
 
 -   **Problem**: When running `npx supabase start` on M1 Macs, users might encounter `exec format error` for the `postgrest` container and an `unhealthy` status for the `supabase_studio` container. This prevents Supabase Studio from being accessible and can indicate issues with other Supabase services.
 -   **Cause**: This is often due to Docker images used by the Supabase CLI not being fully compatible with the ARM64 architecture of M1 Macs, even with Rosetta 2 installed. Specific services like PostgREST or Supabase Studio might pull images that cause an `exec format error`.
@@ -163,9 +170,9 @@ Detailed setup instructions for different project environments are available:
     -   Consider manually defining Supabase services in the project's main `docker-compose.yml` using known ARM64-compatible images as an alternative to the Supabase CLI's local management, though this increases setup complexity.
     -   **Update (2025-05-07)**: A more targeted Perplexity search for GitHub issues or specific Docker Desktop M1 settings related to "exec format error" for PostgREST or "Supabase Studio unhealthy" did not immediately yield a definitive, simple fix. The issue appears rooted in Docker image compatibility on ARM64/M1 architecture. Further investigation into Docker Desktop settings (e.g., "Use Virtualization framework," ensuring "Use Rosetta for x86_64/amd64 emulation on Apple Silicon" is enabled) or deeper dives into Supabase GitHub issues threads are needed. 
 
-## 7. Frontend Component Patterns
+## 8. Frontend Component Patterns
 
-### 7.1. shadcn-vue Button Component Event Handling
+### 8.1. shadcn-vue Button Component Event Handling
 
 When working with `shadcn-vue` Button components, especially those built upon `Primitive` from `reka-ui` (or similar primitive libraries), proper event handling is crucial. If click events (or other events) are not firing as expected, consider the following:
 
@@ -220,7 +227,7 @@ When working with `shadcn-vue` Button components, especially those built upon `P
 
 **Reasoning**: Primitive-based components often rely on explicit attribute and event forwarding. Issues can arise if `$attrs` is not used, or if form submission mechanics interfere with the expected event flow of the custom button component. Direct event binding on the component instance, combined with correct prop initialization and attribute forwarding, ensures more reliable behavior.
 
-### 7.2. Shadcn UI Vue Component Variant Styling with Tailwind 4
+### 8.2. Shadcn UI Vue Component Variant Styling with Tailwind 4
 
 -   **Variant Detection Issue**: When using Shadcn UI Vue components with Tailwind 4, variant styling may not be properly detected, resulting in all buttons appearing black regardless of the specified variant.
 
