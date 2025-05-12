@@ -1,380 +1,214 @@
 # API Endpoints Documentation
 
-This document provides details on the API endpoints available in the Ghostly+ system. It covers authentication, request/response formats, and available operations.
+This document provides details on the API endpoints and interaction patterns within the Ghostly+ system, reflecting our **hybrid architecture**.
 
-> **Important Note**: This documentation will be complemented by FastAPI's automatic OpenAPI documentation (Swagger UI and ReDoc), which is generated at runtime based on the actual code implementations and Pydantic models. The live API documentation will be available at `/api/docs` and `/api/redoc` when the system is running.
+> **Important Note on Architecture**:
+> - **Supabase as Primary BaaS**: Authentication, basic data storage/retrieval (respecting Row-Level Security), and file storage are primarily handled by **Supabase**. Interactions occur via Supabase client libraries (in Next.js frontend/server) or Supabase Edge Functions.
+> - **FastAPI for Specialized Tasks**: A dedicated **FastAPI backend service (to be developed)** will handle complex business logic, C3D file processing, advanced EMG analysis, and computationally intensive report generation.
+> - **Next.js Backend Features**: Simple backend logic tightly coupled with the frontend may be handled by Next.js Route Handlers or Server Actions.
 >
+> This document will distinguish between functionalities provided directly by Supabase, those intended for the future FastAPI service, and those potentially handled by Next.js server features.
+>
+> The FastAPI service, once developed, will have its own live OpenAPI documentation (Swagger UI and ReDoc) available at its designated `/api/docs` and `/api/redoc` paths.
+
 > **Cross-references**:
-> - For system architecture and overall design context, see the [Product Requirements Document (PRD)](../../requirements/prd.md)
-> - For UI interactions that rely on these endpoints, see the [UI/UX Screens](../../requirements/ui_ux_screens.md)
+> - For system architecture and overall design context, see the [Product Requirements Document (PRD)](../../requirements/prd.md) and [System Patterns (Backend Strategy)](../../../memory-bank/systemPatterns.md#5-backend-implementation-strategy-when-to-use-what).
+> - For UI interactions, see the [UI/UX Screens](../../requirements/ui_ux_screens.md).
 
-## Base URL
+## Interaction Patterns & Endpoints
 
-All API endpoints are served under the `/api` base path.
+### 1. Authentication (Handled by Supabase)
 
-- Development: `http://localhost:8000/api`
-- Production: `https://your-domain.com/api`
+User authentication (login, registration, session management, password recovery) is managed **directly by Supabase Auth**.
+-   **Interaction**: The Next.js frontend uses Supabase client libraries (`@supabase/js`, `@supabase/ssr`) to interact with Supabase Auth.
+-   **JWTs**: Supabase issues JWTs upon successful authentication. These JWTs are then used to authorize requests to other services (e.g., the future FastAPI backend or Supabase Edge Functions).
+-   **Notional Endpoints (Supabase Internal)**: While Supabase exposes HTTP endpoints for auth (e.g., `/auth/v1/token`), direct interaction with these is typically abstracted by the client libraries.
 
-## Authentication
+### 2. Data Management (Primarily Supabase, with Next.js & Edge Functions)
 
-All endpoints except `/api/health` and `/api/auth/*` require authentication via JWT.
+Basic CRUD operations and data retrieval for patients, sessions, and users are primarily handled by direct interaction with Supabase, respecting Row-Level Security (RLS).
 
-**Authentication Header**:
-```
-Authorization: Bearer <jwt_token>
-```
+-   **Next.js Frontend/Server + Supabase Client**:
+    -   **Functionality**: Fetching lists of assigned patients, viewing patient details, creating new patient records (by therapists), managing user profiles.
+    -   **Mechanism**: Next.js components (Client or Server) use `@supabase/js` or `@supabase/ssr` to query the Supabase database. RLS policies ensure users only access authorized data.
+    -   **Example Interaction (Conceptual)**: A therapist views their patients. The Next.js app fetches `/rest/v1/patients?...` from Supabase, with the user's JWT ensuring RLS is applied.
 
-## Available Endpoints
+-   **Supabase Edge Functions**:
+    -   **Functionality**: Operations requiring privileged access or server-side logic not suitable for direct client-to-DB calls.
+    -   **Example**: An admin fetching a list of *all* users (bypassing RLS with `service_role` key). The Next.js admin panel would call a specific Edge Function (e.g., `/functions/v1/get-all-users`).
 
-### Health Check
+### 3. Specialized Backend Services (Future FastAPI Backend)
 
-#### `GET /api/health`
+The following functionalities are planned for the dedicated **FastAPI backend service**. These endpoints do not exist yet and will be developed as part of WP3.
 
-Returns the API health status.
+**Base URL (Future FastAPI Service)**:
+- Development: `http://localhost:8000/api` (or other configured port for FastAPI)
+- Production: `https://your-domain.com/api` (or a sub-path like `/fastapi-service`)
 
+**Authentication (for FastAPI Service)**:
+- All FastAPI endpoints will require a valid JWT (obtained from Supabase Auth) in the `Authorization: Bearer <jwt_token>` header. The FastAPI service will be responsible for validating these tokens.
+
+#### Health Check (Future FastAPI)
+
+##### `GET /api/health`
+Returns the FastAPI service health status.
 - **Required Authentication**: None
 - **Response**:
   ```json
   {
     "status": "ok",
-    "version": "1.0.0"
+    "service_name": "Ghostly+ FastAPI Service",
+    "version": "0.1.0"
   }
   ```
 
-### Authentication
+#### Session & C3D File Management (Future FastAPI)
 
-#### `POST /api/auth/login`
-
-Authenticate a user and receive a JWT token.
-
-- **Required Authentication**: None
-- **Request Body**:
-  ```json
-  {
-    "email": "user@example.com",
-    "password": "password123"
-  }
-  ```
-- **Response**:
-  ```json
-  {
-    "access_token": "eyJhbGciOiJIUzI1...",
-    "token_type": "Bearer",
-    "user": {
-      "id": "123e4567-e89b-12d3-a456-426614174000",
-      "email": "user@example.com",
-      "role": "therapist"
-    }
-  }
-  ```
-
-#### `POST /api/auth/refresh`
-
-Refresh an existing JWT token.
-
+##### `POST /api/sessions/upload`
+Upload a C3D file for a new session and trigger processing.
 - **Required Authentication**: Valid JWT
-- **Response**: Same as login endpoint
-
-### Patients
-
-#### `GET /api/patients`
-
-Get a list of patients assigned to the authenticated therapist.
-
-- **Required Authentication**: Valid JWT (Therapist or Researcher role)
-- **Query Parameters**:
-  - `limit` (optional): Maximum number of results to return (default: 20)
-  - `offset` (optional): Number of results to skip (default: 0)
-  - `status` (optional): Filter by status (`active`, `inactive`, etc.)
-- **Response**:
-  ```json
-  {
-    "total": 42,
-    "limit": 20,
-    "offset": 0,
-    "data": [
-      {
-        "id": "123e4567-e89b-12d3-a456-426614174000",
-        "code": "P12345",
-        "age": 72,
-        "gender": "female",
-        "status": "active",
-        "created_at": "2023-06-15T10:30:00Z",
-        "last_session": "2023-07-02T14:15:00Z"
-      },
-      // ...more patients
-    ]
-  }
-  ```
-
-#### `GET /api/patients/{patient_id}`
-
-Get detailed information about a specific patient.
-
-- **Required Authentication**: Valid JWT (Therapist or Researcher role)
-- **Response**:
-  ```json
-  {
-    "id": "123e4567-e89b-12d3-a456-426614174000",
-    "code": "P12345",
-    "age": 72,
-    "gender": "female",
-    "status": "active",
-    "created_at": "2023-06-15T10:30:00Z",
-    "medical_history": "...",
-    "treatment_notes": "...",
-    "sessions": [
-      {
-        "id": "789e4567-e89b-12d3-a456-426614174000",
-        "date": "2023-07-02T14:15:00Z",
-        "duration": 20,
-        "game_level": 3
-      }
-      // ...more sessions
-    ]
-  }
-  ```
-
-#### `POST /api/patients`
-
-Create a new patient record.
-
-- **Required Authentication**: Valid JWT (Therapist role)
-- **Request Body**:
-  ```json
-  {
-    "code": "P12345",
-    "age": 72,
-    "gender": "female",
-    "medical_history": "...",
-    "treatment_notes": "..."
-  }
-  ```
-- **Response**: The created patient object
-
-### Sessions
-
-#### `GET /api/sessions`
-
-Get a list of all sessions.
-
-- **Required Authentication**: Valid JWT (Therapist or Researcher role)
-- **Query Parameters**:
-  - `patient_id` (optional): Filter by patient ID
-  - `start_date` (optional): Filter by start date
-  - `end_date` (optional): Filter by end date
-  - `limit` (optional): Maximum number of results (default: 20)
-  - `offset` (optional): Number of results to skip (default: 0)
-- **Response**:
-  ```json
-  {
-    "total": 156,
-    "limit": 20,
-    "offset": 0,
-    "data": [
-      {
-        "id": "789e4567-e89b-12d3-a456-426614174000",
-        "patient_id": "123e4567-e89b-12d3-a456-426614174000",
-        "patient_code": "P12345",
-        "date": "2023-07-02T14:15:00Z",
-        "duration": 20,
-        "game_level": 3,
-        "has_emg_data": true
-      },
-      // ...more sessions
-    ]
-  }
-  ```
-
-#### `GET /api/sessions/{session_id}`
-
-Get detailed information about a specific session.
-
-- **Required Authentication**: Valid JWT (Therapist or Researcher role)
-- **Response**:
-  ```json
-  {
-    "id": "789e4567-e89b-12d3-a456-426614174000",
-    "patient_id": "123e4567-e89b-12d3-a456-426614174000",
-    "patient_code": "P12345",
-    "therapist_id": "456e4567-e89b-12d3-a456-426614174000",
-    "date": "2023-07-02T14:15:00Z",
-    "duration": 20,
-    "game_level": 3,
-    "game_score": 450,
-    "game_metrics": {
-      "attempts": 12,
-      "successes": 10,
-      "failures": 2
-    },
-    "notes": "Patient showed improved response time today",
-    "c3d_file_path": "/storage/c3d/session_789e4567.c3d"
-  }
-  ```
-
-#### `POST /api/sessions/upload`
-
-Upload a C3D file for a new session.
-
-- **Required Authentication**: Valid JWT (Therapist role)
-- **Request Body**: Multipart form data with the following fields:
-  - `patient_id`: ID of the patient
+- **Request Body**: Multipart form data:
+  - `patient_id`: ID of the patient (Supabase UUID)
   - `c3d_file`: C3D file data
-  - `notes` (optional): Session notes
-  - `date` (optional): Session date/time (defaults to upload time)
-- **Response**: The created session object
-
-### EMG Data
-
-#### `GET /api/emg/metrics/{session_id}`
-
-Get calculated EMG metrics for a specific session.
-
-- **Required Authentication**: Valid JWT (Therapist or Researcher role)
+  - `session_date`: ISO 8601 datetime string
+  - `game_level` (optional): Integer
+  - `game_score` (optional): Integer
+  - `notes` (optional): String
 - **Response**:
   ```json
   {
-    "session_id": "789e4567-e89b-12d3-a456-426614174000",
+    "session_id": "new_session_uuid_from_supabase_or_fastapi",
+    "patient_id": "provided_patient_id",
+    "status": "processing_initiated",
+    "c3d_file_path": "path_in_supabase_storage",
+    "message": "Session data received, C3D processing started."
+  }
+  ```
+*(Further details on how session metadata is stored - in Supabase via FastAPI, or directly by client - to be refined based on workflow).*
+
+#### EMG Data Processing & Analysis (Future FastAPI)
+
+##### `POST /api/emg/analyze/{session_id}`
+Trigger analysis of EMG data for a specific session (whose C3D is already uploaded).
+- **Required Authentication**: Valid JWT
+- **Request Body** (optional, if parameters are needed beyond session_id):
+  ```json
+  {
+    "analysis_parameters": { ... }
+  }
+  ```
+- **Response**:
+  ```json
+  {
+    "session_id": "session_uuid",
+    "analysis_status": "pending/completed",
+    "report_id": "optional_report_id_if_generated"
+  }
+  ```
+
+##### `GET /api/emg/metrics/{session_id}`
+Get calculated EMG metrics for a specific session.
+- **Required Authentication**: Valid JWT
+- **Response**:
+  ```json
+  {
+    "session_id": "session_uuid",
     "metrics": {
-      "rms": {
-        "left_rectus_femoris": 0.45,
-        "right_rectus_femoris": 0.48,
-        "left_vastus_lateralis": 0.52,
-        "right_vastus_lateralis": 0.50
-      },
-      "mvc_percentage": {
-        "left_rectus_femoris": 65,
-        "right_rectus_femoris": 70,
-        "left_vastus_lateralis": 75,
-        "right_vastus_lateralis": 72
-      },
-      "symmetry_index": {
-        "rectus_femoris": 5.6,
-        "vastus_lateralis": 3.8
-      },
+      "rms": { /* ... */ },
+      "mvc_percentage": { /* ... */ },
+      "symmetry_index": { /* ... */ }
       // Additional metrics
     }
   }
   ```
 
-#### `GET /api/emg/raw/{session_id}`
-
-Get raw EMG signal data for a session.
-
-- **Required Authentication**: Valid JWT (Therapist or Researcher role)
+##### `GET /api/emg/raw/{session_id}`
+Get processed/downsampled raw EMG signal data for visualization (if not served directly from Supabase storage by frontend).
+- **Required Authentication**: Valid JWT
 - **Query Parameters**:
   - `muscle` (optional): Filter by muscle name
   - `start_time` (optional): Start time in seconds
   - `end_time` (optional): End time in seconds
-  - `downsample` (optional): Downsample factor for large datasets
+  - `downsample` (optional): Downsample factor
 - **Response**:
   ```json
   {
-    "session_id": "789e4567-e89b-12d3-a456-426614174000",
-    "sampling_rate": 2000,
-    "channels": ["left_rectus_femoris", "right_rectus_femoris", "left_vastus_lateralis", "right_vastus_lateralis"],
-    "data": [
-      {
-        "timestamp": 0.0,
-        "values": [0.012, 0.015, 0.010, 0.014]
-      },
-      {
-        "timestamp": 0.0005,
-        "values": [0.014, 0.016, 0.011, 0.015]
-      },
-      // ...more data points
-    ]
+    "session_id": "session_uuid",
+    "sampling_rate": 1000, // Example processed rate
+    "channels": ["left_rectus_femoris", "..."],
+    "data": [ /* timestamped values */ ]
   }
   ```
 
-#### `POST /api/emg/analyze`
+#### Report Generation (Future FastAPI)
 
-Submit EMG data for analysis.
-
-- **Required Authentication**: Valid JWT (Therapist role)
-- **Request Body**: EMG data to analyze
-- **Response**: Calculated metrics similar to `/api/emg/metrics/{session_id}`
-
-### Reports
-
-#### `GET /api/reports`
-
-Get a list of generated reports.
-
-- **Required Authentication**: Valid JWT (Therapist or Researcher role)
-- **Query Parameters**:
-  - `patient_id` (optional): Filter by patient ID
-  - `type` (optional): Report type
-  - `limit` (optional): Maximum number of results
-  - `offset` (optional): Number of results to skip
-- **Response**: List of report objects
-
-#### `POST /api/reports`
-
-Generate a new report.
-
-- **Required Authentication**: Valid JWT (Therapist role)
+##### `POST /api/reports/generate`
+Generate a new report based on patient/session data and EMG analysis.
+- **Required Authentication**: Valid JWT
 - **Request Body**:
   ```json
   {
-    "type": "patient_progress",
-    "patient_id": "123e4567-e89b-12d3-a456-426614174000",
-    "start_date": "2023-06-01T00:00:00Z",
-    "end_date": "2023-07-15T23:59:59Z",
-    "included_metrics": ["rms", "mvc_percentage", "symmetry_index"],
-    "format": "pdf"
+    "type": "patient_progress", // e.g., patient_progress, session_summary
+    "patient_id": "patient_uuid",
+    "session_ids": ["session_uuid1", "session_uuid2"], // or date range
+    "included_metrics": ["rms", "symmetry_index"],
+    "output_format": "pdf" // or "json"
   }
   ```
-- **Response**: Report object with download URL
-
-### Users
-
-#### `GET /api/users`
-
-Get a list of users (admin only).
-
-- **Required Authentication**: Valid JWT (Administrator role)
-- **Response**: List of user objects
-
-#### `POST /api/users`
-
-Create a new user (admin only).
-
-- **Required Authentication**: Valid JWT (Administrator role)
-- **Request Body**:
+- **Response**:
   ```json
   {
-    "email": "newuser@example.com",
-    "password": "initialPassword123",
-    "role": "therapist",
-    "name": "Dr. Jane Smith",
-    "institutions": ["Hospital A"]
+    "report_id": "new_report_uuid",
+    "status": "generation_queued",
+    "message": "Report generation has started."
+    // "download_url": "transient_url_or_path_in_supabase_storage" // could be provided later
   }
   ```
-- **Response**: Created user object
 
-## Error Handling
+##### `GET /api/reports/{report_id}/status`
+Check the status of a report generation task.
+- **Required Authentication**: Valid JWT
+- **Response**:
+  ```json
+  {
+    "report_id": "report_uuid",
+    "status": "completed/pending/failed",
+    "download_url": "optional_path_to_report_in_supabase_storage_if_completed"
+  }
+  ```
 
-All endpoints follow a consistent error format:
+### 4. Error Handling (General Approach)
 
+Error responses, whether from Supabase, Edge Functions, or the future FastAPI service, should aim for consistency.
+
+-   **Supabase Client Errors**: The Supabase client libraries will throw JavaScript errors that should be caught and handled in the Next.js frontend.
+-   **Edge Function Errors**: Can return JSON error objects.
+-   **FastAPI Errors (Future)**: Will return JSON error objects.
+
+**Example Error JSON Structure**:
 ```json
 {
   "error": {
-    "code": "AUTHENTICATION_ERROR",
-    "message": "Invalid or expired token",
-    "details": "JWT signature verification failed"
+    "code": "SPECIFIC_ERROR_CODE", // e.g., AUTHENTICATION_FAILED, VALIDATION_ERROR, PROCESSING_FAILED
+    "message": "A descriptive error message.",
+    "details": "Optional additional details or context."
   }
 }
 ```
 
-Common error codes:
+Common conceptual error types:
+- `AUTHENTICATION_FAILED`: Invalid, expired, or missing JWT.
+- `AUTHORIZATION_DENIED`: User does not have permission for the action (RLS denial, role check failure).
+- `VALIDATION_ERROR`: Invalid input parameters or request body.
+- `RESOURCE_NOT_FOUND`: The requested resource (e.g., patient, session) does not exist.
+- `PROCESSING_ERROR`: An error occurred during C3D processing, EMG analysis, or report generation.
+- `SERVICE_UNAVAILABLE` / `INTERNAL_SERVER_ERROR`: Generic server-side error.
 
-- `AUTHENTICATION_ERROR`: Invalid or missing authentication
-- `AUTHORIZATION_ERROR`: Insufficient permissions for the operation
-- `VALIDATION_ERROR`: Invalid request parameters/body
-- `NOT_FOUND`: Requested resource doesn't exist
-- `INTERNAL_ERROR`: Unexpected server error
+### 5. Rate Limiting
 
-## Rate Limiting
+-   **Supabase**: Has its own rate limits for Auth and Database APIs. Refer to Supabase documentation.
+-   **Edge Functions**: Subject to Supabase's invocation limits.
+-   **FastAPI Service (Future)**: Will implement its own rate limiting (e.g., 100 requests per minute per user, configurable). Exceeding this will result in a `429 Too Many Requests` response.
 
-API requests are limited to 100 requests per minute per user. Exceeding this limit will result in a 429 Too Many Requests response with retry details in the headers. 
+---
+
