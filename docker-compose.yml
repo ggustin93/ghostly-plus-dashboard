@@ -20,25 +20,48 @@ services:
       - default
       - supabase_network
 
+  # Original Vue/Vite Frontend Service (Restored)
   frontend:
     build:
-      context: ./frontend
+      context: ./frontend # Original context
       dockerfile: Dockerfile
-      target: build-stage
-    container_name: ghostly_frontend
+      target: build-stage # Original target
+    container_name: ghostly_frontend # Original name
     # Use Vite dev server for development with hot-reload
-    command: npm run dev -- --host 0.0.0.0 --port 5173
+    command: npm run dev -- --host 0.0.0.0 --port 5173 # Original command
     volumes:
-      - ./frontend/src:/app/src # Mount src for hot-reloading
-      - ./frontend/public:/app/public # Mount public assets
-      - /app/node_modules # Use node_modules from image, don't mount local ones
-    # Port 5173 is not exposed directly to host anymore, proxied via Nginx
+      - ./frontend/src:/app/src # Original volumes
+      - ./frontend/public:/app/public
+      - /app/node_modules
+    # Port 5173 is internal, proxied via Nginx
     # ports:
     #  - "5173:5173"
     depends_on:
-      - backend # Frontend might make API calls
+      - backend # Original dependency
     env_file:
-      - ./frontend/.env
+      - ./frontend/.env # Original env_file
+    environment:
+      - NODE_ENV=development
+    networks:
+      - default
+      - supabase_network
+
+  # New Next.js Frontend Service
+  frontend_next: # New unique service name
+    build:
+      context: ./frontend-2 # Context for the Next.js app
+      dockerfile: Dockerfile
+    container_name: ghostly_frontend_next # New unique container name
+    command: npm run dev -- -p 3001 # Next.js dev command (runs on port 3001)
+    volumes:
+      - ./frontend-2:/app # Mount entire app directory
+      - /app/node_modules # Exclude host node_modules
+      - /app/.next        # Exclude host .next build cache
+    # Port 3000 is internal, proxied via Nginx
+    depends_on:
+      - backend
+    env_file:
+      - ./frontend-2/.env # .env file for the Next.js app
     environment:
       - NODE_ENV=development
     networks:
@@ -58,7 +81,8 @@ services:
       # - ./nginx/ssl:/etc/nginx/ssl # Uncomment if/when adding SSL certs
     depends_on:
       - backend
-      - frontend
+      - frontend # Depends on original frontend
+      - frontend_next # Also depends on new frontend
     networks:
       - default
       - supabase_network

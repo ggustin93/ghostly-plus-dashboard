@@ -218,8 +218,8 @@ bower_components/
 .yarn-integrity
 
 # Other specific outputs (less relevant for Vite/Vue but kept from original)
-# .next/
-# out/
+frontend-2/.next/
+frontend-2/out/
 # .nuxt/
 
 # ---- Existing Ignores Consolidated ----

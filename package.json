@@ -1,4 +1,11 @@
 {
+  "name": "ghostly-plus-dashboard",
+  "version": "0.1.0",
+  "scripts": {
+    "dev": "cd frontend-2 && npm run dev",
+    "dev:frontend": "cd frontend && npm run dev",
+    "dev:frontend-2": "cd frontend-2 && npm run dev"
+  },
   "devDependencies": {
     "jsonwebtoken": "^9.0.2"
   }
