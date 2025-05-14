@@ -57,4 +57,94 @@ While not explicitly detailed as "UX Goals" in the PRD, the functional requireme
 - **Role-Specific Views**: Interfaces tailored to the distinct needs and workflows of therapists versus researchers.
 - **Accessibility**: Usable by individuals with varying technical skills and potentially with assistive technologies (WCAG 2.1 AA).
 - **Responsiveness**: A seamless experience across different devices (desktop, tablet).
-- **Trust and Security**: Users must feel confident that sensitive patient data is handled securely and privately. 
+- **Trust and Security**: Users must feel confident that sensitive patient data is handled securely and privately.
+
+## Clinical Trial Overview
+
+The GHOSTLY+ project is centered around a clinical trial with NCT05258500 identifier that investigates the effectiveness of EMG-driven serious games for muscle rehabilitation. The trial has two primary research questions:
+
+1. The effectiveness of the Ghostly app (as an additional training to conventional therapy) in relation to strength gain
+2. The effect of Blood Flow Restriction (BFR) during isometric strength training compared to standard isometric strength training
+
+## Target Populations
+
+The study includes three distinct patient populations, each with their own randomized controlled trial (RCT):
+
+1. **Stroke Patients**: Acute and subacute stroke patients with score of 19 or lower on the knee and hip movement test of the Motricity Index
+2. **Hospitalized Elderly**: Patients 65+ years with 14 or less repetitions on the 30-seconds sit-to-stand test
+3. **COVID-19/ICU Patients**: Recovering COVID-19 patients and ICU patients with a score of 2 or less for manual muscle testing of the quadriceps muscle
+
+## Treatment Arms
+
+Each population is randomized into three treatment groups:
+
+1. **Ghostly App (Group A)**: Conventional therapy plus the Ghostly app for isometric quadriceps training
+   - Three sets of twelve repetitions at 75% MVC 
+   - Three training protocols: Standard (120s rest between sets), Cluster set 1 (10s rest between reps), Cluster set 2 (30s rest after 3 consecutive reps)
+
+2. **Ghostly App + BFR (Group B)**: Conventional therapy plus Ghostly app with Blood Flow Restriction
+   - Four sets of 15 repetitions, each contraction lasting three seconds
+   - Training intensity at 100% MVC with two minutes rest between sets
+   - Cuff pressure set at 50% of arterial occlusion pressure
+
+3. **Control Group (Leaflet)**: Conventional therapy plus leaflet-based exercise instructions
+   - Matched with Ghostly game in terms of repetitions, sets and rest intervals
+   - Performed without supervision of therapist
+   - Acts as control condition for the Ghostly intervention
+
+## Primary Outcome Measures
+
+- Change in quadriceps muscle strength from baseline to 2 weeks of intervention (measured with MicroFET dynamometer)
+- Change in quadriceps muscle strength from baseline to 6 weeks or hospital discharge (measured with MicroFET dynamometer)
+
+## Secondary Outcome Measures
+
+1. **Quadriceps Measurements**:
+   - Change in cross-sectional area (ultrasound)
+   - Change in pennation angle (ultrasound)
+   - Change in echo intensity (ultrasound)
+   - All measured at both 2 weeks and 6 weeks/discharge
+
+2. **Body Composition**:
+   - Change in body impedance (Quadscan 4000 device)
+
+3. **Functional Outcomes**:
+   - Length of hospital stay
+   - Change in time spent bedridden
+   - Population-specific measures:
+     - Motricity Index for stroke patients
+     - 30-seconds sit-to-stand test for elderly
+     - Manual muscle testing for COVID-19/ICU patients
+
+4. **User Experience**:
+   - Global Perceived Effect (GPE) questionnaire
+   - Therapy compliance and adherence
+   - Modified USE (Usefulness, Satisfaction, Ease of use) questionnaire
+
+## Analysis Approach
+
+- Statistical analysis using SPSS 27 (IBM)
+- Significance level of 0.05 throughout
+- Descriptive statistics of baseline characteristics
+- Normal distribution assessment using Levene's test
+- Two-way repeated measures ANOVA to assess differences in dependent variables
+- Tukey post-hoc test to compare mean differences for true significance
+- For USE questionnaire: percentage distribution of items and mean scores for subscales
+
+## Web Dashboard Requirements
+
+The web dashboard must support:
+
+1. Visualization of EMG data for quadriceps muscle contractions
+2. Tracking of strength gains and other quadriceps metrics over time
+3. Comparison between treatment groups (Ghostly, Ghostly+BFR, Control)
+4. Analysis of 2-week and 6-week intervention outcomes
+5. Export of data for statistical analysis in SPSS
+6. Population-specific assessment tracking
+7. User experience measurement and analysis
+
+## User Perspectives
+
+- **Therapists**: Need to monitor individual patient progress, compare with baseline, and adjust treatment parameters
+- **Researchers**: Need to analyze treatment effects across populations and treatment arms, export data for statistical analysis
+- **Administrators**: Need to manage the clinical trial across multiple sites while ensuring data security and integrity 

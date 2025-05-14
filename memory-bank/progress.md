@@ -262,3 +262,137 @@ description: Tracks what works, what's left to build, current status, known issu
 
 ---
 **Last Updated**: 2025-05-17 
+
+# Progress
+
+## Current Status
+
+The GHOSTLY+ dashboard development is progressing with a refined understanding of the clinical trial requirements. We've recently updated key visualization components to better align with the quadriceps muscle focus and the specific measurements used in the trial.
+
+## What Works
+
+1. **User Authentication**
+   - Supabase Auth integration for secure login
+   - Role-based permissions system (therapist, researcher, admin)
+   - JWT token handling for secure API requests
+
+2. **Patient Management**
+   - Basic patient registration and profile creation
+   - Treatment group assignment (Ghostly, Ghostly+BFR, Control)
+   - Patient population categorization (stroke, elderly, COVID-19/ICU)
+
+3. **EMG Visualization**
+   - Real-time and recorded EMG signal display
+   - Focus on quadriceps muscle groups
+   - Filter controls for signal processing
+   - Support for comparing left and right leg activation
+   - Treatment group filtering
+
+4. **Muscle Heatmap**
+   - Quadriceps-focused visualization (vastus lateralis, vastus medialis, rectus femoris)
+   - Support for multiple measurement types:
+     - Muscle strength (MicroFET)
+     - Cross-sectional area (ultrasound)
+     - Pennation angle (ultrasound)
+     - Echo intensity (ultrasound)
+   - Side-by-side left/right leg comparison
+   - Time-point comparison (baseline, 2-week, 6-week)
+
+5. **Session Analysis**
+   - Session recording and playback
+   - Basic metrics calculation
+   - Integration with updated visualization components
+   - Session comparison features
+
+## What's Left to Build
+
+1. **Population-Specific Assessment Tools**
+   - Visualization for Motricity Index (stroke patients)
+   - Visualization for 30-second sit-to-stand test (elderly)
+   - Visualization for manual muscle testing (COVID-19/ICU)
+
+2. **Statistical Analysis Tools**
+   - ANOVA result visualization
+   - Tukey post-hoc test result display
+   - Statistical significance indicators
+   - SPSS export functionality
+
+3. **Advanced Comparison Features**
+   - Multi-patient comparison across treatment groups
+   - Population-level analytics
+   - Hospital/site filtering and comparison
+
+4. **Reporting System**
+   - PDF report generation
+   - Custom report templates for different user roles
+   - Batch reporting for research purposes
+
+5. **USE Questionnaire Analysis**
+   - Data collection interface for the modified USE questionnaire
+   - Visualization of percentage distribution of items
+   - Display of mean scores for subscales
+   - Open question response collection and analysis
+
+6. **Therapy Compliance Tracking**
+   - Session attendance tracking (completed vs. prescribed)
+   - Training load comparison (actual vs. prescribed)
+   - Rep counting and validation
+   - Compliance analytics and reporting
+
+## Known Issues
+
+1. **Visualization Components**
+   - Muscle heatmap needs refinement for better accuracy of quadriceps regions
+   - EMG visualization occasionally shows performance issues with large datasets
+   - Treatment group comparison views need clearer visual differentiation
+
+2. **Data Integration**
+   - C3D file parsing needs optimization for larger files
+   - Some ultrasound measurement formats not yet fully supported
+   - MicroFET data integration requires additional validation
+
+3. **User Interface**
+   - Population-specific interfaces need more distinct visual indicators
+   - Some complex analytics views are not yet optimized for mobile devices
+   - USE questionnaire data entry form not yet implemented
+
+## Evolution of Project Decisions
+
+### Initial Focus vs. Current Direction
+
+1. **Initial**: General muscle visualization for rehabilitation
+   **Current**: Specific quadriceps muscle visualization with clinically relevant metrics
+
+2. **Initial**: Generic patient management
+   **Current**: Population-specific tracking with custom assessment tools
+
+3. **Initial**: Basic EMG visualization
+   **Current**: Advanced EMG analysis with training protocol markers
+
+4. **Initial**: Single treatment approach
+   **Current**: Three treatment arms comparison (Ghostly, Ghostly+BFR, Control)
+
+5. **Initial**: Simple progress tracking
+   **Current**: Time-point specific analysis (baseline, 2-week, 6-week)
+
+### Recent Technical Decisions
+
+1. **Decision**: Refactor visualization components to focus on quadriceps
+   **Impact**: Better alignment with clinical trial focus, more relevant data visualization
+
+2. **Decision**: Add treatment group filtering to all visualizations
+   **Impact**: Enables direct comparison between the three study arms
+
+3. **Decision**: Implement time-point specific views
+   **Impact**: Clearer visualization of progress at the 2-week and 6-week measurement points
+
+4. **Decision**: Create separate visualization types for different quadriceps measurements
+   **Impact**: More accurate representation of the various clinical measurements
+
+## Next Implementation Priorities
+
+1. Complete the population-specific assessment visualizations
+2. Implement the statistical analysis visualization components
+3. Develop the USE questionnaire data collection and analysis features
+4. Enhance the therapy compliance tracking system
+5. Refine the muscle heatmap component for greater anatomical accuracy 

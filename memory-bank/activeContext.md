@@ -233,66 +233,112 @@ description: Tracks the current work focus, recent changes, next steps, active d
 
 # Active Development Context
 
-## Current Focus
-- Fixed Supabase authentication issue with Nginx proxy
-- Setup of authentication and authorization system with Supabase
-- Implementing test harness features
-- Preparing initial researcher portal functionality
-- Addressing styling issues with Shadcn UI Vue and Tailwind 4 components
+## Current Focus: Quadriceps-Focused Visualization Components
+
+We're currently focused on refining visualization components to better align with the clinical trial's focus on quadriceps muscle training and measurement. This addresses a key gap in the initial implementation which wasn't sufficiently targeted toward the specific muscles being studied.
 
 ## Recent Changes
-- **Authentication Fix (May 9, 2025)**: Resolved an issue with Supabase authentication through Nginx proxy. Key fixes included:
-  - Simplified Nginx configuration for `/auth/v1/` endpoints
-  - Ensured proper header passthrough from frontend to Supabase Kong
-  - Fixed environment variables in frontend
-  - Detailed documentation added at `docs/supabase-auth-fix.md`
 
-- **UI Component Issues (May 10, 2025)**: Identified styling issues with Shadcn UI Vue components and Tailwind 4:
-  - Button variants not being properly detected, causing all buttons to appear black
-  - Created Task #27 to fix the styling issues
-  - Documented potential causes in techContext.md section 7.2
-  - Issue is likely related to Tailwind 4's migration from HSL to OKLCH color format and component slot attributes
+1. **EMG Visualization Component**
+   - Updated to focus specifically on quadriceps muscles
+   - Added support for comparing data between treatment groups (Ghostly, Ghostly+BFR, Control)
+   - Implemented visualization for different training protocols (standard, cluster set 1, cluster set 2)
+   - Added recording of training compliance metrics
 
-- **Dashboard Design**: Working on UI/UX for patient monitoring dashboard
-- **Data Structures**: Implemented preliminary data structures for patient tracking
-- **API Integration**: Connected frontend components with backend API endpoints
+2. **Muscle Heatmap Component**
+   - Redesigned to focus on quadriceps muscle regions (vastus lateralis, vastus medialis, rectus femoris)
+   - Added visualization of key metrics:
+     - Muscle strength (MicroFET dynamometer)
+     - Cross-sectional area (ultrasound measurements)
+     - Pennation angle (ultrasound measurements)
+     - Echo intensity (ultrasound measurements)
+   - Created side-by-side comparison between left and right legs
+
+3. **Session Analysis Page**
+   - Updated to integrate the new quadriceps-focused components
+   - Added filters for patient population (stroke, elderly, COVID-19/ICU)
+   - Added comparison views for treatment groups
+   - Implemented 2-week vs. 6-week progress tracking
+
+## Active Decisions
+
+1. **Visual Design for Quadriceps Measurements**
+   - Decision: Use color-coded heatmaps to represent different quadriceps metrics (strength, CSA, pennation, echo)
+   - Reasoning: Provides intuitive visual representation of complex muscle data
+   - Status: Implemented in muscle-heatmap.tsx
+
+2. **Treatment Group Comparison**
+   - Decision: Add treatment group filters to visualization components
+   - Reasoning: Clinical trial compares three treatment approaches (Ghostly, Ghostly+BFR, Leaflet)
+   - Status: Partially implemented, needs refinement
+
+3. **Time-Series Analysis Approach**
+   - Decision: Focus on baseline, 2-week, and 6-week comparison views
+   - Reasoning: These are the primary measurement timepoints in the clinical trial
+   - Status: Implemented in session analysis page
+
+4. **Population-Specific Assessment Integration**
+   - Decision: Create separate visualization panels for population-specific metrics
+   - Reasoning: Each population uses different assessment tools (Motricity Index, sit-to-stand, manual testing)
+   - Status: Planned, not yet implemented
 
 ## Next Steps
-- Fix Shadcn UI Vue component styling issues with Tailwind 4 (Task #27)
-- Finish implementing core authentication flows (registration, password reset)
-- Set up role-based access control using Supabase policies
-- Complete researcher portal basic features
-- Implement data visualization components
 
-## Critical Decisions & Considerations
-- **Authentication Strategy**: Using Supabase Auth for all authentication needs
-  - Signups disabled - admin will register therapists and researchers
-  - Authentication must pass through Nginx proxy (now working)
-  - Auth tokens stored in browser local storage
+1. **Implement population-specific assessment visualizations**
+   - Create specialized components for Motricity Index (stroke patients)
+   - Create specialized components for 30-second sit-to-stand test (elderly patients)
+   - Create specialized components for manual muscle testing (COVID-19/ICU patients)
 
-- **Component Styling and Architecture**: 
-  - Need to update Shadcn UI Vue components to work properly with Tailwind 4
-  - Will review and update the theming system for consistent styling
-  - May need to add proper data-slot attributes for component variant styling
-  - Should consider updating color definitions to use OKLCH format instead of HSL
+2. **Add statistical analysis visualization**
+   - Integrate ANOVA results visualization
+   - Add significance indicators to treatment group comparisons
+   - Create visual summary of Tukey post-hoc test results
 
-- **Architecture**: 
-  - React with Vite frontend with Pinia state management
-  - FastAPI backend for custom business logic
-  - Supabase for authentication and data storage
-  - Docker Compose for local development
+3. **Develop USE questionnaire analysis dashboard**
+   - Visualize user experience metrics from the modified USE questionnaire
+   - Create component to display percentage distribution of questionnaire items
+   - Build visualization for subscale mean scores
 
-- **Component Design**: 
-  - Using ShadCN for UI components
-  - Custom theming based on Ghostly brand colors
-  - Mobile-first responsive design
+4. **Enhance session metrics analysis**
+   - Add therapy compliance visualization (sessions completed vs. prescribed)
+   - Add therapy compliance visualization (training load vs. prescribed load)
+   - Create rep counting visualization for exercise adherence
 
-## Patterns & Standards
-- Consistent error handling pattern between frontend and backend
-- API endpoint structure `/api/{version}/{resource}/{id?}/{action?}`
-- Protected routes require JWT validation
-- Progressive enhancement for offline functionality
-- UI component variants should be consistently applied across the application
+## Current Challenges
+
+1. **Complex Data Visualization**
+   - Challenge: Effectively displaying multiple quadriceps metrics in an intuitive way
+   - Approach: Using tabbed interfaces and color-coding to separate different measurement types
+
+2. **Treatment Group Comparison**
+   - Challenge: Creating meaningful visual comparisons between the three treatment approaches
+   - Approach: Using side-by-side bars/charts with clear labeling and statistical indicators
+
+3. **Multiple Patient Populations**
+   - Challenge: Supporting different assessment tools for each population
+   - Approach: Building flexible components that adapt based on patient population type
+
+4. **Temporal Data Analysis**
+   - Challenge: Clearly showing progress across baseline, 2-week, and 6-week measurements
+   - Approach: Consistent timeline visualization with clear markers for each measurement point
+
+## Learnings & Project Insights
+
+1. **Clinical Focus Alignment**
+   - Learning: Visualization components must align precisely with the clinical measurements
+   - Insight: Regular consultation with clinical stakeholders is essential to ensure relevance
+
+2. **Treatment Protocol Visualization**
+   - Learning: Different training protocols (standard vs. cluster sets) need clear visual differentiation
+   - Insight: Use consistent visual language to represent rest periods, sets, and repetitions
+
+3. **Population-Specific Requirements**
+   - Learning: Each patient population has unique assessment tools and baselines
+   - Insight: Dashboard must adapt dynamically to the specific population being viewed
+
+4. **Measurement Integration**
+   - Learning: Various measurement tools (MicroFET, ultrasound, etc.) produce different data formats
+   - Insight: Create a standardized data model that can accommodate all measurement types
 
 ## Current Blockers
 - ~~Supabase authentication through Nginx proxy (needs fixing)~~ RESOLVED

@@ -233,3 +233,170 @@ The authentication process uses a custom fetch implementation to avoid Supabase 
 - Local component state for UI-specific concerns
 - Potential migration to Zustand for more complex state as needed
 
+# System Patterns
+
+## Data Flow Architecture
+
+The GHOSTLY+ system follows a clear data flow pattern for capturing, storing, and analyzing quadriceps muscle data:
+
+1. **Data Capture**: EMG sensors on quadriceps muscles → Ghostly Game → C3D files
+2. **Data Upload**: Authenticated upload to backend API endpoint
+3. **Data Processing**: Backend processes C3D files, extracts metrics
+4. **Data Storage**: Processed data stored in Supabase Database with pseudonymization and encryption
+5. **Data Analysis**: Web Dashboard visualizes data with appropriate access controls
+6. **Data Export**: Exports to SPSS-compatible formats for statistical analysis
+
+## Visualization Patterns
+
+### 1. EMG Visualization
+
+```
+┌─────────────────────────────────┐
+│                                 │
+│     ╱╲      ╱╲     ╱╲    ╱╲    │
+│    ╱  ╲    ╱  ╲   ╱  ╲  ╱  ╲   │
+│   ╱    ╲  ╱    ╲ ╱    ╲╱    ╲  │
+│  ╱      ╲╱      ╲       ╲     ╲ │
+│ ╱                              ╲│
+│                                 │
+└─────────────────────────────────┘
+  EMG Signal with Time Controls
+```
+
+- Temporal visualization of quadriceps EMG signal
+- Real-time or playback modes
+- Amplitude visualization with adjustable scales
+- Multiple channels for different quadriceps muscles (vastus lateralis, vastus medialis, rectus femoris)
+- Training protocol markers (sets, repetitions)
+- Comparison between left and right leg
+
+### 2. Muscle Heatmap Visualization
+
+```
+┌─────────────────────────────────┐
+│    ╔═════════╗                  │
+│    ║███████░░║  ◄── Rectus      │
+│    ║████████░║      Femoris     │
+│    ╚═════════╝                  │
+│    ╔═════════╗                  │
+│    ║██████░░░║  ◄── Vastus      │
+│    ║███░░░░░░║      Lateralis   │
+│    ╚═════════╝                  │
+│    ╔═════════╗                  │
+│    ║████░░░░░║  ◄── Vastus      │
+│    ║███░░░░░░║      Medialis    │
+│    ╚═════════╝                  │
+└─────────────────────────────────┘
+        Quad Muscle Heatmap
+```
+
+- Color-coded visualization of quadriceps muscle activity
+- Intensity mapping based on various measurements:
+  - Strength (MicroFET dynamometer)
+  - Cross-sectional area (ultrasound)
+  - Pennation angle (ultrasound)  
+  - Echo intensity (ultrasound)
+- Side-by-side comparison of left and right leg
+- Time-series visualization (baseline, 2-week, 6-week)
+
+### 3. Progress Tracking Visualization
+
+```
+┌─────────────────────────────────┐
+│                                 │
+│  ┌───┐    ┌───┐    ┌───┐        │
+│  │   │    │   │    │   │        │
+│  │   │    │   │    │   │        │
+│  │   │    │   │    │   │        │
+│  └───┘    └───┘    └───┘        │
+│ Baseline  2 Week   6 Week       │
+│                                 │
+└─────────────────────────────────┘
+       Strength Progress Chart
+```
+
+- Bar/line charts showing progression over time
+- Multiple metrics tracked simultaneously
+- Treatment group comparison view
+- Statistical significance indicators
+- Baseline, 2-week, and 6-week measurements
+- Population-specific assessment visualizations
+
+### 4. Group Comparison Visualization
+
+```
+┌─────────────────────────────────┐
+│                                 │
+│  Group A   Group B   Control    │
+│  ┌───┐     ┌───┐     ┌───┐     │
+│  │   │     │   │     │   │     │
+│  │   │     │   │     │   │     │
+│  │   │     │   │     │   │     │
+│  └───┘     └───┘     └───┘     │
+│                                 │
+└─────────────────────────────────┘
+       Treatment Group Chart
+```
+
+- Compare outcomes across three treatment groups
+- Filter by patient population
+- Multiple outcome measures available
+- Statistical analysis integration
+- Error bars and significance indicators
+- Interactive filtering by timepoint
+
+## Authentication Patterns
+
+The system follows a JWT-based authentication flow:
+
+1. **Login**: User authenticates via Supabase Auth
+2. **Token**: JWT issued to authorized user
+3. **Authorization**: JWT included in all API requests
+4. **Verification**: Backend verifies token and permissions
+5. **Row-Level Security**: Database enforces access control based on user role
+6. **Session Management**: Automatic token refresh and timeout handling
+
+## Data Access Patterns
+
+Different user roles have different access patterns:
+
+1. **Therapists**:
+   - Access only their assigned patients
+   - View individual patient progress
+   - Configure treatment parameters
+   - Record session notes
+
+2. **Researchers**:
+   - Access pseudonymized data across patients
+   - Perform cohort analysis
+   - Export data for external analysis
+   - View statistical summaries
+
+3. **Administrators**:
+   - Manage user accounts and permissions
+   - Configure system settings
+   - Access audit logs
+   - Monitor system health
+
+## Integration Patterns
+
+The system integrates with several external components:
+
+1. **EMG Sensors**: Delsys Trigno Avanti sensors provide raw quadriceps data
+2. **Ghostly Game**: OpenFeasyo platform creates the game experience
+3. **C3D Files**: Standard biomechanics format for data exchange
+4. **SPSS**: Statistical analysis software for research outcomes
+5. **Ultrasound**: Viamo sv7 device captures muscle measurements
+6. **MicroFET**: Dynamometer for strength measurements
+
+## Reporting Patterns
+
+Standard reports follow consistent patterns:
+
+1. **Session Report**: Individual training session details and metrics
+2. **Progress Report**: Patient progression over multiple sessions
+3. **Population Report**: Statistics across a specific patient population
+4. **Treatment Group Report**: Comparison between treatment arms
+5. **Export Report**: Formatted data for SPSS analysis
+6. **USE Questionnaire Report**: User experience analysis
+
