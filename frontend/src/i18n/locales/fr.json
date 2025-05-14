@@ -1,0 +1,94 @@
+{
+  "search": {
+    "placeholder": "Rechercher patients, séances..."
+  },
+  "profile": "Profil",
+  "settings": "Paramètres",
+  "logout": "Déconnexion",
+  "navigation": {
+    "dashboard": "Tableau de bord",
+    "patients": "Patients",
+    "treatments": "Traitements",
+    "reports": "Rapports",
+    "settings": "Paramètres"
+  },
+  "dashboard": {
+    "welcome": "Bon retour",
+    "newTreatment": "Nouveau Traitement",
+    "stats": {
+      "activePatients": "Patients Actifs",
+      "upcomingSessions": "Séances à Venir",
+      "recentActivity": "Activité Récente"
+    },
+    "tabs": {
+      "patients": "Mes Patients",
+      "schedule": "Planning du Jour",
+      "recent": "Séances Récentes"
+    }
+  },
+  "patients": {
+    "title": "Patients",
+    "subtitle": "Gérer et suivre vos patients",
+    "list": {
+      "title": "Liste des Patients",
+      "description": "Voir et gérer tous les patients du système",
+      "noResults": "Aucun patient trouvé",
+      "columns": {
+        "name": "Nom",
+        "status": "Statut",
+        "lastSession": "Dernière Séance",
+        "actions": "Actions"
+      }
+    }
+  },
+  "treatment": {
+    "config": {
+      "title": "Configuration du Traitement",
+      "subtitle": "Configurer les paramètres du jeu et du traitement",
+      "selectPatient": "Sélectionner un Patient",
+      "noPatientSelected": "Veuillez sélectionner un patient pour configurer le traitement",
+      "tabs": {
+        "basic": "Paramètres de Base",
+        "advanced": "Paramètres Avancés",
+        "muscles": "Ciblage Musculaire"
+      },
+      "form": {
+        "name": "Nom du Traitement",
+        "gameType": "Type de Jeu",
+        "difficulty": "Niveau de Difficulté",
+        "duration": "Durée de la Séance",
+        "restInterval": "Intervalle de Repos",
+        "maxIntensity": "Intensité Maximale",
+        "bfr": "Restriction du Flux Sanguin",
+        "bfrPressure": "Pression BFR",
+        "targetMuscles": "Muscles Ciblés",
+        "notes": "Notes Cliniques"
+      },
+      "actions": {
+        "saveTemplate": "Sauvegarder comme Modèle",
+        "saveConfig": "Sauvegarder la Configuration",
+        "preview": "Aperçu",
+        "exitPreview": "Quitter l'Aperçu"
+      }
+    }
+  },
+  "reports": {
+    "progress": {
+      "title": "Rapports de Progression",
+      "subtitle": "Voir et analyser la progression des patients"
+    }
+  },
+  "common": {
+    "loading": "Chargement...",
+    "notFound": "Non trouvé",
+    "error": "Une erreur est survenue",
+    "save": "Sauvegarder",
+    "cancel": "Annuler",
+    "edit": "Modifier",
+    "delete": "Supprimer",
+    "view": "Voir",
+    "back": "Retour",
+    "next": "Suivant",
+    "previous": "Précédent"
+  }
+}

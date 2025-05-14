@@ -1,0 +1,140 @@
+{
+  "search": {
+    "placeholder": "Search patients, sessions..."
+  },
+  "profile": "Profile",
+  "settings": "Settings",
+  "logout": "Log out",
+  "navigation": {
+    "dashboard": "Dashboard",
+    "patients": "Patients",
+    "treatments": "Treatments",
+    "reports": "Reports",
+    "settings": "Settings"
+  },
+  "dashboard": {
+    "welcome": "Welcome back",
+    "newTreatment": "New Treatment",
+    "stats": {
+      "activePatients": "Active Patients",
+      "upcomingSessions": "Upcoming Sessions",
+      "recentActivity": "Recent Activity"
+    },
+    "tabs": {
+      "patients": "My Patients",
+      "schedule": "Today's Schedule",
+      "recent": "Recent Sessions"
+    }
+  },
+  "patients": {
+    "title": "Patients",
+    "subtitle": "Manage and monitor your patients",
+    "list": {
+      "title": "Patient List",
+      "description": "View and manage all patients in the system",
+      "noResults": "No patients found",
+      "columns": {
+        "name": "Name",
+        "status": "Status",
+        "lastSession": "Last Session",
+        "actions": "Actions"
+      }
+    }
+  },
+  "treatment": {
+    "config": {
+      "title": "Treatment Configuration",
+      "subtitle": "Configure game parameters and treatment settings",
+      "selectPatient": "Select Patient",
+      "noPatientSelected": "Please select a patient to configure treatment",
+      "basicDescription": "Set the fundamental parameters for the treatment session.",
+      "advancedDescription": "Adjust advanced settings like intensity and blood flow restriction.",
+      "musclesDescription": "Select and configure target muscle groups for the treatment.",
+      "notesDescription": "Add any relevant clinical notes for this treatment configuration.",
+      "tabs": {
+        "basic": "Basic Settings",
+        "advanced": "Advanced Settings",
+        "muscles": "Muscle Targeting",
+        "notes": "Notes"
+      },
+      "form": {
+        "name": "Treatment Name",
+        "namePlaceholder": "e.g., John Doe - Week 1 Biceps",
+        "gameType": "Game Type",
+        "gameTypePlaceholder": "Select a game",
+        "gameTypeDescription": "Choose the game to be used for this treatment.",
+        "difficulty": "Difficulty Level",
+        "difficultyDescription": "Set the game difficulty (1-10).",
+        "duration": "Session Duration",
+        "durationDescription": "Set the total duration of the game session in minutes.",
+        "restInterval": "Rest Interval",
+        "restIntervalDescription": "Set the rest time between active periods in seconds.",
+        "maxIntensity": "Maximum Intensity",
+        "maxIntensityDescription": "Set the target maximum voluntary contraction (MVC) percentage.",
+        "bfr": "Blood Flow Restriction",
+        "bfrDescription": "Enable if using BFR during this treatment.",
+        "bfrPressure": "BFR Pressure (mmHg)",
+        "bfrPressurePlaceholder": "e.g., 120",
+        "bfrPressureDescription": "Set the pressure for Blood Flow Restriction in mmHg.",
+        "targetMuscles": "Target Muscles",
+        "muscleGroups": "Target Muscle Groups",
+        "muscleGroupsDescription": "Select the muscle groups to target in this session.",
+        "notes": "Clinical Notes",
+        "notesPlaceholder": "Enter any relevant notes about this treatment plan..."
+      },
+      "games": {
+        "maze": "Maze Runner",
+        "space": "Space Guardian"
+      },
+      "actions": {
+        "saveTemplate": "Save as Template",
+        "saveConfig": "Save Configuration",
+        "preview": "Preview Game",
+        "exitPreview": "Exit Preview"
+      },
+      "preview": {
+        "title": "Game Preview",
+        "description": "This is a preview of how the selected game will appear.",
+        "details": "Game: {{gameName}}, Difficulty: {{difficulty}}, Duration: {{duration}} mins"
+      },
+      "muscles": {
+        "biceps": "Biceps",
+        "triceps": "Triceps",
+        "deltoid": "Deltoid",
+        "forearm": "Forearm",
+        "pectoral": "Pectoral",
+        "abdominal": "Abdominal",
+        "quadriceps": "Quadriceps",
+        "hamstring": "Hamstring"
+      }
+    }
+  },
+  "reports": {
+    "progress": {
+      "title": "Progress Reports",
+      "subtitle": "View and analyze patient progress"
+    }
+  },
+  "common": {
+    "loading": "Loading...",
+    "notFound": "Not found",
+    "error": "An error occurred",
+    "save": "Save",
+    "saveChanges": "Save Changes",
+    "cancel": "Cancel",
+    "edit": "Edit",
+    "delete": "Delete",
+    "view": "View",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "minutes": "minutes",
+    "seconds": "seconds"
+  },
+  "welcome": {
+    "back": "Welcome back"
+  },
+  "treatmentConfig": {
+    "title": "Treatment Configuration"
+  }
+}

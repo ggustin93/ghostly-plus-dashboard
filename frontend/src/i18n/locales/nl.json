@@ -1,0 +1,94 @@
+{
+  "search": {
+    "placeholder": "Zoek patiënten, sessies..."
+  },
+  "profile": "Profiel",
+  "settings": "Instellingen",
+  "logout": "Afmelden",
+  "navigation": {
+    "dashboard": "Dashboard",
+    "patients": "Patiënten",
+    "treatments": "Behandelingen",
+    "reports": "Rapporten",
+    "settings": "Instellingen"
+  },
+  "dashboard": {
+    "welcome": "Welkom terug",
+    "newTreatment": "Nieuwe Behandeling",
+    "stats": {
+      "activePatients": "Actieve Patiënten",
+      "upcomingSessions": "Geplande Sessies",
+      "recentActivity": "Recente Activiteit"
+    },
+    "tabs": {
+      "patients": "Mijn Patiënten",
+      "schedule": "Dagplanning",
+      "recent": "Recente Sessies"
+    }
+  },
+  "patients": {
+    "title": "Patiënten",
+    "subtitle": "Beheer en monitor uw patiënten",
+    "list": {
+      "title": "Patiëntenlijst",
+      "description": "Bekijk en beheer alle patiënten in het systeem",
+      "noResults": "Geen patiënten gevonden",
+      "columns": {
+        "name": "Naam",
+        "status": "Status",
+        "lastSession": "Laatste Sessie",
+        "actions": "Acties"
+      }
+    }
+  },
+  "treatment": {
+    "config": {
+      "title": "Behandelingsconfiguratie",
+      "subtitle": "Configureer spelparameters en behandelingsinstellingen",
+      "selectPatient": "Selecteer Patiënt",
+      "noPatientSelected": "Selecteer een patiënt om de behandeling te configureren",
+      "tabs": {
+        "basic": "Basisinstellingen",
+        "advanced": "Geavanceerde Instellingen",
+        "muscles": "Spiertargeting"
+      },
+      "form": {
+        "name": "Behandelingsnaam",
+        "gameType": "Speltype",
+        "difficulty": "Moeilijkheidsgraad",
+        "duration": "Sessieduur",
+        "restInterval": "Rustinterval",
+        "maxIntensity": "Maximale Intensiteit",
+        "bfr": "Bloedstroomrestrictie",
+        "bfrPressure": "BFR-druk",
+        "targetMuscles": "Doelspieren",
+        "notes": "Klinische Notities"
+      },
+      "actions": {
+        "saveTemplate": "Opslaan als Sjabloon",
+        "saveConfig": "Configuratie Opslaan",
+        "preview": "Voorvertoning",
+        "exitPreview": "Voorvertoning Sluiten"
+      }
+    }
+  },
+  "reports": {
+    "progress": {
+      "title": "Voortgangsrapporten",
+      "subtitle": "Bekijk en analyseer patiëntvoortgang"
+    }
+  },
+  "common": {
+    "loading": "Laden...",
+    "notFound": "Niet gevonden",
+    "error": "Er is een fout opgetreden",
+    "save": "Opslaan",
+    "cancel": "Annuleren",
+    "edit": "Bewerken",
+    "delete": "Verwijderen",
+    "view": "Bekijken",
+    "back": "Terug",
+    "next": "Volgende",
+    "previous": "Vorige"
+  }
+}
