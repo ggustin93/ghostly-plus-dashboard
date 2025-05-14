@@ -1,5 +1,8 @@
 # GHOSTLY+ Dashboard: Development Workflow
 
+> **Note**: This documentation is a work in progress and may be updated with additional information and examples.
+
+
 This document outlines the development workflow and practices for the GHOSTLY+ Dashboard project.
 
 ## Task Management with Task Master

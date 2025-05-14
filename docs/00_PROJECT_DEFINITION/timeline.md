@@ -41,4 +41,4 @@ This document provides a high-level estimated timeline for the GHOSTLY+ Dashboar
 ### Month 5: Finalization & Deployment (Tasks 21-25)
 *   **Focus**: Optimizing, testing, documenting, and preparing for deployment.
 *   **Activities**: Performance optimization, comprehensive security testing, setting up CI/CD pipeline, writing documentation, conducting user testing, and implementing feedback.
-*   **Goal**: Application is production-ready, documented, tested, and deployed (potentially on VUB VM if available).
+*   **Goal**: Application is production-ready, documented, tested, and deployed (potentially on VUB VM if available). 

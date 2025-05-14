@@ -2,6 +2,8 @@
 
 This document describes the key data flows within the Ghostly+ system, detailing how information moves between components, is processed, and stored.
 
+> **Important Note:** While this document provides data flow details, the project's **Memory Bank** serves as the single point of truth for all project documentation. For the most current and comprehensive information, please refer to the Memory Bank.
+
 ## Primary Data Acquisition Flow
 
 This represents the main path for data collection from the serious game to the database:

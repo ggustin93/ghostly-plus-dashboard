@@ -260,11 +260,13 @@ The GHOSTLY+ project is structured into six distinct work packages that together
 - Define fallback mechanism (e.g., manual dashboard upload) in case of direct upload failure.
 
 ### 4.2 WORK PACKAGE 2: Web Dashboard (Frontend)
-*This package covers the development of the user-facing web application using **Next.js/React**. It includes UI/UX design, component development, state management, and routing.*
+*This package covers the development of the user-facing web application using **React**. It includes UI/UX design, component development, state management, and routing.*
 
--   **Technology**: Next.js (v14+, App Router), React (v19+), TypeScript, Tailwind CSS, shadcn/ui.
+-   **Technology**: React (v19+), React Router, TypeScript, Tailwind CSS, shadcn/ui, Vite.
 -   **Key Responsibilities**: Role-based interfaces (Therapist, Researcher, Admin), data visualization, interaction with backend services.
--   **Supabase Interaction**: Uses `@supabase/js` and `@supabase/ssr` client libraries primarily for **user authentication** and interacting with Supabase Database/Storage **within the user's security context (respecting RLS)**. It **does not** use the `service_role` key.
+-   **Supabase Interaction**: Uses `@supabase/js` client library primarily for **user authentication** and interacting with Supabase Database/Storage **within the user's security context (respecting RLS)**. It **does not** use the `service_role` key.
+
+**Note**: Initially planned with Next.js, the project now uses standard React with Vite for a lighter, more appropriate solution for our primarily client-side dashboard application.
 
 ### 4.3 WORK PACKAGE 3: Service Layer (Backend API)
 *This package focuses on the **dedicated Python backend service** built with **FastAPI**. It handles core business logic, data processing detached from the frontend framework, and future advanced analytics.*

@@ -1,91 +1,42 @@
-# Ghostly+ Documentation
+# GHOSTLY+ Documentation
 
-Welcome to the Ghostly+ documentation repository! This directory contains comprehensive documentation for the Ghostly+ Dashboard system, a web application supporting an EMG-driven serious game designed to combat muscle strength loss in hospitalized elderly patients.
+> **Note:** The Memory Bank is the single source of truth for this project.
 
-## Documentation Structure
+## Structure
 
-The documentation is organized into five main sections, each serving a distinct purpose in explaining the Ghostly+ system:
+```
+docs/
+├── 00_PROJECT_DEFINITION/    # Core requirements and scope
+│   ├── prd.md               # Product Requirements Document
+│   └── ...                  # Project specs, timeline, UX mockups
+│
+├── 01_ARCHITECTURE/          # System design
+│   ├── architecture.md      # Core architecture overview
+│   ├── data_flow.md         # Data flow diagrams and patterns
+│   └── security.md          # Security implementation details
+│
+├── 02_SETUP_AND_DEVELOPMENT/ # Developer onboarding
+│   ├── local_development_setup.md   # Local setup guide
+│   ├── test_setup.md        # E2E testing approach
+│   ├── developer_testing_guide.md   # MVP testing guide
+│   ├── scripts/             # Setup and utility scripts
+│   └── ...                  # Other setup guides
+│
+└── 03_GUIDES/               # Role-specific guides
+    ├── api_reference.md     # API documentation
+    └── integrations.md      # Integration guides
+```
 
-### 1. Requirements (`/requirements`)
+## Usage Guidelines
 
-Contains the foundational documents that define what we're building:
+1. **Reference Only**: All documentation is for reference. Memory Bank remains the primary source of truth.
 
-- **[Product Requirements Document (PRD)](requirements/prd.md)** - The comprehensive specification of the system, including goals, features, architecture, and timeline.
-- **[UI/UX Screens](requirements/ui_ux_screens.md)** - Detailed specifications for each screen in the user interface, organized by user role (therapist, researcher, administrator).
-  - Includes a **Requirements Traceability Matrix** that maps PRD functional requirements to specific UI screens, ensuring complete coverage of all requirements.
+2. **Document Updates**: When updating the Memory Bank with significant changes, ensure relevant docs are also updated.
 
-### 2. Architecture (`/architecture`)
+3. **Navigation**: The numbered structure provides a logical progression from project definition to specialized guides.
 
-Explains how the system is designed and how data flows through it:
-
-- **[Overview](architecture/overview.md)** - High-level architecture of the system.
-- **[Layered Diagram](architecture/layered_diagram.md)** - Visual representation of the system's layered architecture.
-- **[Security](architecture/security.md)** - Security architecture and GDPR compliance details.
-- **[Data Flow](architecture/data_flow.md)** - Diagrams and descriptions of data flow through the system, including primary and fallback pathways.
-
-### 3. Technical Reference (`/technical`)
-
-Provides detailed technical information for developers:
-
-- **[Stack Overview](technical/stack_overview.md)** - Technology stack overview and rationale.
-- **[EMG Analysis](technical/emg_analysis.md)** - Technical details of EMG signal processing and analysis, including implementation patterns.
-- **[Supabase Auth](technical/supabase_csharp_auth.md)** - C# integration with Supabase Authentication for the game component.
-- **[Supabase Auth Fix](technical/supabase-auth-fix.md)** - Solutions for common authentication issues.
-- **[API Documentation](technical/api/endpoints.md)** - Detailed API endpoints, request/response formats, and authentication requirements.
-
-### 4. Guides (`/guides`)
-
-Provides practical instructions for various tasks:
-
-- **[Development Workflow](guides/development_workflow.md)** - Guide for developers working on the project.
-- **[Deployment](guides/deployment.md)** - Instructions for deploying the system in various environments.
-- **[Environments](guides/environments)** - Environment-specific configuration and setup.
-
-### 5. Project Management (`/project`)
-
-Contains documents related to project planning and tracking:
-
-- **[Timeline](project/timeline.md)** - Project timeline and milestones.
-- **[Task Summary](project/task_summary.md)** - Summary of development tasks.
-- **[Meeting Notes](project/meeting_notes/)** - Notes from project meetings.
-
-## Navigation Tips
-
-- Start with the [PRD](requirements/prd.md) for a complete understanding of the project goals and requirements
-- Review the [UI/UX Screens](requirements/ui_ux_screens.md) document for a visual understanding of the interfaces
-- Check the [Data Flow](architecture/data_flow.md) to understand how information moves through the system
-- Use the [EMG Analysis](technical/emg_analysis.md) document for implementing the metrics processing logic
-- Refer to the [Deployment Guide](guides/deployment.md) when preparing for production deployment
-
-## Document Conventions
-
-- All documentation is written in Markdown format
-- Diagrams use Mermaid syntax for version control and easy updates
-- Code examples include language identifiers for syntax highlighting
-- Cross-references use relative links to other documents
-
-## Contributing to Documentation
-
-When contributing to this documentation:
-
-1. Follow the established directory structure
-2. Use Markdown for all documents
-3. Include diagrams where appropriate using Mermaid
-4. Cross-reference related documents
-5. Keep technical implementation details in the `/technical` directory
-6. Place UI/UX specifications in the `/requirements` directory
-
-## Generating Documentation
-
-The markdown documentation can be converted to HTML or PDF formats using tools like:
-
-- [mdBook](https://rust-lang.github.io/mdBook/) - For generating a searchable web documentation
-- [Pandoc](https://pandoc.org/) - For converting to PDF or other formats
-
-## Documentation TODOs
-
-- [x] ~~Complete API endpoint documentation~~ API endpoints will be partially auto-generated by FastAPI (see [API Endpoints Documentation](technical/api/endpoints.md))
-- [ ] Add detailed database schema documentation
-- [ ] Create user guide for therapists
-- [ ] Add more examples to the deployment guide
-- [ ] Document test methodology and coverage
+4. **Contributions**: When adding documentation:
+   - Place in the appropriate section
+   - Follow existing naming conventions
+   - Update section READMEs as needed
+   - Reference Memory Bank where applicable 

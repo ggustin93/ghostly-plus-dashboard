@@ -1,4 +1,4 @@
-# Full Application Deployment on VUB VM (Frontend, Backend, Supabase)
+# Application Deployment on VUB VM 
 
 > **Note:** This document outlines the planned deployment process for the GHOSTLY+ application on the VUB VM. As the project is in its early stages, some details or specific commands may evolve. Always refer to the latest version and cross-reference with the project's Memory Bank (`memory-bank/`) for the most current information and context.
 

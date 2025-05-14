@@ -1,5 +1,9 @@
 # 🔐 GHOSTLY+ Application Security Overview
 
+> **Important Note:** While this document provides security details, the project's **Memory Bank** serves as the single point of truth for all project documentation. For the most current and comprehensive security information, please refer to the Memory Bank.
+
+> **Document Status:** This security architecture document represents our initial planning and approach at the beginning of the project. As implementation progresses, we will discover new insights, adapt to changing requirements, and refine our security strategies accordingly. This is a living document that will evolve throughout the project lifecycle as we learn and implement. The actual implementation may differ from these initial plans as we optimize for the specific needs of the GHOSTLY+ system.
+
 This document provides a **comprehensive explanation of the planned security architecture** for the GHOSTLY+ application, designed to handle **sensitive medical data** in a private environment (VUB virtual machine), using **Supabase (self-hosted/local), FastAPI, and Vue 3**.
 
 ## Table of Contents

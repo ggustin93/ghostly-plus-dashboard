@@ -1,1 +1,0 @@
-# To Do (cfr Perplexity and https://www.icdvrat.com/2021/ICDVRAT2021-Proceedings.pdf)
