@@ -10,29 +10,46 @@ interface EmgVisualizationProps {
   detailed?: boolean;
   simplified?: boolean;
   previous?: boolean;
+  groupType?: 'ghostly' | 'bfr' | 'control';
 }
 
-const EmgVisualization = ({ detailed, simplified, previous }: EmgVisualizationProps) => {
+const EmgVisualization = ({ detailed, simplified, previous, groupType = 'ghostly' }: EmgVisualizationProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [zoom, setZoom] = useState(1);
-  const [selectedMuscle, setSelectedMuscle] = useState('all');
+  const [selectedMuscle, setSelectedMuscle] = useState('quadriceps');
   const { theme } = useTheme();
+  const [offsetPosition, setOffsetPosition] = useState(0);
   
-  // Generate simulated EMG data
+  // Generate simulated EMG data based on group type and whether it's a previous session
   const generateEmgData = (length: number, amplitude: number, frequency: number, noise: number) => {
+    // Apply different patterns based on group type
+    const groupModifier = 
+      groupType === 'bfr' ? 1.25 : // BFR typically shows higher amplitude
+      groupType === 'control' ? 0.85 : // Control group shows lower amplitude
+      1.0; // Ghostly group baseline
+      
+    const timeModifier = previous ? 0.75 : 1.0; // Previous sessions show lower activation
+    
     const data = [];
     for (let i = 0; i < length; i++) {
-      const signal = 
-        amplitude * Math.sin(i * frequency * 0.01) +
-        (previous ? amplitude * 0.65 : amplitude) * Math.sin(i * frequency * 0.03) +
-        noise * (Math.random() - 0.5);
+      // Create a more quadriceps-specific EMG pattern with burst characteristics
+      const baseSignal = 
+        amplitude * groupModifier * timeModifier * Math.sin(i * frequency * 0.01) +
+        (amplitude * 0.5) * Math.sin(i * frequency * 0.03);
+        
+      // Add contractile bursts typical in strength training
+      const burstFactor = (i % 50 < 25) ? 1.2 : 0.8;
+      
+      // Add characteristic shape for quadriceps contractions
+      const signal = baseSignal * burstFactor + noise * (Math.random() - 0.5);
       data.push(signal);
     }
     return data;
   };
 
-  useEffect(() => {
+  // Function to draw the EMG visualization
+  const drawVisualization = (offset = 0) => {
     if (!canvasRef.current) return;
     
     const canvas = canvasRef.current;
@@ -53,11 +70,16 @@ const EmgVisualization = ({ detailed, simplified, previous }: EmgVisualizationPr
     // Set styles based on theme
     const textColor = theme === 'dark' ? 'rgba(255, 255, 255, 0.8)' : 'rgba(0, 0, 0, 0.8)';
     const gridColor = theme === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)';
-    const lineColor = previous 
-      ? 'rgba(180, 180, 180, 0.8)' 
-      : theme === 'dark' 
-        ? 'hsl(220, 70%, 50%)' 
-        : 'hsl(12, 76%, 61%)';
+    
+    // Color coding based on group type
+    let lineColor = theme === 'dark' ? 'hsl(220, 70%, 50%)' : 'hsl(12, 76%, 61%)';
+    if (previous) {
+      lineColor = 'rgba(180, 180, 180, 0.8)';
+    } else if (groupType === 'bfr') {
+      lineColor = theme === 'dark' ? 'hsl(280, 70%, 50%)' : 'hsl(280, 76%, 61%)';
+    } else if (groupType === 'control') {
+      lineColor = theme === 'dark' ? 'hsl(160, 70%, 50%)' : 'hsl(160, 76%, 61%)';
+    }
     
     // Calculate dimensions
     const width = rect.width;
@@ -83,9 +105,9 @@ const EmgVisualization = ({ detailed, simplified, previous }: EmgVisualizationPr
       ctx.stroke();
     }
     
-    // Generate data
-    const baseAmplitude = previous ? 60 : 80;
-    const noise = previous ? 8 : 12;
+    // Generate data with intensity based on group type and session
+    const baseAmplitude = 80;
+    const noise = 10;
     const dataLength = Math.floor(width * zoom);
     const data = generateEmgData(dataLength, baseAmplitude, 1, noise);
     
@@ -102,7 +124,7 @@ const EmgVisualization = ({ detailed, simplified, previous }: EmgVisualizationPr
     ctx.font = '10px Arial';
     ctx.textAlign = 'center';
     for (let x = 0; x < width; x += 100) {
-      const time = (x / width * 20).toFixed(1) + 's';
+      const time = ((x / width * 20) + (offset / 30)).toFixed(1) + 's';
       ctx.fillText(time, x, height - 5);
     }
     
@@ -113,8 +135,9 @@ const EmgVisualization = ({ detailed, simplified, previous }: EmgVisualizationPr
     
     const step = dataLength / width;
     for (let x = 0; x < width; x++) {
-      const dataIndex = Math.floor(x * step);
-      if (dataIndex < data.length) {
+      // Apply the offset for animation
+      const dataIndex = Math.floor((x * step) + offset) % data.length;
+      if (dataIndex >= 0 && dataIndex < data.length) {
         const y = height / 2 - data[dataIndex];
         if (x === 0) {
           ctx.moveTo(x, y);
@@ -139,7 +162,7 @@ const EmgVisualization = ({ detailed, simplified, previous }: EmgVisualizationPr
         ctx.fillText(a + ' μV', 40, y);
       }
       
-      // Draw threshold line
+      // Draw target threshold line for muscle activation (75% MVC from the study protocol)
       const threshold = 120;
       const thresholdY = height / 2 - threshold;
       
@@ -151,27 +174,34 @@ const EmgVisualization = ({ detailed, simplified, previous }: EmgVisualizationPr
       ctx.stroke();
       ctx.setLineDash([]);
       
-      // Label threshold line
+      // Label threshold line as 75% MVC (from the study protocol)
       ctx.fillStyle = 'rgba(255, 50, 50, 0.8)';
       ctx.textAlign = 'left';
-      ctx.fillText('Threshold (120 μV)', 55, thresholdY - 5);
+      ctx.fillText('Target 75% MVC (120 μV)', 55, thresholdY - 5);
     }
-  }, [theme, zoom, simplified, detailed, previous]);
+  };
+
+  // Initial render
+  useEffect(() => {
+    drawVisualization(offsetPosition);
+  }, [theme, zoom, simplified, detailed, previous, groupType, selectedMuscle, offsetPosition]);
 
   // Animation frame for playing the visualization
   useEffect(() => {
     if (!isPlaying) return;
     
     let animationFrameId: number;
-    let startTime: number;
+    let startTime: number | null = null;
     
     const animate = (timestamp: number) => {
       if (!startTime) startTime = timestamp;
-      const progress = timestamp - startTime;
+      // We can use elapsed time to calculate speed adjustments if needed
+      // const elapsed = timestamp - startTime;
       
-      // Redraw the canvas with scrolling effect
-      // This is a simplified approach - in a real app you'd shift the actual data
+      // Update offset position for scrolling effect (2 pixels per frame)
+      setOffsetPosition(prevOffset => prevOffset + 2);
       
+      // Continue animation loop
       animationFrameId = requestAnimationFrame(animate);
     };
     
@@ -186,14 +216,7 @@ const EmgVisualization = ({ detailed, simplified, previous }: EmgVisualizationPr
   useEffect(() => {
     const handleResize = () => {
       if (canvasRef.current) {
-        const canvas = canvasRef.current;
-        const ctx = canvas.getContext('2d');
-        if (ctx) {
-          // Re-render on resize
-          // This is a simplified approach - in a real app you might debounce this
-          const event = new Event('resize');
-          window.dispatchEvent(event);
-        }
+        drawVisualization(offsetPosition);
       }
     };
     
@@ -201,7 +224,7 @@ const EmgVisualization = ({ detailed, simplified, previous }: EmgVisualizationPr
     return () => {
       window.removeEventListener('resize', handleResize);
     };
-  }, []);
+  }, [offsetPosition]);
 
   return (
     <div className={cn(
@@ -260,15 +283,14 @@ const EmgVisualization = ({ detailed, simplified, previous }: EmgVisualizationPr
             value={selectedMuscle}
             onValueChange={setSelectedMuscle}
           >
-            <SelectTrigger className="w-[160px]">
+            <SelectTrigger className="w-[180px]">
               <SelectValue placeholder="Select muscle" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Muscles</SelectItem>
-              <SelectItem value="biceps">Biceps</SelectItem>
-              <SelectItem value="triceps">Triceps</SelectItem>
-              <SelectItem value="deltoid">Deltoid</SelectItem>
-              <SelectItem value="forearm">Forearm</SelectItem>
+              <SelectItem value="quadriceps">Quadriceps</SelectItem>
+              <SelectItem value="vastus_lateralis">Vastus Lateralis</SelectItem>
+              <SelectItem value="vastus_medialis">Vastus Medialis</SelectItem>
+              <SelectItem value="rectus_femoris">Rectus Femoris</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -290,7 +312,7 @@ const EmgVisualization = ({ detailed, simplified, previous }: EmgVisualizationPr
         
         {simplified && (
           <div className="pointer-events-none absolute bottom-2 right-2 rounded bg-background/80 px-2 py-1 text-xs backdrop-blur-sm">
-            {previous ? 'Previous Session' : 'Current Session'}
+            {previous ? 'Previous Session' : `Current Session (${groupType?.toUpperCase() || 'GHOSTLY'})`}
           </div>
         )}
       </div>
