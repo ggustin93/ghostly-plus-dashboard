@@ -1,89 +1,28 @@
 import js from '@eslint/js';
-import pluginVue from 'eslint-plugin-vue';
-import * as vueParser from 'vue-eslint-parser';
-import tseslint from 'typescript-eslint';
 import globals from 'globals';
-import eslintConfigPrettier from 'eslint-config-prettier';
+import reactHooks from 'eslint-plugin-react-hooks';
+import reactRefresh from 'eslint-plugin-react-refresh';
+import tseslint from 'typescript-eslint';
 
-export default [
-  // Global ignores
+export default tseslint.config(
+  { ignores: ['dist'] },
   {
-    ignores: [
-      'node_modules/',
-      'dist/',
-      '*.d.ts', // Typically, declaration files are not linted for style/rules
-      '.turbo/',
-      '.wrangler/'
-    ]
-  },
-
-  // Base configurations for all relevant files
-  js.configs.recommended,
-  ...tseslint.configs.recommended,
-  ...pluginVue.configs['flat/recommended'], // For Vue 3
-  eslintConfigPrettier, // Make sure this is last in the main extends to override others
-
-  // Configuration for Vue files
-  {
-    files: ['**/*.vue'],
+    extends: [js.configs.recommended, ...tseslint.configs.recommended],
+    files: ['**/*.{ts,tsx}'],
     languageOptions: {
-      parser: vueParser,
-      parserOptions: {
-        parser: tseslint.parser, // Use TypeScript parser for <script> blocks
-        sourceType: 'module',
-        ecmaVersion: 'latest',
-        extraFileExtensions: ['.vue'],
-      },
-      globals: {
-        ...globals.browser,
-        // Add any Vue-specific globals if needed, e.g., defineProps, defineEmits
-        // Though eslint-plugin-vue usually handles these well with <script setup>
-        defineProps: 'readonly',
-        defineEmits: 'readonly',
-        defineExpose: 'readonly',
-        withDefaults: 'readonly',
-      }
+      ecmaVersion: 2020,
+      globals: globals.browser,
+    },
+    plugins: {
+      'react-hooks': reactHooks,
+      'react-refresh': reactRefresh,
     },
     rules: {
-      // Vue specific rules can be adjusted here
-      'vue/multi-word-component-names': 'off',
-      'vue/no-unused-vars': 'warn', // or 'error'
-    }
-  },
-
-  // Configuration for TypeScript files (outside .vue)
-  {
-    files: ['**/*.ts', '**/*.tsx'],
-    languageOptions: {
-      parser: tseslint.parser,
-      parserOptions: {
-        sourceType: 'module',
-        ecmaVersion: 'latest',
-      },
-      globals: {
-        ...globals.browser, // Or globals.node if it's Node.js TS files
-        ...globals.node // Assuming some TS files might be for node scripts (e.g. vite.config.ts)
-      }
+      ...reactHooks.configs.recommended.rules,
+      'react-refresh/only-export-components': [
+        'warn',
+        { allowConstantExport: true },
+      ],
     },
-    rules: {
-      // TypeScript specific rules
-      '@typescript-eslint/no-unused-vars': 'warn', // or 'error'
-    }
-  },
-
-  // Configuration for JavaScript files (e.g., config files like this one)
-  {
-    files: ['**/*.js', '**/*.cjs', '**/*.mjs'],
-    languageOptions: {
-      globals: {
-        ...globals.node, // For Node.js environment config files
-        ...globals.browser // If some JS files are for browser
-      },
-      ecmaVersion: 'latest',
-      sourceType: 'module' // Assuming most JS files are modules
-    },
-    rules: {
-      // JS specific rules
-    }
   }
-]; 
+);

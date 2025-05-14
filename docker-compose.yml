@@ -46,28 +46,6 @@ services:
       - default
       - supabase_network
 
-  # New Next.js Frontend Service
-  frontend_next: # New unique service name
-    build:
-      context: ./frontend-2 # Context for the Next.js app
-      dockerfile: Dockerfile
-    container_name: ghostly_frontend_next # New unique container name
-    command: npm run dev -- -p 3001 # Next.js dev command (runs on port 3001)
-    volumes:
-      - ./frontend-2:/app # Mount entire app directory
-      - /app/node_modules # Exclude host node_modules
-      - /app/.next        # Exclude host .next build cache
-    # Port 3000 is internal, proxied via Nginx
-    depends_on:
-      - backend
-    env_file:
-      - ./frontend-2/.env # .env file for the Next.js app
-    environment:
-      - NODE_ENV=development
-    networks:
-      - default
-      - supabase_network
-
   nginx:
     build:
       context: ./nginx
@@ -82,7 +60,6 @@ services:
     depends_on:
       - backend
       - frontend # Depends on original frontend
-      - frontend_next # Also depends on new frontend
     networks:
       - default
       - supabase_network
