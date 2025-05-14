@@ -4,23 +4,46 @@ description: Tracks the current work focus, recent changes, next steps, active d
 
 # GHOSTLY+ Dashboard: Active Context
 
-## Current Status: Phase 3 (Auth Implementation) - Next.js Frontend
+## Current Status: Phase 3 (Auth Implementation) - React Frontend
 
-- **Date**: 12-04-25
-- **Focus**: Implementing core features (Auth, Account Page) in the new Next.js frontend (`frontend-2`). Debugging module resolution issues.
+- **Date**: 2025-05-17
+- **Focus**: Implementing core features in a consolidated React frontend with Vite. Setting up testing infrastructure.
 - **Recent Changes**:
-    - **Framework Switch**: Decided to switch frontend development from Vue.js (`frontend`) to Next.js/React (`frontend-2`).
-        - **Reasons for switching to Next.js/React**:
-            - To leverage the extensive React ecosystem and its wider availability of mature libraries and components, such as the React version of Shadcn UI which is well-maintained.
-            - To utilize Next.js's powerful full-stack features out-of-the-box, including the App Router for simplified routing, Server Components for improved performance and developer experience, and integrated API routes (Route Handlers) for backend logic co-located with the frontend.
-            - To benefit from Next.js's built-in optimizations for performance and SEO.
-            - To potentially align better with team expertise or industry trends leaning towards React/Next.js for complex web applications.
-            - To overcome specific challenges encountered with the Vue.js setup, such as styling inconsistencies with certain UI libraries (e.g., Shadcn UI Vue) and the desire for a more integrated server-side rendering and data-fetching model.
-    - **`frontend-2` Setup**: Initialized Next.js project, configured Tailwind CSS, Shadcn UI.
-    - **`frontend-2` Auth**: Implemented Supabase client, Auth Context, Auth Form, Login Page, Account Page.
-    - **`frontend-2` Routing**: Configured protected routes (redirecting `/` and `/account` to `/login` if not authenticated, redirecting `/login` to `/account` if authenticated).
-    - **Troubleshooting**: Resolved persistent module resolution errors (`@supabase/supabase-js`, `@radix-ui/react-avatar`) likely related to npm/React 19/Turbopack interactions, requiring cache clears, reinstalls, and disabling Turbopack.
-    - *Older Vue (`frontend`) related changes are now historical.*
+    - **Frontend Consolidation**: Completed major frontend reorganization:
+        - Removed the temporary `frontend-2` Next.js directory completely
+        - Cleaned up Vue components from `frontend` directory
+        - Implemented unified React with Vite frontend in the single `frontend` directory
+        - Created organized folder structure by feature (auth, dashboard, patients, etc.)
+        - Set up UI component library with Shadcn UI for React
+    - **Framework Update**: Finalized transition to React with Vite:
+        - Next.js proved overly complex for our dashboard needs, with server-side features that weren't fully utilized
+        - React with Vite offers a lighter, more appropriate solution for our primarily client-side dashboard application
+        - Better alignment with project complexity and team skillset
+        - Improved development speed with Vite's lightning-fast build times
+        - Simplified routing using React Router
+    - **Documentation Reorganization**:
+        - Created a new numbered folder structure in `/docs`:
+          - `00_PROJECT_DEFINITION`: Core requirements and scope
+          - `01_ARCHITECTURE`: System design documentation
+          - `02_SETUP_AND_DEVELOPMENT`: Developer onboarding and guides
+          - `03_GUIDES`: Role-specific how-to guides
+        - Added main README to explain the docs structure
+        - Consolidated architecture documentation into a single comprehensive file
+        - Created minimal testing documentation focused on MVP approach
+    - **Testing Infrastructure**:
+        - Implemented minimal E2E testing setup with Playwright
+        - Created basic test structure for authentication
+        - Set up MVP backend test approach with FastAPI TestClient
+        - Added testing commands to package.json
+        - Adopted a simplified test folder structure for maintainability
+    - **`frontend` Setup**: Configured React with React Router, Tailwind CSS, Shadcn UI.
+    - **`frontend` Auth**: Implemented Supabase client, Auth Context, Auth Form, Login Page, Account Page.
+    - **`frontend` Component Structure**: Organized components by feature:
+        - UI components (Shadcn UI React components)
+        - Layout components (page layouts, containers)
+        - Feature-specific components (dashboard, patients, treatments, etc.)
+        - Context providers and hooks
+    - *Older Vue and Next.js related code has been completely removed.*
     - **Task 1: Project Setup and Repository Configuration - FULLY COMPLETED.**
     - **Task 2.1: Set up local development environment - COMPLETED.**
     - **Task 2.2: Deploy local Supabase services - COMPLETED.**
@@ -103,8 +126,8 @@ description: Tracks the current work focus, recent changes, next steps, active d
     - Commented out the following Supabase services as they are not currently used: `realtime`, `functions`, `imgproxy`, `analytics`, and `vector`.
     - Essential services remain active: `studio`, `kong`, `auth`, `rest`, `storage`, `db`, `meta`, and `supavisor`.
 - **Active Decisions**:
-    - **Frontend Framework:** Next.js/React (`frontend-2`) is now the primary frontend.
-        - **Rationale Summary**: Chosen for its robust ecosystem, full-stack capabilities (App Router, Server Components, API Routes), built-in optimizations, and to address challenges/preferences over the previous Vue.js approach.
+    - **Frontend Framework:** React with Vite is now the primary frontend, in a single consolidated directory.
+        - **Rationale Summary**: Chosen for its lighter footprint, better alignment with project complexity and team skillset, and improved maintainability with a single codebase.
     - **Backend Strategy:** Hybrid approach. Use Next.js server features for standard web backend logic. Use Supabase Edge Functions for privileged operations/transformations. Use a separate FastAPI service *later* for advanced Python analytics. *(See [systemPatterns.md](mdc:memory-bank/systemPatterns.md#5-backend-implementation-strategy-when-to-use-what) for detailed guidance on choosing the correct implementation location).*
     - Using Poetry for backend Python dependency management.
     - Using npm for frontend Node.js dependency management.
@@ -141,7 +164,7 @@ description: Tracks the current work focus, recent changes, next steps, active d
 
 ## Next Steps (Today)
 
-1.  Continue development on the Next.js admin page (`/admin`).
+1.  Continue development on the React admin page (`/admin`).
     -   Create the Supabase Edge Function (`get-all-users`) to securely fetch user data (potentially pseudonymized).
     -   Implement the frontend page to call the function and display users (likely using Shadcn Table).
 2.  Review and potentially update other documentation (`README.md`, `docs/prd.md`, etc.) to reflect the framework change where necessary.
@@ -149,10 +172,11 @@ description: Tracks the current work focus, recent changes, next steps, active d
 
 ## Important Patterns & Preferences (Emerging)
 
--   Using Next.js App Router for `frontend-2`.
--   Leveraging Shadcn UI for consistent component design in `frontend-2`.
+-   Using React with Vite for the frontend in a single directory.
+-   Organizing frontend code by feature rather than by technical concern.
+-   Leveraging Shadcn UI for consistent component design.
 -   Employing Supabase Edge Functions for operations requiring `service_role` or secure data transformations (e.g., pseudonymization).
--   Preference for Hybrid Backend model (Next.js server + Edge Functions + separate Analytics service) over full FastAPI replacement. *(Refer to [systemPatterns.md](mdc:memory-bank/systemPatterns.md#5-backend-implementation-strategy-when-to-use-what) for detailed implementation guidance).*
+-   Preference for Hybrid Backend model (FastAPI for main backend + Edge Functions + separate Analytics service).
 -   Using manual Docker Compose (`supabase_config/docker-compose.yml` and root `.env`) for managing local Supabase environment due to M1 compatibility issues with `npx supabase start`.
 -   Prioritizing clear documentation and context establishment (Memory Bank initiative).
 -   Adherence to security best practices as outlined in `docs/security.md`.
@@ -173,7 +197,7 @@ description: Tracks the current work focus, recent changes, next steps, active d
 
 ## Learnings & Project Insights
 
--   Module resolution in Next.js with newer dependencies (React 19, Radix UI) and tools (npm, Turbopack) can sometimes require extensive troubleshooting (cache clearing, reinstalls, specific flags like `--legacy-peer-deps`, disabling Turbopack).
+-   Module resolution in React with Vite with newer dependencies (React 19, Radix UI) and tools (npm, Turbopack) can sometimes require extensive troubleshooting (cache clearing, reinstalls, specific flags like `--legacy-peer-deps`, disabling Turbopack).
 -   Clearly defining the roles of different backend options (Next.js server, Edge Functions, separate FastAPI) is important for architectural clarity.
 -   `npx supabase start` can have architecture compatibility issues (`exec format error`) on M1 Macs, particularly with the `postgrest` service.
 -   Manual Docker Compose setup provides more control for resolving such issues (e.g., using `platform: linux/arm64`).
@@ -253,7 +277,7 @@ description: Tracks the current work focus, recent changes, next steps, active d
   - Should consider updating color definitions to use OKLCH format instead of HSL
 
 - **Architecture**: 
-  - Vue.js frontend with Pinia state management
+  - React with Vite frontend with Pinia state management
   - FastAPI backend for custom business logic
   - Supabase for authentication and data storage
   - Docker Compose for local development

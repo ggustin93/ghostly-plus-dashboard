@@ -5,21 +5,34 @@ source_documents: [docs/prd.md](mdc:docs/prd.md) (Section 4), [docs/security.md]
 
 # GHOSTLY+ Dashboard: Technical Context
 
-## 1. Core Technologies
+## 1. Technology Stack
 
 ### 1.1. Frontend (Web Dashboard - WP2)
 
-- **Framework:** **Next.js (v14+ with App Router)** using **React (v19+)**
-- **Language:** TypeScript
-- **UI Components:** shadcn/ui (built on Radix UI primitives)
-- **Styling:** Tailwind CSS (v3.4+)
-- **State Management:** React Context API (initially, potentially Zustand or others later if complexity increases)
-- **Routing:** Next.js App Router
-- **Build Tool:** Next.js CLI (using Webpack or Turbopack)
-- **Package Manager:** npm
-- **Rationale for Switch**: Moved from Vue.js to leverage the React ecosystem, Next.js's integrated full-stack features (App Router, Server Components, API Routes, optimizations), improve developer experience, and address specific UI library integration challenges encountered with Vue.
+- **Framework:** **React (v19+)** with **React Router**
+- **UI Library:** shadcn/ui (React)
+- **CSS:** Tailwind CSS, styled-components (where needed)
+- **State Management:** React Context API (initially, potentially Zustand later if complexity increases)
+- **Routing:** React Router
+- **Build Tool:** Vite
 
-*(Previous Stack: Vue.js 3, Vite, Pinia, Vue Router, shadcn-vue)*
+- **Directory Structure**: Single `frontend/` directory with React+Vite implementation (consolidated from previous structure)
+- **Component Organization**: Follows feature-based organization with shared UI components
+  - `src/components/ui/` - Shadcn UI components
+  - `src/components/layouts/` - Page layouts and structural components
+  - `src/components/dashboard/` - Dashboard-specific components
+  - `src/components/patients/` - Patient management components
+  - `src/components/sessions/` - Session tracking and management
+  - `src/components/treatments/` - Treatment-specific components
+  - `src/components/visualizations/` - Data visualization components
+  - `src/contexts/` - React context providers
+  - `src/pages/` - Page components organized by feature
+  - `src/hooks/` - Custom React hooks
+  - `src/routes/` - Application routing definitions
+
+- **Rationale for Structure**: Migrated to a single frontend directory to simplify development and maintenance, using React with Vite for optimal performance and developer experience. The previous dual-directory approach with separate Vue and Next.js implementations has been consolidated.
+
+*Note: The project has evolved from Vue.js to Next.js, and finally to standard React with Vite to prioritize simplicity, performance, and maintainability.*
 
 ### 1.2. Backend (Service Layer - WP3)
 
@@ -72,7 +85,7 @@ source_documents: [docs/prd.md](mdc:docs/prd.md) (Section 4), [docs/security.md]
 
 ## 4. Key Dependencies & Libraries
 
-### 4.1. Frontend (`frontend-2/package.json`)
+### 4.1. Frontend (`frontend/package.json`)
 
 - `next`: Core Next.js framework
 - `react`, `react-dom`: React library

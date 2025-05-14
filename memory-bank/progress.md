@@ -7,7 +7,7 @@ description: Tracks what works, what's left to build, current status, known issu
 ## What Works:
 
 ### Infrastructure and Setup:
-1. ✅ **Complete project scaffolding** with Docker, Poetry (backend), Vite/Vue 3/TypeScript (frontend), Supabase, and NGINX reverse proxy.
+1. ✅ **Complete project scaffolding** with Docker, Poetry (backend), Vite/React/TypeScript (frontend), Supabase, and NGINX reverse proxy.
 2. ✅ **Local development environment** via Docker Compose with hot-reloading for frontend and backend.
 3. ✅ **Local Supabase instance** running on Docker (M1-compatible) with required services (database, auth, storage, etc.).
 4. ✅ **NGINX configuration** properly proxying requests to frontend, backend, and Supabase services.
@@ -19,33 +19,57 @@ description: Tracks what works, what's left to build, current status, known issu
   - Simplified Nginx configuration for auth endpoints
   - Detailed documentation added in `docs/supabase-auth-fix.md`
 
-### Features and Components (`frontend-2` - Next.js):
-1. ✅ Base UI components (shadcn/ui for React) installed and configured.
-2. ✅ Authentication UI (`AuthForm.tsx`) created using shadcn/ui components.
-3. ✅ Auth Context API (`AuthContext.tsx`) for authentication state management.
-4. ✅ Login Page (`/login`) with redirection logic.
-5. ✅ Account Page (`/account`) displaying basic user info and logout.
-6. ✅ Root Page (`/`) protected, redirects to `/login` or `/account` based on auth state.
+### Features and Components (React with Vite):
+1. ✅ **Consolidated frontend architecture**:
+   - Single `frontend` directory with clean React + Vite implementation
+   - Structured organization by feature (auth, dashboard, patients, etc.)
+   - Complete removal of legacy Vue components and temporary Next.js code
+2. ✅ **UI Component Library**:
+   - Shadcn UI for React components configured
+   - Complete set of UI primitives available
+   - Feature-specific components organized by domain
+3. ✅ **Auth Features**:
+   - Authentication UI components created using shadcn/ui components
+   - Auth Context API for authentication state management
+   - Login Page with redirection logic
+   - Account Page displaying basic user info and logout
+   - Protected routes redirecting based on auth state
+4. ✅ **Routing**:
+   - React Router configured for client-side routing
+   - Route protection based on authentication status
+   - Organized route definitions
 
-*(Previous Vue (`frontend`) components are now archived/obsolete)*
+*(Previous Vue and Next.js components have been completely removed)*
 
 ### Documentation:
 1. ✅ **Development workflow** documentation established.
 2. ✅ **Environment setup guides** created for local CLI development and VM self-hosted Supabase.
 3. ✅ **API and security configuration** documented in detail.
 4. ✅ **Memory Bank** established for contextual documentation.
+5. ✅ **Reorganized documentation structure** with numbered folders:
+   - `00_PROJECT_DEFINITION`: Core requirements and scope
+   - `01_ARCHITECTURE`: System design documentation
+   - `02_SETUP_AND_DEVELOPMENT`: Developer onboarding and guides  
+   - `03_GUIDES`: Role-specific how-to guides
+6. ✅ **Testing documentation** created with MVP approach.
+
+### Testing:
+1. ✅ **E2E testing setup** with Playwright configured.
+2. ✅ **Basic authentication test** created to verify login flow.
+3. ✅ **Backend unit test approach** established with FastAPI TestClient.
+4. ✅ **Testing commands** added to package.json.
 
 ## What's Left to Build:
 
 ### Phase 3: Authentication and Authorization System (In Progress)
-1. ✅ Implement basic email/password login (Done in `frontend-2`).
-2. ✅ Implement session management (Done via Supabase client/Context in `frontend-2`).
+1. ✅ Implement basic email/password login (Done in consolidated React frontend).
+2. ✅ Implement session management (Done via Supabase client/Context).
 3. ⏳ Integrate password reset functionality (Requires UI form and potentially Supabase Edge Function/backend logic).
 4. ⏳ Add user registration functionality (If needed, likely requires admin action or separate form).
 5. ⏳ Set up role-based access control (RBAC) - Requires defining roles (e.g., in a `profiles` table) and checking them.
 6. ⏳ Develop admin interface for user management (Current focus - `/admin` page).
 
-### Phase 4: Basic Dashboard Components (`frontend-2` - Next.js)
+### Phase 4: Basic Dashboard Components (React)
 1. 🔄 Create responsive dashboard layout (e.g., using Shadcn components, potentially a sidebar/header).
 2. 🔄 Implement navigation menu (within the dashboard layout).
 3. 🔄 Design and build dashboard homepage (main content area after login).
@@ -140,17 +164,35 @@ description: Tracks what works, what's left to build, current status, known issu
 
 ### **Frontend Framework Choice:**
 - **Initial Choice**: Vue.js (`frontend`) selected for reactivity and component model.
-- **Switch Decision ([Current Date])**: Switched to **Next.js/React (`frontend-2`)**.
+- **First Switch**: Next.js/React (`frontend-2`).
   - **Rationale**: 
     - Leverage the broader React ecosystem and component libraries (like Shadcn UI, which has robust React support).
-    - Utilize Next.js's integrated full-stack capabilities, including App Router, Server Components, Route Handlers (API routes), and built-in optimizations (image optimization, etc.).
-    - Align with potential team familiarity or preference for the React/Next.js stack (verify if needed).
-    - Simplify routing and server-side rendering/fetching patterns compared to implementing them separately with Vue.
-    - Address challenges encountered with specific Vue component library integrations (e.g., Shadcn UI Vue styling issues).
+    - Utilize Next.js's integrated full-stack capabilities, including App Router, Server Components, Route Handlers (API routes), and built-in optimizations.
+    - Address challenges encountered with specific Vue component library integrations.
+- **Current Choice (May 14, 2025)**: Standard React with Vite
+  - **Rationale**:
+    - Next.js proved overly complex for our dashboard needs
+    - React with Vite offers a lighter, more appropriate solution for our primarily client-side dashboard
+    - Better alignment with project complexity and team skillset
+    - Improved development speed with Vite's fast build times
+- **Frontend Consolidation (May 17, 2025)**: Single React with Vite implementation in `frontend` directory
+  - **Rationale**:
+    - Eliminate code duplication and confusion between multiple frontend implementations
+    - Simplify maintenance with a single codebase
+    - Create clear organization by feature to improve developer experience
+    - Remove technical debt from legacy Vue components and temporary Next.js transition code
+
+### **Testing Strategy Decision:**
+- **Decision (May 14, 2025)**: Adopted a **minimal but effective testing approach**.
+  - **Rationale**: 
+    - E2E tests with Playwright for critical user flows (auth, data submission)
+    - Backend unit tests with FastAPI TestClient for API validation
+    - Simplified folder structure for maintainability
+    - Focus on testing business-critical paths rather than exhaustive coverage
 
 ### **Backend Strategy Choice:**
-- **Decision ([Current Date])**: Adopted a **Hybrid Backend Approach**.
-  - **Rationale**: Utilize Next.js server-side features for standard web backend tasks integrated with the frontend. Use Supabase Edge Functions for specific privileged/isolated tasks (like admin actions, transformations). Plan for a *separate* FastAPI service dedicated to future advanced Python analytics, keeping concerns separated.
+- **Decision (May 17, 2025)**: Refined **Hybrid Backend Approach**.
+  - **Rationale**: Utilize FastAPI for most backend services, Supabase Edge Functions for specific privileged/isolated tasks (like admin actions, transformations). Plan for a *separate* FastAPI service dedicated to future advanced Python analytics, keeping concerns separated.
 
 ## Project Decision Timeline:
 
@@ -195,18 +237,28 @@ description: Tracks what works, what's left to build, current status, known issu
   - Added documentation to techContext.md explaining the issue and planned solutions
   - Determined issue is likely related to Tailwind 4's color format changes and component slot attributes
 
-### [Insert Current Date]
-- Decided to switch frontend framework from Vue.js (`frontend`) to Next.js/React (`frontend-2`).
-- Decided on a Hybrid Backend Strategy (Next.js server + Edge Functions + separate FastAPI for analytics).
-- Started implementation of core auth flow in `frontend-2`.
+### 2025-05-14
+- Reorganized documentation into a numbered folder structure
+- Created minimal testing infrastructure with Playwright for E2E tests
+- Established backend testing approach with FastAPI TestClient
+- Switched from Next.js to standard React with Vite for frontend
+- Created MVP testing document to guide development
+
+### 2025-05-17
+- Consolidated frontend codebase:
+  - Removed frontend-2 directory (Next.js) completely
+  - Cleaned up Vue.js components from frontend directory
+  - Implemented single React with Vite frontend in the frontend directory
+  - Organized components by feature with clean architecture
+  - Updated build process and dependencies
 
 ## Next Actions:
 
 1.  Create Supabase Edge Function (`get-all-users`) for admin page user fetching.
-2.  Build `/admin` page in `frontend-2` to display users (using Shadcn Table).
+2.  Build `/admin` page in React to display users (using Shadcn Table).
 3.  Implement RBAC check for accessing `/admin` page.
-4.  Continue with other pending tasks (Password Reset, Registration, Dashboard Layout etc. in `frontend-2`).
-5.  Review/update other docs (README, PRD) for framework change.
+4.  Expand test coverage for critical user flows.
+5.  Continue with other pending tasks (Password Reset, Registration, Dashboard Layout).
 
 ---
-**Last Updated**: [Insert Current Date] 
+**Last Updated**: 2025-05-17 
