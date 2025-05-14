@@ -5,51 +5,68 @@
 
 ### 1.1 Project Purpose
 
-GHOSTLY+ is an applied research project funded by the Research Foundation – Flanders (FWO) aimed at combating muscle strength loss in hospitalized elderly patients. The project combines blood flow restriction (BFR) with an electromyography (EMG)-driven serious game to create an effective, engaging, and measurable rehabilitation method.
+GHOSTLY+ is an applied research project funded by the Research Foundation – Flanders (FWO) aimed at combating muscle strength loss in hospitalized patients, including stroke patients, elderly patients, and those recovering from COVID-19. The project combines blood flow restriction (BFR) with an electromyography (EMG)-driven serious game to create an effective, engaging, and measurable rehabilitation method.
 
 ### 1.2 Problem Statement
 
-Muscle strength loss due to hospitalization in older adults is a significant clinical problem that contributes to:
+Muscle strength loss in hospitalized patients is a significant clinical problem that contributes to:
 
 - Slower post-hospitalization recovery
 - Increased risk of falls and injuries
 - Decreased autonomy and quality of life
 - Higher frequency of hospital readmissions
+- Extended periods of immobility and bedridden status
+
+This problem is particularly acute in three populations targeted by this study:
+1. Acute and subacute stroke patients
+2. Hospitalized elderly patients
+3. Patients recovering from COVID-19 and ICU patients
 
 ### 1.3 Proposed Solution
 
 The GHOSTLY+ system includes:
 
-1. An EMG-driven serious game on Android tablets (existing component)
-2. Delsys Trigno Avanti EMG sensors (existing component)
-3. A web dashboard for patient monitoring and data analysis (to be developed)
+1. An EMG-driven serious game on Android tablets (existing component) that uses quadriceps muscle contractions to control gameplay
+2. Delsys Trigno Avanti EMG sensors (existing component) to measure muscle activation
+3. Optional blood flow restriction (BFR) applied during training for one experimental group
+4. A web dashboard for patient monitoring and data analysis (to be developed)
 
 ### 1.4 Stakeholders
 
-- **Interdisciplinary research team**: Prof. Eva Swinnen, Prof. David Beckwée, Prof. Bart Jansen
+- **Interdisciplinary research team**: Prof. Eva Swinnen, Prof. David Beckwée, Prof. Bart Jansen, Ruben Debeuf (Principal Investigator)
 - **Participating medical centers**: UZ Brussels, UAntwerpen/UZA, KU Leuven
 - **End users**:
     - Therapists/clinicians
     - Researchers
+- **Study participants**:
+    - Acute and subacute stroke patients
+    - Hospitalized elderly patients (65+ years)
+    - Patients recovering from COVID-19 and ICU patients
 
 ## 2. EXISTING PRODUCT OVERVIEW
 
 ### 2.1 OpenFeasyo Serious Game
 
-The game uses the OpenFeasyo platform, a software framework for creating sensor-driven games:
+The Ghostly app uses the OpenFeasyo platform, a software framework for creating sensor-driven games:
 
 - Runs on Android tablets
-- Gamified interface adapted for elderly users
-- Captures EMG signals to control the game
+- Gamified interface adapted for users
+- Captures EMG signals from quadriceps muscles to control the game
+- Offers three training protocols:
+  - **Standard training**: Three sets of twelve muscle contractions with 120 seconds of rest between sets
+  - **Cluster set 1**: Three sets of twelve repetitions with ten seconds of rest between each contraction
+  - **Cluster set 2**: Three sets of twelve repetitions with 30 seconds of rest after three consecutive contractions
+- Training intensity set at 75% of maximum voluntary contraction (MVC)
 
 ### 2.2 Current Data Collection
 
 The current system:
 
-- Collects data from Delsys Trigno EMG sensors
+- Collects data from Delsys Trigno EMG sensors placed on quadriceps muscles
 - Stores data in C3D format (standard biomechanics format)
 - Records game metrics (level, score, duration)
 - Saves files locally on the tablet
+- Does not currently support centralized storage or analysis
 
 ### 2.3 Limitations of Current System (Prior to Web Dashboard Development)
 
@@ -57,8 +74,10 @@ The current system:
 
 - Lack of centralized patient data
 - Inability for remote monitoring by clinicians
-- Difficulty in comparative analysis between patients
+- Difficulty in comparative analysis between patients and treatment groups
 - Lack of tools to measure progression over time
+- No capacity for statistical analysis across the three RCTs
+- Limited ability to visualize and compare key outcome measures (muscle strength, cross-sectional area, pennation angle, echo intensity)
 
 ## 3. WEB DASHBOARD REQUIREMENTS
 
@@ -69,29 +88,45 @@ The current system:
 **Essential for MVP**:
 - View results of patients' therapy sessions
 - Visualize EMG signals and game metrics
-- Track individual patient progress with basic trend visualization
+- Track individual patient progress with basic trend visualization of key quadriceps metrics:
+  - Muscle strength (measured by MicroFET dynamometer)
+  - Cross-sectional area (ultrasound measurements)
+  - Pennation angle (ultrasound measurements)
+  - Echo intensity (ultrasound measurements)
+- Track population-specific assessment measures:
+  - Motricity Index for stroke patients 
+  - 30-second sit-to-stand test for elderly patients
+  - Manual muscle testing for COVID-19/ICU patients
 - Configure exercise programs and game parameters
 - Manage patient profiles and demographic information
+- Record therapy compliance and adherence metrics
 
 **Future Releases**:
 - Generate comprehensive clinical reports
-- Compare patient cohorts with advanced analytics
+- Compare patient cohorts with advanced analytics across the three study populations
 - Create and share treatment templates
 - Access detailed longitudinal progress tracking
 - Collaborate with other therapists on treatment plans
+- Support Global Perceived Effect (GPE) questionnaire analysis
+- Integrate USE (Usefulness, Satisfaction, and Ease of use) questionnaire data
 
 ### 3.1.2 Researcher-Focused Features
 
 **Essential for MVP**:
 - Access pseudonymized patient data for analysis
-- Export data for external statistical analysis
-- Create and manage basic patient cohorts
+- Export data for external statistical analysis in SPSS 27
+- Create and manage patient cohorts based on study arm (Ghostly, Ghostly+BFR, Control/Leaflet)
 - Generate simple multi-site statistics
 - Filter and segment data based on key parameters
+- Compare treatment groups within each population
+- Visualize 2-week and 6-week intervention outcomes
 
 **Future Releases**:
 - Perform advanced comparative data analysis
-- Access sophisticated statistical tools directly in the platform
+- Access sophisticated statistical tools directly in the platform, including:
+  - Two-way repeated measures ANOVA
+  - Tukey post hoc test
+  - Descriptive statistics with Levene's test for normal distribution
 - Create custom research dashboards
 - Generate publication-ready visualizations
 - Define complex cohort criteria with multiple parameters
@@ -136,11 +171,13 @@ The current system:
 ### 3.2.2 Patient Management
 
 **Essential for MVP**:
-- Basic patient registration and profile creation
+- Patient registration and profile creation with population categorization (stroke, elderly, COVID-19/ICU)
 - Assignment of patients to therapists
-- Simple program adherence tracking
+- Treatment group assignment (Ghostly, Ghostly+BFR, Control/Leaflet)
+- Program adherence tracking
 - Core intervention history recording
-- Fundamental demographic data management
+- Demographic data management
+- Recording of inclusion/exclusion criteria status
 
 **Future Releases**:
 - Advanced medical history integration
@@ -152,10 +189,11 @@ The current system:
 ### 3.2.3 Cohort Management
 
 **Essential for MVP**:
-- Create and manage basic patient cohorts
+- Create and manage patient cohorts by population and treatment group
 - Simple assignment of therapists to cohorts
 - Fundamental cohort-level metrics
 - Basic cohort comparison functionality
+- Track 2-week and 6-week intervention outcomes by cohort
 
 **Future Releases**:
 - Advanced cohort analytics and statistical tools
@@ -167,25 +205,48 @@ The current system:
 ### 3.2.4 EMG Data Visualization
 
 **Essential for MVP**:
-- Temporal graphs showing basic EMG signals
-- Fundamental muscle strength analysis visualization
-- Basic muscle contraction detection display
-- Simple session-to-session comparison
+- Temporal graphs showing quadriceps EMG signals
+- Muscle strength analysis visualization (MVC measurements)
+- Muscle contraction detection and pattern display
+- Session-to-session comparison of EMG data
+- Visualization of different training protocols (standard, cluster set 1, cluster set 2)
 
 **Future Releases**:
 - Advanced muscle fatigue analysis with predictive indicators
-- Multi-dimensional EMG visualization with 3D mapping
+- Multi-dimensional EMG visualization with muscle mapping
 - Machine learning assisted pattern recognition
 - Real-time collaborative visualization review
 - Custom visualization parameters for research applications
 
-### 3.2.5 Game Performance Analysis
+### 3.2.5 Quadriceps Measurement Visualization
+
+**Essential for MVP**:
+- Visualization of key quadriceps measurements:
+  - Muscle strength (MicroFET dynamometer data)
+  - Cross-sectional area (ultrasound measurements)
+  - Pennation angle (ultrasound measurements)
+  - Echo intensity (ultrasound measurements)
+- Comparison between left and right legs
+- Baseline vs. 2-week vs. 6-week visualization
+- Treatment group comparison views
+
+**Future Releases**:
+- Integration with ultrasound image data
+- Advanced analysis of muscle quality metrics
+- Correlation analysis between different measurement types
+- Predictive modeling of strength gains based on early measurements
+
+### 3.2.6 Game Performance Analysis
 
 **Essential for MVP**:
 - Basic scores and progressions in the game
 - Session duration and frequency tracking
-- Simple correlation between EMG activity and game performance
+- Correlation between EMG activity and game performance
 - Short-term performance tracking
+- Therapy compliance and adherence metrics:
+  - Number of sessions completed vs. prescribed
+  - Training load achieved vs. prescribed
+  - Repetitions performed vs. prescribed
 
 **Future Releases**:
 - Advanced long-term trend analysis with predictive modeling
@@ -194,18 +255,20 @@ The current system:
 - Adaptive difficulty recommendations based on performance
 - Multi-factor analysis incorporating clinical variables
 
-### 3.2.6 Reports and Exports
+### 3.2.7 Reports and Exports
 
 - **Essential for MVP**:
-  - Basic data export capabilities for researchers (CSV, Excel)
+  - Basic data export capabilities for researchers (CSV, Excel, SPSS-compatible formats)
   - Session summary views for therapists
-  - Fundamental EMG visualization exports for clinical documentation
+  - EMG visualization exports for clinical documentation
+  - Summary data for USE questionnaire analysis
 
 - **Future Releases**:
   - PDF clinical report generation with customizable templates
   - Printable comprehensive dashboards
   - Summary reports by medical center
   - Advanced visualization exports with annotations
+  - Statistical analysis reports (ANOVA, post-hoc tests)
 
 ### 3.3 Non-Functional Requirements
 
@@ -344,7 +407,7 @@ The GHOSTLY+ project is structured into six distinct work packages that together
 
 #### 4.7.1 Data Acquisition (Primary Flow)
 1. Therapist logs into the Ghostly Game on the Android tablet using Supabase Auth.
-2. Patient uses the serious game with EMG sensors.
+2. Patient uses the serious game with EMG sensors on quadriceps muscles.
 3. Data is recorded locally during the session.
 4. Upon session completion, the Game application generates the C3D file.
 5. The Game application authenticates with the Backend API using the therapist's JWT.
@@ -560,6 +623,7 @@ ghostly-plus/
     - Round 3: Final usability assessment (Week 19)
 - Structured feedback collection and iteration based on user input
 - Usability metrics tracking across testing rounds
+- Incorporation of USE questionnaire feedback for dashboard improvement
 
 ## 6. PLANNING AND MILESTONES
 
@@ -578,18 +642,21 @@ The project timeline is designed to complete all essential work within 5 months,
 - Database schema implementation
 - Encryption and pseudonymization system
 - Integration with OpenFeasyo game system
+- Support for quadriceps muscle EMG data processing
 
 ### 6.3 Phase 3: Dashboard Development (Weeks 9-14)
 
 - Vue.js project setup and component architecture
 - Therapist interface implementation
-- EMG visualization and analytics features
+- EMG visualization and quadriceps analytics features
 - Authentication and user management
+- Study population and treatment group management
 
 ### 6.4 Phase 4: Advanced Features and Testing (Weeks 15-18)
 
 - Advanced EMG analysis and reporting
 - Cross-cohort comparison functionality
+- 2-week vs. 6-week intervention comparison features
 - Performance optimization
 - Security testing and vulnerability fixes
 
@@ -604,15 +671,15 @@ The project timeline is designed to complete all essential work within 5 months,
 
 ### 7.1 Evaluation Approach
 
-The project success will be measured through system performance monitoring, security assessments, and user feedback from therapists and researchers.
+The project success will be measured through system performance monitoring, security assessments, and user feedback from therapists and researchers across the three clinical trial populations.
 
 ### 7.2 Key Metrics
 
-Core metrics include system response times, data import reliability, and cross-center data exchange effectiveness.
+Core metrics include system response times, data import reliability, cross-center data exchange effectiveness, and alignment with clinical trial measurement requirements.
 
 ### 7.3 User Feedback
 
-Regular therapist and researcher feedback will be collected to evaluate usability, integration with clinical workflows, and quality of visualizations.
+Regular therapist and researcher feedback will be collected to evaluate usability, integration with clinical workflows, and quality of visualizations, particularly for the USE questionnaire analysis.
 
 ## 8. OPEN QUESTIONS / ITEMS TO CLARIFY
 
@@ -624,6 +691,7 @@ To finalize this PRD, we would need to clarify the following points:
     - Which library is currently used to generate C3D files?
     - What is the exact structure of EMG data in these files?
     - What volume of data is generated per game session?
+    - Are quadriceps-specific measurements already captured in the C3D files?
 2. **OpenFeasyo Integration**:
     - Can the game be modified to automatically send data?
     - Is there an API or communication mechanism with the game?
@@ -637,13 +705,15 @@ To finalize this PRD, we would need to clarify the following points:
 ### 8.2 Functional Questions
 
 1. **Specific Therapist Needs**:
-    - Which EMG metrics are most clinically relevant? *(Preliminary analysis completed in [technical/emg_analysis.md](../technical/emg_analysis.md) - pending final validation with therapists)*
-    - What type of reports would be most useful?
-    - How to structure comparisons between patients?
+    - Which quadriceps EMG metrics are most clinically relevant? *(Preliminary analysis completed in [technical/emg_analysis.md](../technical/emg_analysis.md) - pending final validation with therapists)*
+    - How should the different population-specific assessment tools be visualized?
+    - What type of reports would be most useful for each patient population?
+    - How to structure comparisons between treatment groups?
 2. **Research Needs**:
-    - Which statistical analyses should be integrated?
-    - What export formats are required?
-    - Are there specific requirements for publishing results?
+    - How should SPSS 27 integration be handled?
+    - What specific formats are required for ANOVA and Tukey post-hoc analysis?
+    - What statistical visualizations would be most valuable?
+    - Are there specific requirements for publishing results from the three RCTs?
 
 ### 8.3 Organizational Questions
 
@@ -672,10 +742,16 @@ To finalize this PRD, we would need to clarify the following points:
 - **FastAPI**: Modern Python web framework for building APIs
 - **GDPR (General Data Protection Regulation)**: EU regulation on data protection and privacy
 - **JWT (JSON Web Token)**: Compact, URL-safe means of representing claims to be transferred between parties
+- **MVC (Maximum Voluntary Contraction)**: The maximum force output of a muscle during voluntary contraction
 - **OpenFeasyo**: Software platform for creating rehabilitation games
+- **Pennation Angle**: The angle at which muscle fibers are arranged relative to the line of action of the muscle
 - **PostgreSQL**: Open-source relational database system
 - **Pseudonymization**: Processing personal data so it can no longer be attributed to a specific data subject without additional information
 - **PWA (Progressive Web App)**: Web application that functions like a native app
+- **RCT (Randomized Controlled Trial)**: Study design where participants are randomly allocated to intervention or control groups
 - **RLS (Row-Level Security)**: Security feature in PostgreSQL that restricts which rows users can access
+- **Sarcopenia**: Loss of skeletal muscle mass and strength as a result of aging
+- **SPSS**: Statistical Package for the Social Sciences, software for statistical analysis
 - **Supabase**: Open-source Firebase alternative providing database, authentication, and storage services
+- **USE Questionnaire**: Usefulness, Satisfaction, and Ease of use questionnaire for evaluating user experience
 - **Vue.js**: Progressive JavaScript framework for building user interfaces
