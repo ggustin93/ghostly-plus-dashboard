@@ -9,7 +9,7 @@ source_documents: [docs/prd.md](mdc:docs/prd.md) (Section 4), [docs/security.md]
 
 The GHOSTLY+ system is composed of existing client-side components and a new server-side extension (Web Dashboard and supporting services). The architecture is designed around Work Packages (WP) as defined in [docs/prd.md](mdc:docs/prd.md) (Section 4):
 
--   **WP1: Existing System Integration**: Interfacing with OpenFeasyo game (MonoGame/C# on Android) and Delsys Trigno EMG sensors. Key modification: game will authenticate via Supabase Auth and upload C3D files directly to the backend API.
+-   **WP1: Existing System Integration**: Interfacing with OpenFeasyo game (MonoGame/C# on Android) and Delsys Trigno EMG sensors. Key modification: game will authenticate via Supabase Auth and upload C3D files directly to the backend API. A single **Rehabilitation Session** (overall therapy appointment) can result in one or more C3D files, each representing a distinct **Game Session** (a single instance of playing the game).
 -   **WP2: Web Dashboard (Frontend)**: **React** with **React Router**, Tailwind CSS, shadcn/ui, Context API/Zustand. Provides role-based interfaces for therapists and researchers in a single consolidated codebase. *(Migrated from Next.js to standard React with Vite for simplicity and performance, and consolidated into a single directory)*
     -   Handles UI rendering, client-side validation, and user interactions.
     -   Organized by feature with clean component hierarchy.
@@ -128,14 +128,60 @@ flowchart TD
     (Source: [docs/prd.md](mdc:docs/prd.md) 4.6.1)
 -   **Modular Project Structure**: The codebase will follow a recommended structure separating backend, frontend (`frontend-2`), Docker configs, etc. (Source: [docs/prd.md](mdc:docs/prd.md) 4.10)
 
+### 2.1. API Structure and Routing Pattern
+
+The application follows a **versioned API structure** with clear domain separation:
+
+- **API Paths**: Organized with the following pattern:
+  - Generic system endpoints: `/api/endpoint` (e.g., `/api/health`)
+  - Domain-specific API endpoints: `/v1/domain/endpoint` (e.g., `/v1/c3d/upload`)
+  
+- **NGINX Configuration**:
+  - Location `/api/` proxies directly to backend FastAPI service
+  - Location `/v1/` proxies directly to backend FastAPI service
+  - Each path maintained separately for clear routing
+
+- **FastAPI Router Organization**:
+  - Domain-specific routers with tags for API documentation:
+    ```python
+    # Example router setup
+    from fastapi import APIRouter
+    
+    router = APIRouter(prefix="/v1/c3d", tags=["C3D Processing"])
+    
+    @router.post("/upload")
+    async def upload_c3d_file():
+        # Implementation
+    ```
+
+- **Frontend API Client**:
+  - Centralized API client that maps to backend endpoints:
+    ```typescript
+    // Example API client
+    export const ghostlyApi = {
+      async uploadC3DFile(file: File, options = {}): Promise<Result> {
+        const formData = new FormData();
+        formData.append('file', file);
+        // Add options to formData
+        
+        const response = await fetch(`${API_BASE_URL}/v1/c3d/upload`, {
+          method: 'POST',
+          body: formData,
+        });
+        
+        return await response.json();
+      }
+    };
+    ```
+
 ## 3. Component Relationships
 
--   **Ghostly Game (OpenFeasyo)**: Collects EMG data -> Authenticates *directly* with Supabase Auth -> Uploads C3D to FastAPI Backend (sending JWT).
--   **Web Dashboard (React)**: User Interface (React components) -> Authenticates *directly* with Supabase Auth (using `@supabase/js`/`@supabase/ssr`) -> Manages auth state -> Communicates with FastAPI Backend (sending JWT) -> Leverages Next.js server features (Server Components, Route Handlers using `@supabase/ssr`) for integrated backend tasks/data fetching within user context (RLS enforced) -> May call Edge Functions for specific privileged actions.
--   **FastAPI Backend**: Receives requests from Game & Dashboard -> **Verifies JWTs** (issued by Supabase Auth) -> Processes business logic -> Interacts **directly with Supabase DB (PostgreSQL)** via ORM/driver for complex logic/analytics -> Handles encryption/decryption & pseudonymization -> May use `supabase-py` optionally for simple tasks.
+-   **Ghostly Game (OpenFeasyo)**: Collects EMG data for each **Game Session** -> Authenticates *directly* with Supabase Auth -> Uploads C3D file(s) (one per Game Session, potentially batched per **Rehabilitation Session**) to FastAPI Backend (sending JWT).
+-   **Web Dashboard (React)**: User Interface (React components) -> Authenticates *directly* with Supabase Auth (using `@supabase/js`/`@supabase/ssr`) -> Manages auth state -> Communicates with FastAPI Backend (sending JWT) to manage **Rehabilitation Sessions** and their associated **Game Session** data (C3D files) -> Leverages Next.js server features (Server Components, Route Handlers using `@supabase/ssr`) for integrated backend tasks/data fetching within user context (RLS enforced) -> May call Edge Functions for specific privileged actions.
+-   **FastAPI Backend**: Receives requests from Game & Dashboard -> **Verifies JWTs** (issued by Supabase Auth) -> Processes business logic (e.g., associating multiple C3D files/Game Sessions with a single Rehabilitation Session) -> Interacts **directly with Supabase DB (PostgreSQL)** via ORM/driver for complex logic/analytics -> Handles encryption/decryption & pseudonymization -> May use `supabase-py` optionally for simple tasks.
 -   **Supabase Auth**: Issues JWTs upon successful authentication.
--   **Supabase Database (PostgreSQL)**: Stores application data; enforces RLS based on JWT claims for direct access from React/clients.
--   **Supabase Storage**: Stores files (C3D, reports, avatars); access controlled by RLS policies.
+-   **Supabase Database (PostgreSQL)**: Stores application data, including a clear structure to link multiple **Game Sessions (C3D files)** to a parent **Rehabilitation Session**; enforces RLS based on JWT claims for direct access from React/clients.
+-   **Supabase Storage**: Stores files (C3D from each **Game Session**, reports); access controlled by RLS policies.
 -   **Supabase Edge Functions:** Execute specific backend logic -> Use `supabase-js` client **with `service_role` key** for privileged Supabase operations (bypassing RLS when needed).
 
 See diagrams in [docs/prd.md](mdc:docs/prd.md) (Sections 4.8, 4.9) and [docs/security.md](mdc:docs/security.md) (Data Flow Diagrams) for visual representations. **Note:** Diagrams may need manual updates to reflect the React frontend and these interaction patterns. *Refer to Section 5 below for a detailed guide on choosing the appropriate backend implementation strategy.*
@@ -148,6 +194,43 @@ See diagrams in [docs/prd.md](mdc:docs/prd.md) (Sections 4.8, 4.9) and [docs/sec
 -   **RLS Policy Implementation**: Correctly defining and implementing PostgreSQL RLS policies in Supabase to ensure strict data segregation and access control.
 -   **Security Measures**: Proper implementation of encryption/decryption services, pseudonymization, and other security controls outlined in [docs/security.md](mdc:docs/security.md).
 -   **Hybrid Backend Strategy**: Defining clear boundaries between logic handled by Next.js server-side features, Supabase Edge Functions, and the potential separate FastAPI analytics service. *Refer to Section 5 below for detailed guidance.*
+
+### 4.1. Authentication
+
+```
+┌────────────┐     ┌────────────┐     ┌────────────┐     ┌────────────┐
+│  Login     │────▶│  Auth API  │────▶│  JWT Gen   │────▶│  Store     │
+│  Form      │     │  Endpoint  │     │  (Supabase)│     │  Token     │
+└────────────┘     └────────────┘     └────────────┘     └────────────┘
+                                                               │
+                                                               ▼
+┌────────────┐     ┌────────────┐     ┌────────────┐     ┌────────────┐
+│  Protected │◀────│  Auth      │◀────│  Check     │◀────│  Load      │
+│  Content   │     │  Context   │     │  Valid     │     │  User Data │
+└────────────┘     └────────────┘     └────────────┘     └────────────┘
+```
+
+### 4.2. C3D File Processing
+
+*This describes processing for C3D files, typically one per Game Session, which are then associated with an overall Rehabilitation Session.*
+
+```
+┌────────────┐     ┌────────────┐     ┌────────────┐     ┌────────────┐
+│  Upload    │────▶│  API       │────▶│  Process   │────▶│  Store     │
+│  C3D File(s)│     │  Client    │     │  C3D Data  │     │  Results   │
+│ (per Game  │     │            │     │ (per file) │     │ (link to  │
+│  Session)  │     │            │     │            │     │ Rehab Ses)│
+└────────────┘     └────────────┘     └────────────┘     └────────────┘
+                                                               │
+                                                               ▼
+┌────────────┐     ┌────────────┐     ┌────────────┐     ┌────────────┐
+│  Display   │◀────│  Format    │◀────│  Transform │◀────│  Load      │
+│  Results   │     │  For UI    │     │  Data      │     │  Results   │
+│ (Aggregated│     │ (Aggregate │     │ (per file) │     │ (per Rehab│
+│ per Rehab  │     │  if needed)│     │            │     │  Session)  │
+│  Session)  │     │            │     │            │     │            │
+└────────────┘     └────────────┘     └────────────┘     └────────────┘
+```
 
 ## 5. Implementation Strategy Selection
 
@@ -183,9 +266,9 @@ For interacting with the database and implementing backend logic, multiple optio
     *   Complex statistical analysis of patient data.
     *   **How:** Deploy as a separate service that can be scaled independently, with its own authentication and resource allocation.
 
-## 3. Frontend Architecture
+## 6. Frontend Structure
 
-### 3.1 Component Structure
+### 6.1. Component Structure
 
 The React frontend follows a feature-based architecture:
 
@@ -216,7 +299,7 @@ This organization enables:
 - Simplified testing and maintenance
 - Clear separation between UI components and business logic
 
-### 3.2 Frontend Authentication Flow
+### 6.2. Frontend Authentication Flow
 
 The authentication process uses a custom fetch implementation to avoid Supabase client header issues:
 
@@ -227,15 +310,152 @@ The authentication process uses a custom fetch implementation to avoid Supabase 
 5. Protected routes check auth state in React Router
 6. Auth context provides user information throughout the app
 
-### 3.3 State Management
+### 6.3. Component Composition
 
-- React Context API for global state (authentication, user profile)
-- Local component state for UI-specific concerns
-- Potential migration to Zustand for more complex state as needed
+The frontend uses a **composed component pattern** with shadcn/ui:
 
-# System Patterns
+- **Primitive Components**: Base UI elements from shadcn/ui/radix
+- **Compound Components**: Combinations of primitives for specific UI patterns
+- **Feature Components**: Domain-specific components using compounds and primitives
+- **Page Components**: Full page layouts composed of feature components
 
-## Data Flow Architecture
+```
+└─ Pages
+   └─ Feature Components
+      └─ Compound Components
+         └─ Primitive Components
+```
+
+### 6.4. State Management
+
+- **React Context API** for global state:
+  - Authentication state
+  - User preferences
+  - Application theme
+  
+- **Local Component State** for UI interactions:
+  - Form inputs
+  - Toggles
+  - Modals
+
+- **Query Hooks** for data fetching (potential future addition)
+
+## 7. Backend Structure
+
+### 7.1. FastAPI Organization
+
+```
+app/
+├── api/                 # API routes by domain
+│   ├── c3d_processing_api.py   # C3D file processing endpoints
+│   └── user_api.py      # User-related endpoints
+├── core/                # Core functionality
+│   ├── config.py        # Configuration settings
+│   └── security.py      # Security utilities
+├── db/                  # Database interaction
+│   ├── models.py        # SQLAlchemy models (if used)
+│   └── session.py       # Database session management
+├── services/            # Business logic services
+│   ├── c3d_service.py   # C3D processing logic
+│   └── user_service.py  # User-related business logic
+└── main.py              # Application entry point
+```
+
+### 7.2. API Documentation
+
+- **OpenAPI/Swagger UI** automatically generated by FastAPI
+- **Tags** used to categorize endpoints by domain
+- **Description** for each endpoint with expected inputs and outputs
+
+## 8. Database Schema
+
+### 8.1. Core Entities
+
+- **users** (Managed by Supabase Auth)
+  - id (primary key)
+  - email
+  - created_at
+  - updated_at
+
+- **profiles**
+  - id (foreign key to users.id)
+  - first_name
+  - last_name
+  - role
+  - created_at
+  - updated_at
+
+- **patients**
+  - id (primary key)
+  - external_id
+  - therapist_id (foreign key to profiles.id)
+  - first_name
+  - last_name
+  - date_of_birth
+  - created_at
+  - updated_at
+
+- **sessions**
+  - id (primary key)
+  - patient_id (foreign key to patients.id)
+  - therapist_id (foreign key to profiles.id)
+  - date
+  - notes
+  - created_at
+  - updated_at
+
+- **emg_data**
+  - id (primary key)
+  - session_id (foreign key to sessions.id)
+  - file_path
+  - processed
+  - results
+  - created_at
+  - updated_at
+
+### 8.2. Row-Level Security (RLS)
+
+- **users**: Only the user themselves or admin can access their data
+- **profiles**: Only the user themselves or admin can modify their profile
+- **patients**: Only assigned therapist or admin can access patient data
+- **sessions**: Only involved therapist or admin can access session data
+- **emg_data**: Only therapist who created the session or admin can access data
+
+## 9. Testing Strategy
+
+### 9.1. Frontend Testing
+
+- **Component Tests**: Testing individual components in isolation
+- **Integration Tests**: Testing component interactions
+- **E2E Tests**: Testing full user flows with Playwright
+
+### 9.2. Backend Testing
+
+- **Unit Tests**: Testing individual functions and methods
+- **API Tests**: Testing API endpoints with FastAPI TestClient
+- **Integration Tests**: Testing service interactions
+
+## 10. Security Patterns
+
+### 10.1. Authentication and Authorization
+
+- **JWT-based Authentication**: Using Supabase Auth
+- **Role-Based Access Control**: Different UI views and API access based on user role
+- **Row-Level Security**: Database access control at the row level
+
+### 10.2. API Security
+
+- **Input Validation**: Using Pydantic schemas for request validation
+- **CORS Configuration**: Restricting cross-origin requests
+- **Rate Limiting**: Preventing abuse through request rate limiting (future implementation)
+
+### 10.3. Data Security
+
+- **Data Encryption**: Sensitive data encrypted at rest
+- **Pseudonymization**: Patient identifiers pseudonymized
+- **Access Logging**: Logging access to sensitive data
+
+## 11. Data Flow Architecture
 
 The GHOSTLY+ system follows a clear data flow pattern for capturing, storing, and analyzing quadriceps muscle data:
 
@@ -246,9 +466,9 @@ The GHOSTLY+ system follows a clear data flow pattern for capturing, storing, an
 5. **Data Analysis**: Web Dashboard visualizes data with appropriate access controls
 6. **Data Export**: Exports to SPSS-compatible formats for statistical analysis
 
-## Visualization Patterns
+## 12. Visualization Patterns
 
-### 1. EMG Visualization
+### 12.1. EMG Visualization
 
 ```
 ┌─────────────────────────────────┐
@@ -270,7 +490,7 @@ The GHOSTLY+ system follows a clear data flow pattern for capturing, storing, an
 - Training protocol markers (sets, repetitions)
 - Comparison between left and right leg
 
-### 2. Muscle Heatmap Visualization
+### 12.2. Muscle Heatmap Visualization
 
 ```
 ┌─────────────────────────────────┐
@@ -299,7 +519,7 @@ The GHOSTLY+ system follows a clear data flow pattern for capturing, storing, an
 - Side-by-side comparison of left and right leg
 - Time-series visualization (baseline, 2-week, 6-week)
 
-### 3. Progress Tracking Visualization
+### 12.3. Progress Tracking Visualization
 
 ```
 ┌─────────────────────────────────┐
@@ -322,7 +542,7 @@ The GHOSTLY+ system follows a clear data flow pattern for capturing, storing, an
 - Baseline, 2-week, and 6-week measurements
 - Population-specific assessment visualizations
 
-### 4. Group Comparison Visualization
+### 12.4. Group Comparison Visualization
 
 ```
 ┌─────────────────────────────────┐
@@ -345,18 +565,7 @@ The GHOSTLY+ system follows a clear data flow pattern for capturing, storing, an
 - Error bars and significance indicators
 - Interactive filtering by timepoint
 
-## Authentication Patterns
-
-The system follows a JWT-based authentication flow:
-
-1. **Login**: User authenticates via Supabase Auth
-2. **Token**: JWT issued to authorized user
-3. **Authorization**: JWT included in all API requests
-4. **Verification**: Backend verifies token and permissions
-5. **Row-Level Security**: Database enforces access control based on user role
-6. **Session Management**: Automatic token refresh and timeout handling
-
-## Data Access Patterns
+## 13. Data Access Patterns
 
 Different user roles have different access patterns:
 
@@ -378,7 +587,7 @@ Different user roles have different access patterns:
    - Access audit logs
    - Monitor system health
 
-## Integration Patterns
+## 14. Integration Patterns
 
 The system integrates with several external components:
 
@@ -389,7 +598,7 @@ The system integrates with several external components:
 5. **Ultrasound**: Viamo sv7 device captures muscle measurements
 6. **MicroFET**: Dynamometer for strength measurements
 
-## Reporting Patterns
+## 15. Reporting Patterns
 
 Standard reports follow consistent patterns:
 

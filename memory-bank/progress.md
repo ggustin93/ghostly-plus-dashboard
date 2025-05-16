@@ -18,6 +18,17 @@ description: Tracks what works, what's left to build, current status, known issu
   - Custom fetch implementation in authStore bypasses Supabase client header issues
   - Simplified Nginx configuration for auth endpoints
   - Detailed documentation added in `docs/supabase-auth-fix.md`
+8. ✅ **API endpoint restructuring** for C3D file processing (as of May 24, 2025)
+  - Renamed API router prefix from `/api/v1/ghostly` to `/api/v1/c3d` for clarity
+  - Added proper nginx configuration for both `/api/` and `/v1/` paths
+  - Fixed frontend API client to use correct paths without duplicate `/api` prefixes
+  - Added health endpoint at `/api/health` for system monitoring
+9. ✅ **Improved Nginx configuration** for file uploads (as of May 24, 2025)
+  - Used variables for upstream services with appropriate names
+  - Disabled IPv6 in resolver configuration
+  - Added detailed error handling for troubleshooting
+  - Enabled larger request body size for file uploads
+  - Fixed 502 Bad Gateway errors with proper resolver variables
 
 ### Features and Components (React with Vite):
 1. ✅ **Consolidated frontend architecture**:
@@ -33,11 +44,23 @@ description: Tracks what works, what's left to build, current status, known issu
    - Auth Context API for authentication state management
    - Login Page with redirection logic
    - Account Page displaying basic user info and logout
-   - Protected routes redirecting based on auth state
+   - Protected routes redirecting based on auth status
 4. ✅ **Routing**:
    - React Router configured for client-side routing
    - Route protection based on authentication status
    - Organized route definitions
+5. ✅ **API Client Integration**:
+   - Centralized API client in `lib/api.ts`
+   - Proper endpoint structure for C3D file uploads and processing
+   - Error handling and type definitions
+6. 🔄 **C3D File Processing & EMG Analysis**:
+   - Created API service (`api.ts`) with TypeScript interfaces for C3D and EMG data
+   - Implemented `C3DUpload` component for file uploads with processing options
+   - Developed `EMGAnalysisDisplay` component for visualization of analysis results
+   - Added `C3DUploadCard` dashboard component for quick access
+   - Integrated with routes for `/sessions/upload` and `/patients/:patientId/upload`
+   - Added upload buttons to sessions list and patient profile pages
+   - ⚠️ EMG waveform visualization API implemented but currently displays placeholder data instead of actual C3D data
 
 *(Previous Vue and Next.js components have been completely removed)*
 
@@ -59,9 +82,17 @@ description: Tracks what works, what's left to build, current status, known issu
 3. ✅ **Backend unit test approach** established with FastAPI TestClient.
 4. ✅ **Testing commands** added to package.json.
 
-## What's Left to Build:
+### Backend Development:
+1. ✅ **Basic FastAPI structure** with proper router organization.
+2. ✅ **C3D processing endpoint** created at `/v1/c3d/upload` for file processing.
+3. ✅ **Health check endpoint** created at `/api/health` for system monitoring.
+4. ✅ **Required Python dependencies** identified and added to pyproject.toml:
+   - numpy, pandas, ezc3d, matplotlib, scipy for C3D processing
+   - FastAPI, uvicorn, python-multipart for API handling
 
-### Phase 3: Authentication and Authorization System (In Progress)
+## What's Left to Build (Dashboard Focus, Supporting GHOSTLY+ Proposal WPs):
+
+### Phase 3: Authentication and Authorization System (Supporting WP2, WP3, WP4, WP5)
 1. ✅ Implement basic email/password login (Done in consolidated React frontend).
 2. ✅ Implement session management (Done via Supabase client/Context).
 3. ⏳ Integrate password reset functionality (Requires UI form and potentially Supabase Edge Function/backend logic).
@@ -69,20 +100,35 @@ description: Tracks what works, what's left to build, current status, known issu
 5. ⏳ Set up role-based access control (RBAC) - Requires defining roles (e.g., in a `profiles` table) and checking them.
 6. ⏳ Develop admin interface for user management (Current focus - `/admin` page).
 
-### Phase 4: Basic Dashboard Components (React)
+### Phase 4: Basic Dashboard Components (Supporting WP2, WP3, WP4, WP5)
 1. 🔄 Create responsive dashboard layout (e.g., using Shadcn components, potentially a sidebar/header).
 2. 🔄 Implement navigation menu (within the dashboard layout).
 3. 🔄 Design and build dashboard homepage (main content area after login).
 4. ✅ Develop user profile page (`/account` - basic version done).
+5. ✅ Implement C3D file upload component with processing options.
+6. ✅ Create EMG analysis visualization component.
+7. ✅ Add dashboard quick-access card for C3D uploads.
+8. ⏳ **Support for RCT Management (WP3, WP4):**
+    -   Participant list views with status indicators (recruited, active, completed, dropout).
+    -   Forms/interface for logging baseline (T0), 1-week (T1), and discharge (T2) assessment data (MicroFet, ultrasound findings, functional tests, questionnaire summaries if not externally managed).
+    -   Interface for managing/viewing BFR cuff pressure settings (e.g., AOP, %MVC used) per session if logged.
+    -   Tracking adherence to intervention (e.g., GHOSTLY+ session frequency, duration from game logs).
 
-### Phase 5: Data Processing and Visualization (`frontend-2` & Backend)
-1. 🔄 Create API (FastAPI or Edge Function) for C3D file processing.
-2. 🔄 Implement file upload functionality (in `frontend-2`, calling the API).
-3. 🔄 Develop 3D visualization components (in `frontend-2`, possibly using libraries like Three.js).
+### Phase 5: Data Processing and Visualization (Supporting WP2, WP4, WP5)
+1. ✅ Create API (FastAPI) for C3D file processing (Basic endpoint created at `/v1/c3d/upload`).
+2. ✅ Implement file upload functionality (Frontend API client created with TypeScript interfaces).
+3. 🔄 Develop 3D visualization components (possibly using libraries like Three.js) - *Currently EMG waveform vis is 2D, 3D might be for biomechanical models if relevant later.*
 4. 🔄 Create data analysis and reporting modules (potentially leveraging the separate Python analytics service).
+    -   Generation of reports for individual patients (clinical progress).
+    -   Tools for researchers to compare groups (Intervention vs. Control) based on collected outcome measures.
+5. ⏳ Implement additional validation for file uploads.
+6. ⏳ Add more detailed error handling for file processing.
+7. ⏳ Add visualization options for different muscle groups.
+8. ⏳ **Implement sEMG-derived metrics calculation in backend (WP2, WP5):** As per proposal (fatigue, strength, mass estimation) and display relevant metrics/reports in dashboard.
+9. ⏳ **Data Export (WP5):** Robust export functionality for pseudonymized data in formats suitable for SPSS/REDCap.
 
-### Phase 6: Integration with Existing Game
-1. 🔄 Establish API endpoints for game data exchange.
+### Phase 6: Integration with Existing Game (GHOSTLY+ game - WP2)
+1. 🔄 Establish API endpoints for game data exchange (C3D upload is one part; potentially DDA parameters, game settings, detailed logs).
 2. 🔄 Implement user progress synchronization.
 3. 🔄 Develop game session management.
 
@@ -97,10 +143,11 @@ description: Tracks what works, what's left to build, current status, known issu
 3. 🔄 Optimize performance.
 4. 🔄 Conduct user acceptance testing.
 
-### Phase 9: Deployment and Documentation
+### Phase 9: Deployment and Documentation (Supporting WP6 - Utilisation)
 1. 🔄 Create deployment scripts.
-2. 🔄 Prepare user and administrator documentation.
+2. 🔄 Prepare user and administrator documentation (including details for physiotherapists on using dashboard for GHOSTLY+ protocol).
 3. 🔄 Develop maintenance procedures.
+4. ⏳ **Prepare for Multi-Site Data Handling (WP3, WP4):** Ensure dashboard can segregate or tag data by hospital site (UZB, UZA, UZL Pellenberg) if needed for analysis or site-specific views.
 
 ## Project Status & Progress Notes:
 
@@ -125,23 +172,72 @@ description: Tracks what works, what's left to build, current status, known issu
   - Resolved M1 Mac compatibility issues
   - Established proper JWT configuration for secure authentication
 
-### Task 3: Authentication and Authorization System (`frontend-2` Focus)
+### Task 3: Authentication and Authorization System (Frontend Focus)
 - ⏳ **IN PROGRESS**
 - ✅ Supabase authentication backend configured and tested.
-- ✅ Basic login UI implemented (`AuthForm.tsx` in `frontend-2`).
-- ✅ Auth Context API for state management (`AuthContext.tsx` in `frontend-2`).
-- ✅ Login/Account pages with routing protection implemented in `frontend-2`.
-- ✅ Resolved module resolution issues related to dependencies in `frontend-2`.
-- ⏳ *Previous Vue (`frontend`) auth implementation efforts are archived.* 
+- ✅ Basic login UI implemented (`AuthForm.tsx`).
+- ✅ Auth Context API for state management.
+- ✅ Login/Account pages with routing protection implemented.
+- ✅ Resolved module resolution issues related to dependencies.
 - ⏳ Next: Implement Admin page, RBAC, Password Reset, Registration (if applicable).
+
+### Task 4: C3D File Processing API
+- ✅ **COMPLETED**
+- ✅ Created C3D processing endpoint at `/v1/c3d/upload`.
+- ✅ Updated frontend API client to use correct endpoints.
+- ✅ Added required Python dependencies to pyproject.toml.
+- ✅ Added build dependencies to Dockerfile.
+- ✅ Created TypeScript interfaces for C3D and EMG data.
+- ✅ Implemented frontend components for file upload and analysis visualization.
+- ✅ Added routing and integration with existing application.
+- ✅ Fixed Nginx configuration to resolve 502 Bad Gateway errors.
 
 ## Known Issues:
 
 1. **Docker Stability**: Occasional issues with Docker restarts, may require system reboot to resolve. *(Seems less frequent now?)*
-2. **Frontend (`frontend-2`)**: Need to implement Role-Based Access Control (RBAC) checks for admin page.
-3. **UI Component Styling**: *(Verify if Tailwind 4 / Shadcn UI issues from Vue project persist in Next.js/React setup. Assume resolved unless specified otherwise)*.
+2. **Backend Dependencies**: Issues with ezc3d compilation in Docker build process (Python C extension).
+3. **Frontend**: Need to implement Role-Based Access Control (RBAC) checks for admin page.
+4. **UI Component Styling**: *(Verify if Tailwind 4 / Shadcn UI issues from Vue project persist in Next.js/React setup. Assume resolved unless specified otherwise)*.
+5. **EMG Waveform Visualization**: Waveform data visualization appears to be displaying placeholder/generated data instead of actual C3D file data. The `/api/v1/c3d/results/{result_id}/waveform` endpoint may need debugging to correctly extract and return real waveform data.
 
 ## Evolution of Project Decisions:
+
+### C3D Processing API Structure:
+- **Initial implementation**: API endpoints under `/api/v1/ghostly/upload`
+- **Problem identified**: Mismatch between frontend API client paths and backend router prefix
+- **Solution**: 
+  - Renamed router prefix from `/api/v1/ghostly` to `/api/v1/c3d` for clearer domain separation
+  - Removed duplicate `/api` prefixes in frontend API client
+  - Added proper nginx location blocks for both `/api/` and `/v1/` paths
+  - Created consistent API path structure across entire application
+
+### C3D Upload and EMG Analysis UI:
+- **Initial implementation**: Basic file upload component with minimal options
+- **Problem identified**: Need for more control over processing parameters and visualization options
+- **Solution**:
+  - Created dedicated `C3DUpload` component with advanced processing options
+  - Developed separate `EMGAnalysisDisplay` component for visualization
+  - Added dashboard card component for quick access
+  - Implemented multiple access points (sessions page, patient page)
+  - Designed for extensibility with different muscle groups
+
+### Backend Dependency Management:
+- **Initial implementation**: Basic Python dependencies for FastAPI
+- **Problem identified**: Missing scientific libraries for C3D processing
+- **Solution**:
+  - Added numpy, pandas, ezc3d, matplotlib, scipy to pyproject.toml
+  - Added build-essential, cmake, gcc, g++ to Dockerfile for compilation
+  - Working on multi-stage Docker build to separate compilation from runtime
+
+### Nginx Configuration Improvements:
+- **Initial implementation**: Basic proxying for frontend, backend, and Supabase services
+- **Problem identified**: 502 Bad Gateway errors when accessing the application
+- **Solution**:
+  - Used variables for upstream services with appropriate names
+  - Disabled IPv6 in resolver configuration
+  - Added detailed error handling for troubleshooting
+  - Enabled larger request body size for file uploads
+  - Used resolver variables consistently throughout the config
 
 ### Supabase Authentication Approach:
 - **Initial implementation**: Used standard Supabase client for authentication
@@ -205,52 +301,42 @@ description: Tracks what works, what's left to build, current status, known issu
 - Selected Apache 2.0 as placeholder license (pending TTO consultation)
 
 ### 2025-05-06
-- Established folder structure and Docker configuration
-- Set up backend with FastAPI
-- Created frontend with Vue 3 and shadcn-vue components
-- Configured Supabase services with Docker Compose
+- Configured basic Docker containers (nginx, frontend, backend)
+- Set up Supabase for local development environment
+- Created NGINX configuration for proxying requests
+- Established initial project structure
 
 ### 2025-05-07
-- Set up Supabase authentication
-- Created storage buckets for different data types
-- Configured CORS for API access
-- Developed auth UI components with shadcn-vue
+- Documented local development environment setup
+- Created storage buckets in Supabase
+- Configured CORS for Supabase services
+- Implemented first version of authentication
 
 ### 2025-05-08
-- Organized documentation into separate guides
 - Created comprehensive API and security documentation
-- Developed utility scripts for environment setup
-- Updated Memory Bank with detailed technical context
+- Refined authentication implementation
+- Reorganized documentation structure
 
 ### 2025-05-09
-- Diagnosed and fixed authentication issues:
-  - Identified header management issues with Nginx proxy
-  - Implemented direct Supabase connection for auth operations
-  - Modified Supabase client configuration to prevent automatic header management
-  - Updated Nginx configuration to explicitly remove Authorization header for auth endpoints
-  - Documented two viable architectural approaches for authentication flow
-
-### 2025-05-10
-- Identified styling issues with Shadcn UI Vue components and Tailwind 4:
-  - Component variants (especially buttons) not being detected correctly
-  - Created Task #27 to fix styling issues
-  - Added documentation to techContext.md explaining the issue and planned solutions
-  - Determined issue is likely related to Tailwind 4's color format changes and component slot attributes
+- Fixed authentication issues with custom fetch implementation
+- Optimized Supabase services for local development
+- Updated Docker and NGINX configuration for improved stability
 
 ### 2025-05-14
-- Reorganized documentation into a numbered folder structure
-- Created minimal testing infrastructure with Playwright for E2E tests
-- Established backend testing approach with FastAPI TestClient
-- Switched from Next.js to standard React with Vite for frontend
-- Created MVP testing document to guide development
+- Decided to switch to React with Vite (rather than Next.js)
+- Adopted minimal but effective testing approach
+- Refined backend strategy to hybrid approach
 
 ### 2025-05-17
-- Consolidated frontend codebase:
-  - Removed frontend-2 directory (Next.js) completely
-  - Cleaned up Vue.js components from frontend directory
-  - Implemented single React with Vite frontend in the frontend directory
-  - Organized components by feature with clean architecture
-  - Updated build process and dependencies
+- Consolidated frontend to single React with Vite implementation
+- Organized frontend code by feature
+- Set up testing infrastructure with Playwright and FastAPI TestClient
+
+### 2025-05-24
+- Implemented C3D file upload and EMG analysis components
+- Created API client with TypeScript interfaces for C3D and EMG data
+- Fixed Nginx configuration to resolve 502 Bad Gateway errors
+- Improved API endpoint structure for C3D file processing
 
 ## Next Actions:
 
@@ -258,10 +344,11 @@ description: Tracks what works, what's left to build, current status, known issu
 2.  Build `/admin` page in React to display users (using Shadcn Table).
 3.  Implement RBAC check for accessing `/admin` page.
 4.  Expand test coverage for critical user flows.
-5.  Continue with other pending tasks (Password Reset, Registration, Dashboard Layout).
+5.  Investigate and fix waveform data visualization issue - ensure the `/api/v1/c3d/results/{result_id}/waveform` endpoint returns real C3D file data instead of placeholder data.
+6.  Continue with other pending tasks (Password Reset, Registration, Dashboard Layout).
 
 ---
-**Last Updated**: 2025-05-17 
+**Last Updated**: 2025-05-24 
 
 # Progress
 

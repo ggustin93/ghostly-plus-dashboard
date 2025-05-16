@@ -63,10 +63,10 @@ The Ghostly app uses the OpenFeasyo platform, a software framework for creating 
 The current system:
 
 - Collects data from Delsys Trigno EMG sensors placed on quadriceps muscles
-- Stores data in C3D format (standard biomechanics format)
-- Records game metrics (level, score, duration)
-- Saves files locally on the tablet
-- Does not currently support centralized storage or analysis
+- Stores data in C3D format (standard biomechanics format); multiple C3D files may be generated if a single rehabilitation session involves multiple distinct game plays.
+- Records game metrics (level, score, duration) within each C3D file or associated metadata.
+- Saves C3D files locally on the tablet.
+- Does not currently support centralized storage or analysis for multiple C3D files from a single rehabilitation session in an aggregated manner.
 
 ### 2.3 Limitations of Current System (Prior to Web Dashboard Development)
 
@@ -86,13 +86,9 @@ The current system:
 ### 3.1.1 Therapist-Focused Features
 
 **Essential for MVP**:
-- View results of patients' therapy sessions
-- Visualize EMG signals and game metrics
-- Track individual patient progress with basic trend visualization of key quadriceps metrics:
-  - Muscle strength (measured by MicroFET dynamometer)
-  - Cross-sectional area (ultrasound measurements)
-  - Pennation angle (ultrasound measurements)
-  - Echo intensity (ultrasound measurements)
+- View results of patients' **Rehabilitation Sessions**, with the ability to inspect data from individual **Game Sessions (C3D files)** within them.
+- Visualize EMG signals and game metrics from individual or aggregated **Game Sessions** composing a **Rehabilitation Session**.
+- Track individual patient progress with basic trend visualization of key quadriceps metrics (data potentially aggregated from multiple **Game Sessions** per **Rehabilitation Session**).
 - Track population-specific assessment measures:
   - Motricity Index for stroke patients 
   - 30-second sit-to-stand test for elderly patients
@@ -114,7 +110,7 @@ The current system:
 
 **Essential for MVP**:
 - Access pseudonymized patient data for analysis
-- Export data for external statistical analysis in SPSS 27
+- Export data for external statistical analysis in SPSS 27 (or SPSS-compatible formats)
 - Create and manage patient cohorts based on study arm (Ghostly, Ghostly+BFR, Control/Leaflet)
 - Generate simple multi-site statistics
 - Filter and segment data based on key parameters
@@ -149,7 +145,7 @@ The current system:
 
 ### 3.2 Detailed Functional Requirements
 
-> **Implementation Mapping**: For a detailed mapping of these requirements to specific UI screens, please see the [Requirements Traceability Matrix](ui_ux_screens.md#requirements-traceability-matrix) in the UI/UX Screens document.
+> **Implementation Mapping**: For a detailed mapping of these requirements to specific UI screens, please see the [UX_UI_specifications.md](UX_UI_specifications.md) in the Ghostly+ Dashboard: Functional Design and UI/UX Specifications document.
 
 ### 3.2.1 Authentication and Authorization
 
@@ -174,8 +170,8 @@ The current system:
 - Patient registration and profile creation with population categorization (stroke, elderly, COVID-19/ICU)
 - Assignment of patients to therapists
 - Treatment group assignment (Ghostly, Ghostly+BFR, Control/Leaflet)
-- Program adherence tracking
-- Core intervention history recording
+- Program adherence tracking (potentially distinguishing between adherence to overall Rehabilitation Session schedule and completion of all prescribed Game Sessions within it).
+- Core intervention history recording, including a clear structure for **Rehabilitation Sessions** and their constituent **Game Sessions (C3D files)**.
 - Demographic data management
 - Recording of inclusion/exclusion criteria status
 
@@ -239,14 +235,15 @@ The current system:
 ### 3.2.6 Game Performance Analysis
 
 **Essential for MVP**:
-- Basic scores and progressions in the game
-- Session duration and frequency tracking
-- Correlation between EMG activity and game performance
-- Short-term performance tracking
+- Basic scores and progressions in the game (per **Game Session**).
+- **Rehabilitation Session** and **Game Session** duration and frequency tracking.
+- Correlation between EMG activity and game performance (analyzed per **Game Session**).
+- Short-term performance tracking (across multiple **Game Sessions** and **Rehabilitation Sessions**).
 - Therapy compliance and adherence metrics:
-  - Number of sessions completed vs. prescribed
-  - Training load achieved vs. prescribed
-  - Repetitions performed vs. prescribed
+  - Number of **Rehabilitation Sessions** completed vs. prescribed.
+  - Number of **Game Sessions** completed vs. prescribed within each **Rehabilitation Session** (if applicable).
+  - Training load achieved vs. prescribed (potentially aggregated per **Rehabilitation Session** from its **Game Sessions**).
+  - Repetitions performed vs. prescribed (similarly aggregated or tracked per **Game Session**).
 
 **Future Releases**:
 - Advanced long-term trend analysis with predictive modeling
@@ -262,6 +259,7 @@ The current system:
   - Session summary views for therapists
   - EMG visualization exports for clinical documentation
   - Summary data for USE questionnaire analysis
+  - Data export in formats compatible with REDCap for archival/clinical trial master data.
 
 - **Future Releases**:
   - PDF clinical report generation with customizable templates
@@ -289,7 +287,7 @@ The current system:
 
 ### 3.3.3 Accessibility
 
-- WCAG 2.1 level AA compliance (?)
+- WCAG 2.1 level AA compliance (Target, to be confirmed based on project resources and final scope)
 - Multilingual support (English, Dutch, French)
 
 ### 3.3.4 Availability and Reliability
@@ -318,9 +316,10 @@ The GHOSTLY+ project is structured into six distinct work packages that together
     - Implement user login (therapist/researcher) within the game interface using Supabase Auth (via REST API or C# client library).
     - Securely handle JWT tokens within the game application.
 - **Implement direct, authenticated C3D file upload from the game:**
-    - Upon session completion, the game application will upload the generated C3D file directly to a secure backend API endpoint.
-    - The upload request must include the user's valid JWT for authentication and association with the correct patient/session.
-- Define fallback mechanism (e.g., manual dashboard upload) in case of direct upload failure.
+    - After each **Game Session** (i.e., a single instance of playing the game), the game application will generate a C3D file.
+    - The game application should be capable of uploading each generated C3D file directly to a secure backend API endpoint, either immediately after the Game Session or potentially batched at the end of the overall **Rehabilitation Session**. The exact timing (per game vs. per rehab session) needs confirmation.
+    - Each upload request must include the user's valid JWT for authentication and clear identifiers to associate the C3D file with the correct patient and the overarching Rehabilitation Session.
+- Define fallback mechanism (e.g., manual dashboard upload) in case of direct upload failure, allowing for upload of one or more C3D files per Rehabilitation Session.
 
 ### 4.2 WORK PACKAGE 2: Web Dashboard (Frontend)
 *This package covers the development of the user-facing web application using **React**. It includes UI/UX design, component development, state management, and routing.*
@@ -329,7 +328,7 @@ The GHOSTLY+ project is structured into six distinct work packages that together
 -   **Key Responsibilities**: Role-based interfaces (Therapist, Researcher, Admin), data visualization, interaction with backend services.
 -   **Supabase Interaction**: Uses `@supabase/js` client library primarily for **user authentication** and interacting with Supabase Database/Storage **within the user's security context (respecting RLS)**. It **does not** use the `service_role` key.
 
-**Note**: Initially planned with Next.js, the project now uses standard React with Vite for a lighter, more appropriate solution for our primarily client-side dashboard application.
+**Note**: The project uses **React with Vite** for a client-side focused dashboard application. (Previous considerations for other frameworks like Vue.js or Next.js have been superseded by this choice for simplicity, performance, and maintainability).
 
 ### 4.3 WORK PACKAGE 3: Service Layer (Backend API)
 *This package focuses on the **dedicated Python backend service** built with **FastAPI**. It handles core business logic, data processing detached from the frontend framework, and future advanced analytics.*
@@ -339,11 +338,12 @@ The GHOSTLY+ project is structured into six distinct work packages that together
 -   **Supabase Interaction**: Primarily **verifies JWTs** issued by Supabase Auth. For data access, it often interacts **directly with the PostgreSQL database** for complex operations. May use `supabase-py` client optionally for simple utility tasks.
 
 ### 4.4 WORK PACKAGE 4: Data Infrastructure
-*This package covers the setup, configuration, and management of the **self-hosted Supabase instance**, including the database, authentication service, storage, and edge functions.*
+*This package covers the setup, configuration, and management of the **self-hosted Supabase instance**, including the database, authentication service, storage, and edge functions. Supabase serves as the primary operational database and BaaS for the dashboard.*
 
 -   **Technology**: Supabase (Self-Hosted), PostgreSQL (v15+), Supabase Auth (GoTrue), Supabase Storage, Supabase Edge Functions (Deno).
 -   **Key Responsibilities**: Data persistence (PostgreSQL), file storage, user authentication/JWT issuance (Auth), enforcing Row-Level Security (RLS), providing secure environment for privileged backend logic (Edge Functions).
 -   **Supabase Edge Functions**: Provide serverless backend logic capability within the Supabase ecosystem. They are the designated place to use the Supabase JS client **with the `service_role` key** for **privileged operations** that need to bypass RLS.
+-   **Note on Clinical Trial Data Archival**: While Supabase provides the operational data infrastructure for the dashboard, the GHOSTLY+ FWO proposal indicates that **REDCap** will be utilized for the primary, GDPR-compliant archival and master storage of clinical trial data. The dashboard should support data export in formats compatible with REDCap.
 
 ### 4.5 WORK PACKAGE 5: Security and Compliance
 *This package outlines the critical measures for data privacy, security, GDPR compliance, and ethical handling of patient data throughout the system.*
@@ -382,7 +382,7 @@ The GHOSTLY+ project is structured into six distinct work packages that together
 #### 4.6.1 Containerization
 - **Technology**: Docker & Docker Compose
 - **Setup**:
-    - Separate Dockerfiles for backend (FastAPI) and frontend (Vue.js - using multi-stage builds for efficiency).
+    - Separate Dockerfiles for backend (FastAPI) and frontend (React - using multi-stage builds for efficiency).
     - `docker-compose.yml` for orchestrating local development environment (backend, frontend, potentially a local Supabase instance via its Docker image for testing).
 - Considerations for scalability (e.g., running multiple backend instances) and ease of deployment.
 
@@ -396,34 +396,32 @@ The GHOSTLY+ project is structured into six distinct work packages that together
 
 *(This section summarizes the hybrid approach)*
 
--   The **Next.js frontend (`frontend-2`)** handles user presentation and interacts directly with **Supabase Auth** (using client libraries like `@supabase/ssr`) for authentication. For data, it can fetch directly from Supabase (respecting RLS) or call the FastAPI backend or Edge Functions.
--   **Next.js server-side features** (Route Handlers, Server Actions) provide backend logic tightly coupled to the frontend, also using `@supabase/ssr` to interact with Supabase within the user's RLS context.
--   **Supabase Edge Functions** provide secure, isolated endpoints for operations requiring **privileged access** (using the `service_role` key via the JS client).
--   The **dedicated FastAPI backend** handles **complex Python-specific logic**, advanced analytics, and tasks decoupled from the primary web UI. It verifies JWTs and typically interacts **directly with the PostgreSQL database**.
+-   The **React frontend** (developed with Vite) handles user presentation and interacts directly with **Supabase Auth** (using client libraries like `@supabase/js`) for authentication. For data, it can fetch directly from Supabase (respecting RLS) or call the FastAPI backend or Supabase Edge Functions.
+-   The React frontend is primarily client-side. Server-side logic is handled by **Supabase Edge Functions** (for privileged Supabase operations requiring the `service_role` key) and the **dedicated FastAPI backend** (for complex Python-specific logic, advanced analytics, and tasks decoupled from the primary web UI).
 -   **Supabase** acts as the central BaaS platform providing Auth, Database (with RLS), Storage, and Edge Functions.
 
 ### 4.8 Data Flow
-*This section illustrates how data moves through the system, prioritizing the authenticated flow from the game.*
+*This section illustrates how data moves through the system, prioritizing the authenticated flow from the game. It assumes that a **Rehabilitation Session** can consist of one or more **Game Sessions**, each resulting in a C3D file.*
 
-#### 4.7.1 Data Acquisition (Primary Flow)
-1. Therapist logs into the Ghostly Game on the Android tablet using Supabase Auth.
-2. Patient uses the serious game with EMG sensors on quadriceps muscles.
-3. Data is recorded locally during the session.
-4. Upon session completion, the Game application generates the C3D file.
+#### 4.8.1 Data Acquisition (Primary Flow)
+1. Therapist logs into the Ghostly Game on the Android tablet using Supabase Auth and initiates a **Rehabilitation Session** for a patient.
+2. Patient undertakes one or more **Game Sessions** (plays the serious game) with EMG sensors on quadriceps muscles.
+3. Data is recorded locally during each **Game Session**.
+4. After each **Game Session** completion, the Game application generates a C3D file.
 5. The Game application authenticates with the Backend API using the therapist's JWT.
-6. The Game application uploads the C3D file directly to the secure backend endpoint.
-7. Backend validates the JWT, processes the C3D file, pseudonymizes patient info (if needed at this stage), encrypts sensitive data.
-8. Backend stores processed data in the Supabase Database and the C3D file in Supabase Storage, associating it with the correct patient and session.
+6. The Game application uploads each C3D file (from each Game Session) directly to the secure backend endpoint. This may occur after each Game Session or be batched at the end of the Rehabilitation Session.
+7. Backend validates the JWT, processes each C3D file, pseudonymizes patient info (if needed at this stage), encrypts sensitive data.
+8. Backend stores processed data and each C3D file in Supabase Storage, associating them with the correct patient and the specific **Rehabilitation Session** (and potentially a Game Session identifier within that Rehabilitation Session).
 
-#### 4.7.2 Data Acquisition (Fallback Flow)
-1. If direct upload fails, the C3D file remains on the tablet.
+#### 4.8.2 Data Acquisition (Fallback Flow)
+1. If direct upload fails for any C3D files from a **Rehabilitation Session**, they remain on the tablet.
 2. Therapist logs into the Web Dashboard.
-3. Therapist manually uploads the C3D file via the dashboard interface, selecting the relevant patient/session.
-4. Dashboard sends the file to the Backend.
-5. Backend processes and stores the data as in the primary flow (steps 7-8).
+3. Therapist manually uploads the C3D file(s) via the dashboard interface, selecting the relevant patient and associating them with the correct **Rehabilitation Session**.
+4. Dashboard sends the file(s) to the Backend.
+5. Backend processes and stores the data as in the primary flow (steps 7-8), ensuring each C3D is linked to the overarching Rehabilitation Session.
 
-#### 4.7.3 Data Consultation
-*(Renumbered from 4.3.2)*
+#### 4.8.3 Data Consultation
+*(Previously 4.7.3)*
 1. User (Therapist/Researcher) authenticates on the Web Dashboard using Supabase Auth.
 2. Frontend makes a request to the backend with JWT
 3. Backend verifies permissions
@@ -431,7 +429,7 @@ The GHOSTLY+ project is structured into six distinct work packages that together
 5. Data is returned and visualized in the dashboard
 
 ### 4.9 Data Flow Diagram
-*Sequence diagram updated for primary authenticated game upload.*
+*Sequence diagram updated for primary authenticated game upload and to reflect multiple C3D files per rehabilitation session.*
 ```mermaid
 sequenceDiagram
     participant Patient as Patient with EMG Device
@@ -439,26 +437,28 @@ sequenceDiagram
     participant AuthClient as Supabase Auth Client (in Game)
     participant Backend as FastAPI Backend
     participant DB as Supabase DB / Storage
-    participant Dashboard as Vue.js Dashboard
+    participant Dashboard as React Dashboard (Vite)
     participant Therapist as Therapist/Researcher
 
     Note over Patient,Therapist: Data Acquisition Flow (Primary)
-    Therapist->>Game: Initiates Session / Logs In
+    Therapist->>Game: Initiates Rehabilitation Session / Logs In
     Game->>AuthClient: Request Authentication (e.g., with credentials)
     AuthClient->>Supabase Auth: Authenticates User
     Supabase Auth-->>AuthClient: Returns JWT
-    AuthClient-->>Game: Provides JWT
+    AuthClient-->>Game: Provides JWT to Game
 
-    Patient->>Game: Performs rehabilitation exercises
-    Game->>Game: Records EMG signals + game metrics
-    Game->>Game: Generates C3D file locally
+    loop For each Game Session within Rehabilitation Session
+        Patient->>Game: Performs rehabilitation exercises (Game Session)
+        Game->>Game: Records EMG signals + game metrics for current Game Session
+        Game->>Game: Generates C3D file locally for current Game Session
 
-    Game->>Backend: Uploads C3D file via secure API endpoint (with JWT)
-    Backend->>Supabase Auth: Validates JWT (optional, can be done locally)
-    Backend->>Backend: Validates & processes C3D data
-    Backend->>Backend: Pseudonymizes patient info
-    Backend->>Backend: Encrypts sensitive data
-    Backend->>DB: Stores processed data & C3D file (Storage)
+        Game->>Backend: Uploads C3D file (for current Game Session) via secure API endpoint (with JWT)
+        Backend->>Supabase Auth: Validates JWT (optional, can be done locally)
+        Backend->>Backend: Validates & processes C3D data
+        Backend->>Backend: Pseudonymizes patient info
+        Backend->>Backend: Encrypts sensitive data
+        Backend->>DB: Stores processed data & C3D file (Storage), linked to Rehabilitation Session & Patient
+    end
 
     Note over Patient,Therapist: Data Acquisition Flow (Fallback - Manual Import)
     alt Direct Upload Fails
@@ -495,7 +495,7 @@ sequenceDiagram
 ```
 
 ### 4.10 Recommended Project Structure
-*This structure organizes the backend, frontend, Docker configurations, and deployment settings logically. Inspired by common practices for FastAPI + Vue projects.*
+*This structure organizes the backend, frontend, Docker configurations, and deployment settings logically. Inspired by common practices for FastAPI + React projects.*
 
 ```plaintext
 ghostly-plus/
@@ -522,26 +522,26 @@ ghostly-plus/
 │   ├── pyproject.toml            # Dependencies (using Poetry recommended)
 │   └── requirements.txt          # Fallback dependencies
 │
-├── frontend/                     # Vue 3 frontend (TypeScript)
+├── frontend/                     # React frontend (TypeScript, Vite)
 │   ├── src/
 │   │   ├── assets/               # Static assets (images, fonts)
 │   │   ├── components/           # Reusable UI components (incl. shadcn/ui)
 │   │   │   └── ...
-│   │   ├── composables/          # Vue 3 composables (shared logic)
+│   │   ├── contexts/             # React Context API providers
+│   │   │   └── authContext.tsx   # Example: Auth context
+│   │   ├── hooks/                # Custom React hooks
+│   │   │   └── useAuth.ts        # Example: Auth hook
+│   │   ├── pages/                # Page-level components
 │   │   │   └── ...
-│   │   ├── views/                # Page-level components
-│   │   │   └── ...
-│   │   ├── router/               # Vue Router configuration
-│   │   │   └── index.ts
-│   │   ├── stores/               # Pinia state management stores
-│   │   │   └── auth.ts           # Recommended: Auth store example
+│   │   ├── routes/               # React Router configuration
+│   │   │   └── index.tsx
 │   │   ├── services/             # API interaction layer
-│   │   │   └── api.ts            # Recommended: Axios instance with interceptors
+│   │   │   └── apiClient.ts      # Recommended: Axios instance with interceptors
 │   │   ├── types/                # TypeScript type definitions
 │   │   ├── lib/                  # shadcn/ui library utils
 │   │   │   └── utils.ts
-│   │   ├── App.vue               # Root Vue component
-│   │   └── main.ts               # Application entry point
+│   │   ├── App.tsx               # Root React component
+│   │   └── main.tsx              # Application entry point
 │   ├── public/                   # Static assets copied to dist root
 │   ├── index.html                # Main HTML file
 │   ├── package.json              # Frontend dependencies & scripts
@@ -580,8 +580,8 @@ ghostly-plus/
 *   **Production Deployment:** Build static frontend assets (`npm run build`). Use Nginx (or similar web server/reverse proxy) configured via `nginx/conf.d/default.conf`. Nginx should:
     *   Serve the static frontend assets (HTML, JS, CSS) from the built `frontend/dist` directory.
     *   Act as a reverse proxy, forwarding requests starting with `/api` (or another chosen prefix) to the backend FastAPI container.
-*   **API Client (`frontend/src/services/api.ts`):** Implement using Axios or Fetch, potentially with interceptors to automatically attach JWT tokens from the auth store and handle 401 Unauthorized errors globally.
-*   **Auth Store (`frontend/src/stores/auth.ts`):** Use Pinia to manage user authentication state (token, user info) and provide login/logout actions.
+*   **API Client (`frontend/src/services/apiClient.ts`):** Implement using Axios or Fetch, potentially with interceptors to automatically attach JWT tokens from the auth store and handle 401 Unauthorized errors globally.
+*   **Auth Store (`frontend/src/contexts/authContext.tsx`):** Use React Context API to manage user authentication state (token, user info) and provide login/logout actions.
 *   **Environment Variables:** Use `.env` files (loaded by Docker Compose, FastAPI settings, and Vite) to manage configuration secrets and environment-specific settings. Provide a `.env.example` for guidance.
 
 ## 5. DEVELOPMENT AND DEPLOYMENT
@@ -611,8 +611,8 @@ ghostly-plus/
     - C3D file parsing validation
     - EMG data processing verification
 - Frontend: Component and integration testing
-    - Vue component tests with Vue Test Utils
-    - End-to-end testing with Cypress
+    - React component tests (e.g., using React Testing Library, Vitest)
+    - End-to-end testing with Cypress or Playwright
 - Continuous integration with automated test runs on each commit
 
 #### 5.3.2 User Testing
@@ -646,7 +646,7 @@ The project timeline is designed to complete all essential work within 5 months,
 
 ### 6.3 Phase 3: Dashboard Development (Weeks 9-14)
 
-- Vue.js project setup and component architecture
+- React project setup and component architecture (with Vite)
 - Therapist interface implementation
 - EMG visualization and quadriceps analytics features
 - Authentication and user management
@@ -690,7 +690,8 @@ To finalize this PRD, we would need to clarify the following points:
 1. **C3D Format Details**:
     - Which library is currently used to generate C3D files?
     - What is the exact structure of EMG data in these files?
-    - What volume of data is generated per game session?
+    - What volume of data is generated per **Game Session** (i.e., per C3D file)?
+    - What is the typical number of **Game Sessions** (and thus C3D files) per **Rehabilitation Session** for each training protocol/patient population?
     - Are quadriceps-specific measurements already captured in the C3D files?
 2. **OpenFeasyo Integration**:
     - Can the game be modified to automatically send data?
@@ -735,11 +736,12 @@ To finalize this PRD, we would need to clarify the following points:
 ### 9.2 Glossary
 
 - **BFR (Blood Flow Restriction)**: Technique that restricts venous blood flow return while allowing arterial flow during exercise
-- **C3D (Coordinate 3D)**: File format for recording synchronized 3D and analog data
+- **C3D (Coordinate 3D)**: File format for recording synchronized 3D and analog data. In this project, one C3D file is typically generated per **Game Session**.
 - **Cohort**: Group of patients participating in the study under similar conditions
 - **Docker**: Platform for developing, shipping, and running applications in containers
 - **EMG (Electromyography)**: Technique for recording the electrical activity of muscle tissue
 - **FastAPI**: Modern Python web framework for building APIs
+- **Game Session**: A single, distinct instance of a patient playing the GHOSTLY+ serious game, typically resulting in the generation of one C3D file. Multiple Game Sessions can occur within a single **Rehabilitation Session**.
 - **GDPR (General Data Protection Regulation)**: EU regulation on data protection and privacy
 - **JWT (JSON Web Token)**: Compact, URL-safe means of representing claims to be transferred between parties
 - **MVC (Maximum Voluntary Contraction)**: The maximum force output of a muscle during voluntary contraction
@@ -749,9 +751,9 @@ To finalize this PRD, we would need to clarify the following points:
 - **Pseudonymization**: Processing personal data so it can no longer be attributed to a specific data subject without additional information
 - **PWA (Progressive Web App)**: Web application that functions like a native app
 - **RCT (Randomized Controlled Trial)**: Study design where participants are randomly allocated to intervention or control groups
+- **Rehabilitation Session**: An overall therapy appointment or interaction between a therapist and a patient. A Rehabilitation Session may include one or more **Game Sessions** where the patient plays the serious game.
 - **RLS (Row-Level Security)**: Security feature in PostgreSQL that restricts which rows users can access
 - **Sarcopenia**: Loss of skeletal muscle mass and strength as a result of aging
 - **SPSS**: Statistical Package for the Social Sciences, software for statistical analysis
 - **Supabase**: Open-source Firebase alternative providing database, authentication, and storage services
 - **USE Questionnaire**: Usefulness, Satisfaction, and Ease of use questionnaire for evaluating user experience
-- **Vue.js**: Progressive JavaScript framework for building user interfaces

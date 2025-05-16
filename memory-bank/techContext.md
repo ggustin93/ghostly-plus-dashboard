@@ -1,6 +1,6 @@
 ---
-description: Details the technologies, development setup, technical constraints, dependencies, and tool usage patterns for the GHOSTLY+ Dashboard.
-source_documents: [docs/prd.md](mdc:docs/prd.md) (Section 4), [docs/security.md](mdc:docs/security.md)
+description: Details the technologies, development setup, technical constraints, dependencies, and tool usage patterns for the GHOSTLY+ Dashboard, within the broader GHOSTLY+ project context.
+source_documents: [docs/prd.md](mdc:docs/prd.md) (Section 4), [docs/security.md](mdc:docs/security.md), [docs/00_PROJECT_DEFINITION/ressources/2024_ghostly_proposal.md](mdc:docs/00_PROJECT_DEFINITION/ressources/2024_ghostly_proposal.md)
 ---
 
 # GHOSTLY+ Dashboard: Technical Context
@@ -41,6 +41,7 @@ source_documents: [docs/prd.md](mdc:docs/prd.md) (Section 4), [docs/security.md]
 - **Data Validation:** Pydantic
 - **Database Interaction:** SQLAlchemy (for potential future DB interactions beyond Supabase direct access)
 - **Package Manager:** Poetry
+- **Potential Libraries for sEMG Analysis (as per proposal WP2, Task 2.3)**: Libraries for calculating RMS, MAV/MAD, VAR, spectral indices, time-frequency analysis (e.g., `scipy.signal`, `numpy`, `pandas`, potentially specialized biomechanics libraries). Libraries for sEMG-force modeling and regression (e.g., `scikit-learn`).
 
 ### 1.3. Database & BaaS (Data Infrastructure - WP4)
 
@@ -58,12 +59,20 @@ source_documents: [docs/prd.md](mdc:docs/prd.md) (Section 4), [docs/security.md]
 - **Orchestration (Local Dev):** Docker Compose
 - **Reverse Proxy (Local Dev & Prod):** Nginx
 
-### 1.5. Game Client Integration (WP1)
+### 1.5. Game Client & Intervention Hardware (WP2, WP3)
 
-- **Platform:** Android
-- **Framework:** MonoGame (via OpenFeasyo)
+- **Platform:** Android (Tablet)
+- **Framework:** MonoGame (via OpenFeasyo for existing Ghostly game, to be adapted to GHOSTLY+)
 - **Language:** C#
-- **Sensors:** Delsys Trigno EMG
+- **EMG Sensors:** Delsys Trigno Avanti (primary for RCT), with WP2 task to explore/integrate other (low-cost) wireless sEMG sensors.
+- **BFR Cuffs:** Smart Cuffs system (Smart Tools, USA) or similar, for applying Blood Flow Restriction during exercises.
+
+### 1.6. Clinical Measurement & External Tools (WP4, WP5)
+
+- **Muscle Strength Measurement:** Handheld dynamometer (e.g., MicroFet).
+- **Muscle Mass Assessment:** Bedside ultrasound (for M. Rectus Femoris cross-sectional area).
+- **Data Storage (Clinical Trial Master Data/Archive):** REDCap (mentioned in proposal for GDPR-proof storage, separate from Supabase operational DB for dashboard).
+- **Statistical Analysis:** SPSS or similar statistical software (for analysis of exported data from dashboard/REDCap).
 
 ## 2. Development Setup
 
@@ -79,9 +88,8 @@ source_documents: [docs/prd.md](mdc:docs/prd.md) (Section 4), [docs/security.md]
 ## 3. Technical Constraints
 
 - **Self-Hosted Supabase:** The entire Supabase instance runs on a private VUB VM, not Supabase Cloud. This impacts deployment, maintenance, and potentially available Supabase features/extensions.
-- **GDPR Compliance:** Strict adherence required due to handling sensitive medical (EMG) data. Pseudonymization and encryption are key requirements.
-- **Existing Game Client:** The dashboard must integrate with the existing C#/MonoGame Android application.
-- **M1 Mac Compatibility:** Local Supabase setup requires specific Docker configurations (`platform: linux/arm64` for some services, manual Docker Compose preferred over `npx supabase start`).
+- **GDPR Compliance:** Strict adherence required due to handling sensitive medical data. Pseudonymization (e.g., SHA-256 as per `systemPatterns.md`) and encryption (e.g., Fernet) are key requirements. The proposal highlights storing data in REDCap as a GDPR-proof measure, and CME approval is needed.
+- **Existing Game Client Adaptation:** The dashboard must integrate with the GHOSTLY+ game, which is an adaptation of the existing C#/MonoGame Android application (OpenFeasyo). This involves changes to the game for authentication and data upload.
 
 ## 4. Key Dependencies & Libraries
 
@@ -111,6 +119,10 @@ source_documents: [docs/prd.md](mdc:docs/prd.md) (Section 4), [docs/security.md]
 - `python-dotenv`: Environment variable management
 - `py-bcrypt`: Password hashing (if needed outside Supabase Auth)
 - `ruff`: Linter/Formatter
+- `numpy`, `scipy`, `pandas`: For numerical analysis, signal processing (sEMG metrics).
+- `scikit-learn`: For machine learning models (e.g., sEMG-force modeling, regression for muscle mass estimation).
+- `matplotlib` (optional, for server-side plot generation if needed, or for internal analysis scripting).
+- `ezc3d`: For C3D file parsing.
 
 ### 4.3. Supabase / Infrastructure
 

@@ -1,20 +1,40 @@
 ---
-description: Tracks the current work focus, recent changes, next steps, active decisions, and key learnings for the GHOSTLY+ Dashboard project.
+description: Tracks the current work focus, recent changes, next steps, active decisions, and key learnings for the GHOSTLY+ Dashboard project, contextualized by the FWO proposal.
+source_documents: [docs/00_PROJECT_DEFINITION/ressources/2024_ghostly_proposal.md](mdc:docs/00_PROJECT_DEFINITION/ressources/2024_ghostly_proposal.md)
 ---
 
 # GHOSTLY+ Dashboard: Active Context
 
-## Current Status: Phase 3 (Auth Implementation) - React Frontend
+**Foundational Context Note:** This document reflects the ongoing development of the GHOSTLY+ Web Dashboard. The project's overarching scope, research aims, and initial planning (including Work Package definitions) are detailed in the **[FWO Proposal (April 2024)](mdc:docs/00_PROJECT_DEFINITION/ressources/2024_ghostly_proposal.md)**. The dashboard primarily supports WP2 (Game & Dashboard Development), WP3 (RCT & Interventions), WP4 (Data Collection), and WP5 (Data Analyses) of that proposal.
 
-- **Date**: 2025-05-17
-- **Focus**: Implementing core features in a consolidated React frontend with Vite. Setting up testing infrastructure.
+## Current Status: Phase 4 (C3D Processing & EMG Analysis) - React Frontend
+
+- **Date**: 2025-05-24
+- **Focus**: Implementing C3D file upload, processing, and EMG analysis visualization components. Resolving infrastructure issues.
 - **Recent Changes**:
-    - **Frontend Consolidation**: Completed major frontend reorganization:
-        - Removed the temporary `frontend-2` Next.js directory completely
-        - Cleaned up Vue components from `frontend` directory
-        - Implemented unified React with Vite frontend in the single `frontend` directory
-        - Created organized folder structure by feature (auth, dashboard, patients, etc.)
-        - Set up UI component library with Shadcn UI for React
+    - **C3D Processing & EMG Analysis Components**:
+        - Successfully fixed C3D file upload functionality by aligning API route prefixes
+        - Fixed Docker configuration for ezc3d library dependencies using a single-stage build approach
+        - Implemented `C3DUpload` component for uploading C3D files with advanced processing options
+        - Created `EMGAnalysisDisplay` component to visualize EMG analysis results with tables and charts
+        - Added `C3DUploadCard` component for the dashboard for quick access
+        - Added TypeScript interfaces for C3D and EMG data in the API service
+        - Integrated real EMG waveform data from C3D files via dedicated API endpoint (may still be showing placeholder data)
+        - Updated Recharts library from v2.12.7 to v2.15.3 to resolve React deprecation warnings
+        - Integrated components into the application routing:
+            - Added routes for `/sessions/upload` and `/patients/:patientId/upload`
+            - Added upload buttons to sessions list and patient profile pages
+            - Integrated with dashboard via card component
+        - Added toast notifications with existing hooks
+    - **Documentation Refinement (ui_ux_screens.md)**:
+        - The `docs/00_PROJECT_DEFINITION/ui_ux_screens.md` document was retitled to "Ghostly+ Dashboard: Functional Design and UI/UX Specifications" to more accurately reflect its evolved scope, which now explicitly includes functional design aspects alongside UI and UX specifications.
+    - **NGINX Configuration Improvements**:
+        - Updated `nginx/conf.d/default.conf` to resolve 502 Bad Gateway errors:
+            - Used variables for upstream services with appropriate names
+            - Disabled IPv6 in the resolver configuration
+            - Added detailed error handling for troubleshooting
+            - Enabled larger request body size for file uploads
+            - Used resolver variables consistently throughout the config
     - **Framework Update**: Finalized transition to React with Vite:
         - Next.js proved overly complex for our dashboard needs, with server-side features that weren't fully utilized
         - React with Vite offers a lighter, more appropriate solution for our primarily client-side dashboard application
@@ -116,10 +136,16 @@ description: Tracks the current work focus, recent changes, next steps, active d
     - Updated `memory-bank/techContext.md` to specify Tailwind CSS v4.
     - Successfully tested the full Docker environment (`docker-compose up --build`) with frontend and backend accessible via Nginx.
 - All changes committed.
-- **Docker & NGINX Configuration (as of 2025-05-09):**
+- **Docker & NGINX Configuration (as of 2025-05-24):**
     - Aligned main `docker-compose.yml` for NGINX proxying:
         - Added `supabase_network` to the `nginx` service to enable communication with `supabase-kong`.
         - Updated `frontend` service's `VITE_API_BASE_URL` to `http://localhost/api` to route API calls through NGINX.
+    - Updated `nginx/conf.d/default.conf` with improved configuration:
+        - Used variables for upstream services with appropriate names
+        - Disabled IPv6 in resolver configuration
+        - Added detailed error handling for troubleshooting
+        - Enabled larger request body size for file uploads (for C3D files)
+        - Used resolver variables consistently throughout the config
     - Verified `nginx/conf.d/default.conf` correctly proxies to frontend (`/`), backend (`/api`), and Supabase services (`/auth/v1`, `/rest/v1`, etc.).
 - **Supabase Services Optimization (as of 2025-05-09):**
     - Reviewed services in `supabase_config/docker-compose.yml` for local development.
@@ -128,7 +154,7 @@ description: Tracks the current work focus, recent changes, next steps, active d
 - **Active Decisions**:
     - **Frontend Framework:** React with Vite is now the primary frontend, in a single consolidated directory.
         - **Rationale Summary**: Chosen for its lighter footprint, better alignment with project complexity and team skillset, and improved maintainability with a single codebase.
-    - **Backend Strategy:** Hybrid approach. Use Next.js server features for standard web backend logic. Use Supabase Edge Functions for privileged operations/transformations. Use a separate FastAPI service *later* for advanced Python analytics. *(See [systemPatterns.md](mdc:memory-bank/systemPatterns.md#5-backend-implementation-strategy-when-to-use-what) for detailed guidance on choosing the correct implementation location).*
+    - **Backend Strategy:** Hybrid approach. Use a dedicated FastAPI backend for Python-specific processing (like C3D file analysis). Use Supabase Edge Functions for privileged operations/transformations. *(See [systemPatterns.md](mdc:memory-bank/systemPatterns.md#5-backend-implementation-strategy-when-to-use-what) for detailed guidance on choosing the correct implementation location).*
     - Using Poetry for backend Python dependency management.
     - Using npm for frontend Node.js dependency management.
     - Apache 2.0 as placeholder license (Task #26 pending for VUB TTO consultation).
@@ -164,14 +190,31 @@ description: Tracks the current work focus, recent changes, next steps, active d
 
 ## Next Steps (Today)
 
-1.  Continue development on the React admin page (`/admin`).
-    -   Create the Supabase Edge Function (`get-all-users`) to securely fetch user data (potentially pseudonymized).
-    -   Implement the frontend page to call the function and display users (likely using Shadcn Table).
-2.  Review and potentially update other documentation (`README.md`, `docs/prd.md`, etc.) to reflect the framework change where necessary.
-3.  Commit Memory Bank updates.
+1.  Further optimize Nginx configuration for handling large file uploads.
+2.  Work on integrating the EMG analysis results with the patient record system.
+3.  Refine EMG analysis components to support metrics outlined in GHOSTLY+ proposal (WP2, Task 2.3), such as:
+    -   Muscle fatigue indicators (e.g., spectral indices, time-frequency analysis features).
+    -   Muscle strength/force estimations (sEMG-force modeling).
+    -   Muscle mass estimations (regression models using sEMG and other parameters, for comparison with ultrasound data from WP4).
+4.  Plan for Dynamic Difficulty Adjustment (DDA) data logging and potential dashboard interfaces if therapist/researcher input is needed for DDA algorithms (as per GHOSTLY+ proposal WP2, Task 2.4).
+
+## Additional Investigation Needed
+
+1.  EMG Waveform Data Display:
+    -   Currently displaying placeholder data instead of real C3D waveform data.
+    -   Debug the `/api/v1/c3d/results/{result_id}/waveform` endpoint to ensure proper extraction.
+    -   Add logging to trace data flow from C3D file to frontend visualization.
+    -   Enhance error handling to provide clear diagnostics when original C3D files can't be processed.
+    -   Verify file paths and references to original C3D files in the results directory.
+2.  **Dashboard Support for RCT Data Management (WP3, WP4, WP5)**:
+    -   Assess requirements for managing participant randomization data (if any part is managed in-dashboard vs. external IWRS).
+    -   Ensure dashboard can capture/display all outcome measures specified in the proposal (MicroFet, ultrasound data entry/links, functional tests, questionnaires, adherence, user experience).
+    -   Define data export formats compatible with SPSS and REDCap (as mentioned in proposal for WP5 and GDPR compliance).
+    -   Clarify dashboard's role in supporting mixed-methods data for implementation analysis (surveys, interview notes if digitized).
 
 ## Important Patterns & Preferences (Emerging)
 
+-   **Data Model Granularity**: A single **Rehabilitation Session** (the overall therapy appointment) can comprise one or more **Game Sessions**. Each Game Session results in a distinct C3D file. This many-to-one relationship (Game Sessions to Rehabilitation Session) is crucial for data upload, storage, analysis, and UI representation.
 -   Using React with Vite for the frontend in a single directory.
 -   Organizing frontend code by feature rather than by technical concern.
 -   Leveraging Shadcn UI for consistent component design.
@@ -194,6 +237,15 @@ description: Tracks the current work focus, recent changes, next steps, active d
       2. Nginx proxy with explicit header management (removing Authorization header)
       3. Custom fetch implementation that bypasses Supabase client's internal header management
     - Custom fetch approach gives complete control over headers and appears to be the most reliable solution
+-   **C3D file processing and EMG analysis**:
+    - Separate dedicated components for upload, analysis, and display
+    - TypeScript interfaces for strong typing of C3D and EMG data structures
+    - Integration with FastAPI backend for complex numerical processing
+    - Dashboard card components for quick access to key features
+    - Multiple access points for uploading files (sessions page, patient page)
+    - Real EMG waveform visualization using actual C3D data through dedicated API endpoints
+    - Lazy loading of waveform data (loaded only when user selects the waveform tab)
+    - Fallback to sophisticated placeholder data when original C3D files are unavailable
 
 ## Learnings & Project Insights
 
@@ -230,129 +282,112 @@ description: Tracks the current work focus, recent changes, next steps, active d
       2. Direct connections to Supabase services (bypassing Nginx)
       3. Custom fetch implementation that completely bypasses the Supabase client's auth methods
     - The custom fetch approach provides the most reliable solution as it gives complete control over headers 
+-   **Nginx configuration best practices**:
+    - Use variables for upstream services to improve maintainability
+    - Disable IPv6 in resolver when not needed to avoid connection issues
+    - Add detailed error logging for troubleshooting
+    - Configure appropriate request body sizes for file uploads
+    - Use consistent resolver variables throughout the configuration
+    - When facing 502 Bad Gateway errors, review network connectivity between services and check DNS resolution
+-   **C/C++ Extension Libraries in Docker**: Python packages with compiled C/C++ extensions (like ezc3d) require special handling in Docker:
+  - Single-stage builds are often more reliable than multi-stage builds for maintaining library paths and dependencies
+  - LD_LIBRARY_PATH must include all directories containing .so files, including within site-packages
+  - Build tools and dependencies must remain in the final image for some libraries to function properly
+  - Verification scripts for testing imports are valuable for troubleshooting library issues
+  - Including both runtime and build dependencies may increase image size but ensures library compatibility
+- **API Routing Consistency**: Ensure API routes are registered with the same prefixes that frontend clients expect:
+  - The FastAPI router registration must include any prefixes added by nginx (`/api`) before the version prefix (`/v1`)
+  - Routes should be consistently defined as `app.include_router(router, prefix="/api/v1/resource")` to match frontend requests
+  - When debugging 404 errors, compare the exact URL path in the frontend request with how routes are registered in the backend
+  - Nginx location blocks should align with the API path structure used in both frontend and backend
+- **React Component Best Practices**: Stay current with React's evolving best practices:
+  - Use function parameters for defaults instead of the legacy `defaultProps` pattern
+  - Keep dependencies updated to avoid deprecation warnings 
+  - For third-party library warnings, consider updating to newer versions when available
+  - Implement wrapper components when needed to adapt older libraries to current React patterns
+- **Debugging Data Visualization Issues**: When troubleshooting data visualization problems:
+  - Add logging at key data transformation points between backend and frontend
+  - Verify that fallback/placeholder data isn't being used accidentally when real data should be available
+  - Check file paths and references to original data files, especially after processing steps
+  - Test API endpoints directly (using tools like curl, Postman, or browser devtools) to isolate frontend vs backend issues
 
 # Active Development Context
 
-## Current Focus: Quadriceps-Focused Visualization Components
+## Current Focus
 
-We're currently focused on refining visualization components to better align with the clinical trial's focus on quadriceps muscle training and measurement. This addresses a key gap in the initial implementation which wasn't sufficiently targeted toward the specific muscles being studied.
+We are currently working on **fixing API endpoint routing and file upload functionality** in the GHOSTLY+ Dashboard, specifically:
+
+1. Resolving 502 Bad Gateway errors occurring when uploading C3D files
+2. Aligning frontend API requests with backend endpoints
+3. Configuring nginx properly to handle API requests
+4. Ensuring all required backend dependencies for C3D processing are properly installed
 
 ## Recent Changes
 
-1. **EMG Visualization Component**
-   - Updated to focus specifically on quadriceps muscles
-   - Added support for comparing data between treatment groups (Ghostly, Ghostly+BFR, Control)
-   - Implemented visualization for different training protocols (standard, cluster set 1, cluster set 2)
-   - Added recording of training compliance metrics
+### API Endpoint Restructuring (2025-05-24)
+- Renamed router prefix from `/api/v1/ghostly` to `/api/v1/c3d` for clearer domain separation
+- Updated FastAPI tag from "GHOSTLY EMG" to "C3D Processing" to accurately reflect purpose
+- Modified `/health` endpoint to be `/api/health` for consistent access through nginx
+- Fixed duplicate `/api` prefixes in frontend API client requests that were causing path mismatches
+- Updated nginx configuration to properly handle both `/api/` and `/v1/` routes
 
-2. **Muscle Heatmap Component**
-   - Redesigned to focus on quadriceps muscle regions (vastus lateralis, vastus medialis, rectus femoris)
-   - Added visualization of key metrics:
-     - Muscle strength (MicroFET dynamometer)
-     - Cross-sectional area (ultrasound measurements)
-     - Pennation angle (ultrasound measurements)
-     - Echo intensity (ultrasound measurements)
-   - Created side-by-side comparison between left and right legs
+### Backend Dependency Management (2025-05-24)
+- Added required Python dependencies for C3D processing:
+  - `numpy` for numerical operations
+  - `pandas` for data manipulation
+  - `ezc3d` for C3D file processing
+  - `matplotlib` for visualization
+  - `scipy` for signal processing
+- Modified Dockerfile to include necessary build dependencies (cmake, build-essential) for ezc3d
+- Added system dependencies for runtime support of scientific libraries
 
-3. **Session Analysis Page**
-   - Updated to integrate the new quadriceps-focused components
-   - Added filters for patient population (stroke, elderly, COVID-19/ICU)
-   - Added comparison views for treatment groups
-   - Implemented 2-week vs. 6-week progress tracking
+### Nginx Configuration Refinement (2025-05-24)
+- Added proper location block for `/v1/` paths to proxy to backend
+- Removed problematic rewrite rule that was stripping `/api` prefix
+- Increased timeouts for file uploads to 300 seconds
+- Ensured consistent routing for all API endpoints
 
-## Active Decisions
+## Active Decisions & Considerations
 
-1. **Visual Design for Quadriceps Measurements**
-   - Decision: Use color-coded heatmaps to represent different quadriceps metrics (strength, CSA, pennation, echo)
-   - Reasoning: Provides intuitive visual representation of complex muscle data
-   - Status: Implemented in muscle-heatmap.tsx
+### API Path Structure
+- **Decision**: Use `/v1/c3d/*` for C3D-specific processing endpoints and `/api/health` for generic system endpoints
+- **Rationale**: This provides clearer domain separation while maintaining backwards compatibility with existing integrations
 
-2. **Treatment Group Comparison**
-   - Decision: Add treatment group filters to visualization components
-   - Reasoning: Clinical trial compares three treatment approaches (Ghostly, Ghostly+BFR, Leaflet)
-   - Status: Partially implemented, needs refinement
+### Backend Dependencies
+- **Challenge**: Complex dependencies like ezc3d require C++ compilation and system libraries
+- **Approach**: Added proper build environment in Docker with cmake and build tools
+- **Consideration**: May need to investigate alternative C3D processing approaches if library compilation continues to cause issues
 
-3. **Time-Series Analysis Approach**
-   - Decision: Focus on baseline, 2-week, and 6-week comparison views
-   - Reasoning: These are the primary measurement timepoints in the clinical trial
-   - Status: Implemented in session analysis page
-
-4. **Population-Specific Assessment Integration**
-   - Decision: Create separate visualization panels for population-specific metrics
-   - Reasoning: Each population uses different assessment tools (Motricity Index, sit-to-stand, manual testing)
-   - Status: Planned, not yet implemented
+### Docker Build Process
+- **Issue**: Docker build issues with ezc3d compilation 
+- **Next step**: Consider using multi-stage Docker build to separate compilation environment from runtime
+- **Alternative**: Investigate pre-built wheels or alternative C3D processing libraries
 
 ## Next Steps
 
-1. **Implement population-specific assessment visualizations**
-   - Create specialized components for Motricity Index (stroke patients)
-   - Create specialized components for 30-second sit-to-stand test (elderly patients)
-   - Create specialized components for manual muscle testing (COVID-19/ICU patients)
+1. **Resolve ezc3d compilation issues** in Docker build
+   - Investigate Docker multi-stage builds
+   - Consider pre-built wheels or alternative libraries
+   - Ensure proper system libraries are available at runtime
 
-2. **Add statistical analysis visualization**
-   - Integrate ANOVA results visualization
-   - Add significance indicators to treatment group comparisons
-   - Create visual summary of Tukey post-hoc test results
+2. **Complete frontend-backend integration testing**
+   - Test C3D file upload with real files
+   - Verify proper error handling for invalid files
+   - Ensure response data format matches frontend expectations
 
-3. **Develop USE questionnaire analysis dashboard**
-   - Visualize user experience metrics from the modified USE questionnaire
-   - Create component to display percentage distribution of questionnaire items
-   - Build visualization for subscale mean scores
+3. **Update related frontend components**
+   - Ensure consistent API path usage across all components
+   - Add proper loading and error states for file uploads
+   - Update visualization components to handle processed C3D data
 
-4. **Enhance session metrics analysis**
-   - Add therapy compliance visualization (sessions completed vs. prescribed)
-   - Add therapy compliance visualization (training load vs. prescribed load)
-   - Create rep counting visualization for exercise adherence
-
-## Current Challenges
-
-1. **Complex Data Visualization**
-   - Challenge: Effectively displaying multiple quadriceps metrics in an intuitive way
-   - Approach: Using tabbed interfaces and color-coding to separate different measurement types
-
-2. **Treatment Group Comparison**
-   - Challenge: Creating meaningful visual comparisons between the three treatment approaches
-   - Approach: Using side-by-side bars/charts with clear labeling and statistical indicators
-
-3. **Multiple Patient Populations**
-   - Challenge: Supporting different assessment tools for each population
-   - Approach: Building flexible components that adapt based on patient population type
-
-4. **Temporal Data Analysis**
-   - Challenge: Clearly showing progress across baseline, 2-week, and 6-week measurements
-   - Approach: Consistent timeline visualization with clear markers for each measurement point
+4. **Document API changes**
+   - Update API documentation with new endpoint structure
+   - Document required payload formats and response structures
+   - Add example requests and responses
 
 ## Learnings & Project Insights
 
-1. **Clinical Focus Alignment**
-   - Learning: Visualization components must align precisely with the clinical measurements
-   - Insight: Regular consultation with clinical stakeholders is essential to ensure relevance
-
-2. **Treatment Protocol Visualization**
-   - Learning: Different training protocols (standard vs. cluster sets) need clear visual differentiation
-   - Insight: Use consistent visual language to represent rest periods, sets, and repetitions
-
-3. **Population-Specific Requirements**
-   - Learning: Each patient population has unique assessment tools and baselines
-   - Insight: Dashboard must adapt dynamically to the specific population being viewed
-
-4. **Measurement Integration**
-   - Learning: Various measurement tools (MicroFET, ultrasound, etc.) produce different data formats
-   - Insight: Create a standardized data model that can accommodate all measurement types
-
-## Current Blockers
-- ~~Supabase authentication through Nginx proxy (needs fixing)~~ RESOLVED
-- **Shadcn UI Vue component styling** with Tailwind 4 (Task #27 created to address)
-- Realtime update implementation for patient metrics
-
-## Performance Considerations
-- Minimize API calls to Supabase by caching where appropriate
-- Optimize image uploads and storage for patient uploads
-- Use connection pooling for database connections
-- Ensure styled components are optimized for performance
-
-## Security Considerations
-- Ensuring secure handling of patient data
-- Proper RBAC implementation
-- Regular security reviews of data access patterns
-- Sanitizing user inputs to prevent injection attacks 
+- **API Path Consistency**: The importance of consistent API path structures between frontend, nginx configuration, and backend routes
+- **Docker Multi-Stage Builds**: For complex scientific Python libraries, multi-stage builds can separate compilation environments from runtime
+- **Dependency Management**: Scientific Python libraries often require careful management of system dependencies beyond what Poetry installs
+- **Nginx Configuration**: Subtle differences in location blocks (e.g., `/api` vs `/api/`) can have significant impacts on request routing 
