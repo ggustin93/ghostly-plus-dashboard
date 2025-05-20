@@ -92,62 +92,100 @@ description: Tracks what works, what's left to build, current status, known issu
 
 ## What's Left to Build (Dashboard Focus, Supporting GHOSTLY+ Proposal WPs):
 
-### Phase 3: Authentication and Authorization System (Supporting WP2, WP3, WP4, WP5)
+### Phase 3: Authentication and Authorization System (Supporting WP2, WP3, WP4, WP5 - aligns with `UX_UI_specifications.md` Admin persona A1-A2)
 1. ✅ Implement basic email/password login (Done in consolidated React frontend).
 2. ✅ Implement session management (Done via Supabase client/Context).
-3. ⏳ Integrate password reset functionality (Requires UI form and potentially Supabase Edge Function/backend logic).
-4. ⏳ Add user registration functionality (If needed, likely requires admin action or separate form).
-5. ⏳ Set up role-based access control (RBAC) - Requires defining roles (e.g., in a `profiles` table) and checking them.
-6. ⏳ Develop admin interface for user management (Current focus - `/admin` page).
+3. ⏳ Integrate password reset functionality (Requires UI form and potentially Supabase Edge Function/backend logic - **A2**).
+4. ⏳ Add user registration functionality (Likely admin-initiated or specific form for new study personnel - **A1, A2**).
+5. ⏳ Set up role-based access control (RBAC) - Requires defining roles (Therapist, Researcher, Admin in `User` table) and checking them in frontend/backend - **A1**.
+6. ⏳ Develop admin interface for user management (user listing, role assignment, (de)activation - **A1, A2**).
 
-### Phase 4: Basic Dashboard Components (Supporting WP2, WP3, WP4, WP5)
-1. 🔄 Create responsive dashboard layout (e.g., using Shadcn components, potentially a sidebar/header).
-2. 🔄 Implement navigation menu (within the dashboard layout).
-3. 🔄 Design and build dashboard homepage (main content area after login).
-4. ✅ Develop user profile page (`/account` - basic version done).
-5. ✅ Implement C3D file upload component with processing options.
-6. ✅ Create EMG analysis visualization component.
-7. ✅ Add dashboard quick-access card for C3D uploads.
-8. ⏳ **Support for RCT Management (WP3, WP4):**
-    -   Participant list views with status indicators (recruited, active, completed, dropout).
-    -   Forms/interface for logging baseline (T0), 1-week (T1), and discharge (T2) assessment data (MicroFet, ultrasound findings, functional tests, questionnaire summaries if not externally managed).
-    -   Interface for managing/viewing BFR cuff pressure settings (e.g., AOP, %MVC used) per session if logged.
-    -   Tracking adherence to intervention (e.g., GHOSTLY+ session frequency, duration from game logs).
+### Phase 4: Therapist Persona - Core Functionalities (Aligns with `UX_UI_specifications.md` Section 4.1 - T1-T5)
+1.  **T1: Personalized Dashboard & Patient List:**
+    *   ⏳ Display assigned patient list with key identifiers (e.g., pseudo-ID, study group).
+    *   ⏳ Show alerts for overdue tasks or critical patient updates.
+    *   ⏳ List upcoming Rehabilitation Sessions.
+2.  **T2: Patient Profile & Clinical Data Management:**
+    *   ⏳ Interface to view/manage detailed patient profiles (`Patient` table: demographics, medical history, consent status).
+    *   ⏳ Forms for inputting/tracking clinical assessment data (`ClinicalAssessment`, `ClinicalOutcomeMeasure` tables) at T0, T1, T2, including:
+        *   Core GHOSTLY+ measures (e.g., muscle strength, functional tests detailed in specs).
+        *   Optional/Further measures (e.g., muscle morphology, body comp, QoL, as per clinical_trial_info.md, if deemed necessary).
+    *   ⏳ Interface for managing MVC calibration data (`MVCCalibration` table).
+3.  **T3: Rehabilitation & Game Session Management & Monitoring:**
+    *   ⏳ Interface to schedule/log/manage Rehabilitation Sessions (`RehabilitationSession` table).
+    *   ⏳ For each Rehab Session, manage one or more Game Sessions (`GameSession` table), including:
+        *   Configuration of game parameters (level from `GameLevel`, DDA review - `dda_parameters_snapshot` in `GameSession`).
+        *   BFR protocol application details (`bfr_applied` in `GameSession`).
+        *   sEMG sensor selection (`sensor_type_used` in `GameSession`).
+    *   ⏳ Review detailed analysis of individual Game Sessions:
+        *   Visualizations of EMG data (raw from C3D, processed).
+        *   Display of key sEMG-derived metrics (`EMGCalculatedMetric` table from `EMGMetricDefinition` - RMS, MAV/MAD, fatigue indices, etc., as per WP2.3).
+        *   Display of game performance statistics (`GamePlayStatistic` table - duration, intensity, activation points, etc., as per WP2.3).
+4.  **T4: Session Configuration (BFR & Game Setup):**
+    *   ⏳ Detailed UI for configuring BFR settings (AOP, LOP determination support, target pressure).
+    *   ⏳ UI for configuring GHOSTLY+ game parameters (e.g., selecting levels from `GameLevel`, adjusting difficulty if DDA is not fully auto, reviewing DDA settings).
+    *   ⏳ Interface for initiating and logging MVC calibration procedures (`MVCCalibration` table).
+5.  **T5: Clinical Documentation & Reporting (MVP focus on GHOSTLY+ specific):**
+    *   ⏳ Interface to add/edit/view clinical notes for Rehab/Game Sessions (`overall_notes` in `RehabilitationSession`).
+    *   ⏳ Generate GHOSTLY+ specific progress reports (MVP) summarizing sEMG/game metrics from `EMGCalculatedMetric`/`GamePlayStatistic` and core clinical outcomes from `ClinicalOutcomeMeasure`, referencing WP2.3 data.
+    *   ⏳ (Non-MVP/Further) Broader clinical progress reports for export (e.g., for REDCap).
 
-### Phase 5: Data Processing and Visualization (Supporting WP2, WP4, WP5)
-1. ✅ Create API (FastAPI) for C3D file processing (Basic endpoint created at `/v1/c3d/upload`).
+### Phase 5: Researcher Persona - Core Functionalities (Aligns with `UX_UI_specifications.md` Section 4.2 - R1-R3)
+1.  **R1: Study Dashboard & Oversight:**
+    *   ⏳ Display study-wide dashboard: patient counts per site (`HospitalSite` links), recruitment/retention metrics.
+    *   ⏳ Overview of adherence/compliance based on `GamePlayStatistic` and `RehabilitationSession` (WP2.3 data).
+    *   ⏳ Data quality monitoring (e.g., missing assessments from `ClinicalAssessment`).
+2.  **R2: Data Exploration & Analysis:**
+    *   ⏳ Interface for pseudonymized data exploration: `Patient`, `ClinicalAssessment`, `ClinicalOutcomeMeasure`, `RehabilitationSession`, `GameSession`, `EMGCalculatedMetric`, `GamePlayStatistic`, `MVCCalibration` data.
+    *   ⏳ Tools for cohort comparisons (Intervention vs. Control - `study_group` in `Patient` table).
+    *   ⏳ Visualization of outcome changes over time (longitudinal data from assessments and sessions).
+    *   ⏳ Analysis of DDA parameter usage (`dda_parameters_snapshot` in `GameSession`).
+3.  **R3: Data Export & Reporting:**
+    *   ⏳ Robust export functionality for pseudonymized datasets (CSV, SPSS/REDCap compatible formats), including all WP2 data and clinical measures (`EMGCalculatedMetric`, `GamePlayStatistic`, `ClinicalOutcomeMeasure`, etc.).
+
+### Phase 6: Administrator Persona - Core Functionalities (Aligns with `UX_UI_specifications.md` Section 4.3 - A1-A4)
+1.  **A1: User & Access Management:**
+    *   ⏳ Manage user accounts (`User` table - create, edit, (de)activate).
+    *   ⏳ Assign roles (Therapist, Researcher, Admin to `User.role`).
+    *   ⏳ Assign patients (`Patient` table) to therapists (`Therapist` table).
+    *   ⏳ Manage site access if necessary (`HospitalSite` table).
+2.  **A2: System Configuration & Maintenance:**
+    *   ⏳ Manage study parameters (e.g., site details in `HospitalSite`, potentially game level definitions in `GameLevel` if not hardcoded).
+    *   ⏳ View audit logs (requires logging mechanism).
+    *   ⏳ Manage `EMGMetricDefinition` if extensible.
+3.  **A3: Data Integrity & Management:**
+    *   ⏳ Monitor data quality and completeness (e.g., orphaned records, missing C3D file links in `GameSession.c3d_file_storage_path`).
+    *   ⏳ Oversee data backup/restore procedures (Supabase managed mostly, but admin needs awareness).
+    *   ⏳ Manage data export configurations for REDCap/other systems.
+4.  **A4: System Health & Monitoring:**
+    *   ⏳ Dashboard for system performance (DB connections, API response times, storage usage from Supabase Storage).
+    *   ⏳ Error log monitoring.
+
+### Phase 7: Backend sEMG Processing & Game Data Integration (Supporting WP2, WP3)
+1. ✅ Create API (FastAPI) for C3D file processing (Basic endpoint created at `/v1/c3d/upload` - `GameSession.c3d_file_storage_path` is key).
 2. ✅ Implement file upload functionality (Frontend API client created with TypeScript interfaces).
-3. 🔄 Develop 3D visualization components (possibly using libraries like Three.js) - *Currently EMG waveform vis is 2D, 3D might be for biomechanical models if relevant later.*
-4. 🔄 Create data analysis and reporting modules (potentially leveraging the separate Python analytics service).
-    -   Generation of reports for individual patients (clinical progress).
-    -   Tools for researchers to compare groups (Intervention vs. Control) based on collected outcome measures.
-5. ⏳ Implement additional validation for file uploads.
-6. ⏳ Add more detailed error handling for file processing.
-7. ⏳ Add visualization options for different muscle groups.
-8. ⏳ **Implement sEMG-derived metrics calculation in backend (WP2, WP5):** As per proposal (fatigue, strength, mass estimation) and display relevant metrics/reports in dashboard.
-9. ⏳ **Data Export (WP5):** Robust export functionality for pseudonymized data in formats suitable for SPSS/REDCap.
+3. ⏳ **Implement detailed sEMG-derived metrics calculation in backend ([WP2_proposal_detailed.md](mdc:docs/00_PROJECT_DEFINITION/ressources/WP2_proposal_detailed.md) Task 2.3, WP5):** As per proposal (fatigue indicators, strength/force estimations, mass estimations) and store in `EMGCalculatedMetric` table, linking to `GameSession` and `EMGMetricDefinition`.
+4. ⏳ **Process and store detailed game statistics (WP2.3)** from game logs/C3D into `GamePlayStatistic` table, linking to `GameSession` and `GameLevel`.
+5. ⏳ **Log DDA parameters (WP2.4)** used during a `GameSession` into `GameSession.dda_parameters_snapshot`.
+6. ⏳ Establish API endpoints for game to send detailed logs if C3D is insufficient for all WP2.3/WP2.4 data.
+7. ⏳ Ensure backend processing can handle data from different sensor types if integrated per WP2.2 (`GameSession.sensor_type_used`).
 
-### Phase 6: Integration with Existing Game (GHOSTLY+ game - WP2)
-1. 🔄 Establish API endpoints for game data exchange (C3D upload is one part; potentially DDA parameters, game settings, detailed logs).
-2. 🔄 Implement user progress synchronization.
-3. 🔄 Develop game session management.
+### Phase 8: Advanced Features & Refinements (Post-MVP)
+1. 🔄 Implement advanced data export options (custom queries, scheduled reports).
+2. 🔄 Develop therapist annotation tools for EMG/game data.
+3. 🔄 Implement more sophisticated patient progress tracking visualizations (longitudinal trends, comparative views).
+4. 🔄 Implement features for multi-site data segregation/tagging if needed (`Patient.hospital_id`, `Therapist.hospital_id`).
 
-### Phase 7: Advanced Features
-1. 🔄 Implement data export functionality.
-2. 🔄 Create therapist annotation tools.
-3. 🔄 Develop patient progress tracking.
+### Phase 9: Testing and Optimization
+1. 🔄 Set up comprehensive automated testing framework (unit, integration, E2E for all personas and features T1-T5, R1-R3, A1-A4).
+2. 🔄 Perform security audit (OWASP Top 10, data handling).
+3. 🔄 Optimize performance for large datasets and concurrent users.
+4. 🔄 Conduct user acceptance testing with actual Therapists, Researchers, and Admins.
 
-### Phase 8: Testing and Optimization
-1. 🔄 Set up automated testing framework.
-2. 🔄 Perform security audit.
-3. 🔄 Optimize performance.
-4. 🔄 Conduct user acceptance testing.
-
-### Phase 9: Deployment and Documentation (Supporting WP6 - Utilisation)
-1. 🔄 Create deployment scripts.
-2. 🔄 Prepare user and administrator documentation (including details for physiotherapists on using dashboard for GHOSTLY+ protocol).
+### Phase 10: Deployment and Documentation (Supporting WP6 - Utilisation)
+1. 🔄 Create deployment scripts for VUB private VM.
+2. 🔄 Prepare detailed user and administrator documentation for all features (T1-T5, R1-R3, A1-A4), including GHOSTLY+ protocol specifics for therapists.
 3. 🔄 Develop maintenance procedures.
-4. ⏳ **Prepare for Multi-Site Data Handling (WP3, WP4):** Ensure dashboard can segregate or tag data by hospital site (UZB, UZA, UZL Pellenberg) if needed for analysis or site-specific views.
 
 ## Project Status & Progress Notes:
 
@@ -191,6 +229,7 @@ description: Tracks what works, what's left to build, current status, known issu
 - ✅ Implemented frontend components for file upload and analysis visualization.
 - ✅ Added routing and integration with existing application.
 - ✅ Fixed Nginx configuration to resolve 502 Bad Gateway errors.
+- ⚠️ **Further work needed to implement detailed sEMG metrics calculation (WP2.3) and DDA data handling (WP2.4, WP2.5) in the backend, and corresponding frontend displays.**
 
 ## Known Issues:
 
@@ -210,6 +249,15 @@ description: Tracks what works, what's left to build, current status, known issu
   - Removed duplicate `/api` prefixes in frontend API client
   - Added proper nginx location blocks for both `/api/` and `/v1/` paths
   - Created consistent API path structure across entire application
+
+### Data Presentation in UX/UI Specifications (Therapist Persona):
+- **Evolution**: The structure and numbering of data tables within the Therapist Persona section of `docs/00_PROJECT_DEFINITION/UX_UI_specifications.md` were refined.
+- **Details**:
+    - Key feature categories were logically reordered.
+    - Data tables were renumbered sequentially (3.1.1 through 3.1.5) to align with the new feature order.
+    - The former "Table 3.1.2: Intervention Adherence & Contextual Data" was removed, as its specific data points were deemed redundant or better integrated into other feature descriptions or general session notes, streamlining the documented data requirements.
+    - Minor textual clarifications, like adding "- Main interface" to the Therapist persona overview, were incorporated.
+- **Rationale**: To improve clarity, reduce redundancy, and ensure a more logical flow of information in the specifications guiding UI/UX development for the therapist interface.
 
 ### C3D Upload and EMG Analysis UI:
 - **Initial implementation**: Basic file upload component with minimal options

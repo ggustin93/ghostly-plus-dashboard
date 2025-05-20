@@ -5,7 +5,62 @@ source_documents: [docs/00_PROJECT_DEFINITION/ressources/2024_ghostly_proposal.m
 
 # GHOSTLY+ Dashboard: Active Context
 
-**Foundational Context Note:** This document reflects the ongoing development of the GHOSTLY+ Web Dashboard. The project's overarching scope, research aims, and initial planning (including Work Package definitions) are detailed in the **[FWO Proposal (April 2024)](mdc:docs/00_PROJECT_DEFINITION/ressources/2024_ghostly_proposal.md)**. The dashboard primarily supports WP2 (Game & Dashboard Development), WP3 (RCT & Interventions), WP4 (Data Collection), and WP5 (Data Analyses) of that proposal.
+**Foundational Context Note:** This document reflects the ongoing development of the GHOSTLY+ Web Dashboard. The project's overarching scope, research aims, and initial planning (including Work Package definitions) are detailed in the **[FWO Proposal (April 2024)](mdc:docs/00_PROJECT_DEFINITION/ressources/2024_ghostly_proposal.md)**. The dashboard primarily supports WP2 (Game & Dashboard Development), WP3 (RCT & Interventions), WP4 (Data Collection), and WP5 (Data Analyses) of that proposal. **Specific tasks and deliverables from [WP2_proposal_detailed.md](mdc:docs/00_PROJECT_DEFINITION/ressources/WP2_proposal_detailed.md), such as sEMG metric implementation, multi-sensor considerations, and dynamic difficulty adjustment data handling, should be actively integrated into development sprints and reflected in this document as they are addressed.**
+
+## Current Work Focus (as of [Current Date]):
+
+-   **Primary Focus:** Refining and implementing the detailed user functionalities and data management strategies as outlined in the **`docs/00_PROJECT_DEFINITION/UX_UI_specifications.md`** document. This document now serves as the primary guide for feature development across all three user personas (Therapist, Researcher, Administrator).
+-   **Data Modeling & Backend Alignment:** Ensuring all backend development (FastAPI) and frontend data handling aligns with the structure defined in **`docs/00_PROJECT_DEFINITION/database_schema_simplified_research.md`**. This includes correct mapping of UI elements to database tables like `Patient`, `RehabilitationSession`, `GameSession`, `ClinicalAssessment`, `ClinicalOutcomeMeasure`, `EMGCalculatedMetric`, `GamePlayStatistic`, `User`, etc.
+-   **Therapist Persona Implementation (MVP):** Prioritizing the core features for the Therapist persona (T1-T5 in `UX_UI_specifications.md`), focusing on patient management, clinical data input (core measures), rehabilitation/game session management, and basic progress monitoring (sEMG/game metrics).
+-   **Backend sEMG Metric Calculation:** Advancing the backend logic for calculating and storing key sEMG-derived metrics (WP2.3) into the `EMGCalculatedMetric` table, as these are crucial for both Therapist and Researcher views.
+-   **User Story Prioritization:** Reviewing and assigning priorities (e.g., Must-have, Should-have for MVP) to the user stories (T1-T5, R1-R3, A1-A4) within `UX_UI_specifications.md` to guide phased implementation.
+
+## Recent Changes & Decisions:
+
+-   **Comprehensive UX/UI Specification Update:** The `docs/00_PROJECT_DEFINITION/UX_UI_specifications.md` document has been extensively updated to include:
+    -   Detailed feature lists (user stories T1-T5, R1-R3, A1-A4) structured in tables.
+    -   Clear persona definitions with Executive Summaries, Primary Goals, Pain Points, and Reference Contacts.
+    -   Consolidated EMG/Game metric definitions, referencing a new Section 9 (Parameter Tables).
+    -   Introduction of simple text-based user flow diagrams.
+    -   Addition of "Key UX Discussion Points" for certain screens.
+    -   Addition of a disclaimer regarding reliance on `2024_ghostly_proposal.md` and `clinical_trial_info.md` and the need for research team validation.
+    -   Restructuring of content to group information by interface/persona.
+-   **Refinement of Data Tables in UX/UI Specifications:** Further cleanup and restructuring within `docs/00_PROJECT_DEFINITION/UX_UI_specifications.md` (Therapist Persona section) involved:
+    -   Renumbering of data tables (previously 3.1.3, 3.1.4, 3.1.5, 3.1.1, 3.1.2 became 3.1.1 through 3.1.5 in the new order of features).
+    -   Removal of the old "Table 3.1.2: Intervention Adherence & Contextual Data" as its content was either redundant or better integrated elsewhere, simplifying the data points to be collected/displayed for session context.
+    -   Minor textual clarifications, including the addition of "- Main interface" to the Therapist persona overview.
+-   **Database Schema Formalized:** A simplified research database schema has been documented in `docs/00_PROJECT_DEFINITION/database_schema_simplified_research.md`, providing a clear ERD and table definitions. This schema is now a core reference for development.
+-   **Memory Bank Update:** All Memory Bank files (`projectbrief.md`, `productContext.md`, `systemPatterns.md`, `techContext.md`, `progress.md`, and this `activeContext.md`) have been updated to reflect the new level of detail from `UX_UI_specifications.md` and `database_schema_simplified_research.md`.
+-   **Redundancy Reduction in UX Specs:** Executive Summaries and Primary Goals in `UX_UI_specifications.md` were reviewed, and merged for the Administrator persona to reduce redundancy.
+
+## Next Steps & Immediate Priorities:
+
+1.  **Research Team Validation of UX Specifications:** Crucially, the updated `docs/00_PROJECT_DEFINITION/UX_UI_specifications.md` needs to be reviewed and validated by the GHOSTLY+ research team to confirm assumptions and clarify requirements before extensive implementation.
+2.  **Prioritize User Stories (MoSCoW):** Fill in the "Priority / Notes" column for all user stories (T1-T5, R1-R3, A1-A4) in `UX_UI_specifications.md` using MoSCoW or a similar framework, in collaboration with the research team if possible.
+3.  **Backend Development for Core Therapist Features:**
+    -   Develop FastAPI endpoints to support T1-T3 functionalities, ensuring data is created/retrieved according to `database_schema_simplified_research.md` (e.g., creating/updating `Patient`, `RehabilitationSession`, `GameSession`, `ClinicalAssessment`, `ClinicalOutcomeMeasure` records).
+    -   Implement logic for calculating and storing core sEMG metrics (e.g., RMS, MAV) into `EMGCalculatedMetric` based on C3D file processing or direct data streams.
+    -   Implement logic for processing and storing game statistics into `GamePlayStatistic`.
+4.  **Frontend Development for Core Therapist Features:**
+    -   Build React components for Therapist views (T1: Dashboard/Patient List, T2: Patient Profile/Clinical Data Entry, T3: Session Management/Monitoring).
+    -   Integrate these components with the new backend APIs.
+    -   Focus on clear visualization of clinical data, sEMG metrics, and game stats.
+5.  **Refine Data Flow for Game Data:** Solidify how detailed game log data (beyond C3D, if necessary for WP2.3/WP2.4 metrics) will be transmitted from the game to the backend and stored (e.g., potentially new tables or extended fields in `GamePlayStatistic` or `GameSession`).
+
+## Key Patterns & Preferences Emerging:
+
+-   **Document-Driven Development:** `UX_UI_specifications.md` and `database_schema_simplified_research.md` are now central artifacts guiding development.
+-   **Modular Design:** Continue with feature-based organization in both frontend (React components) and backend (FastAPI routers/services).
+-   **Clear Separation of Concerns:** Maintain distinct responsibilities between frontend (UI/UX, client-side state), backend (business logic, data processing, security), and Supabase (data storage, auth, BaaS utilities).
+-   **Iterative Refinement:** Expect further refinements to `UX_UI_specifications.md` based on research team feedback and initial implementation experiences.
+
+## Learnings & Project Insights:
+
+-   The detailed UX specification process has highlighted the complexity and interconnectedness of data required for the GHOSTLY+ dashboard. Having a clear, validated set of requirements is paramount before deep coding.
+-   Formalizing the database schema early, even in a simplified form, provides significant clarity for both backend and frontend development.
+-   Regularly updating the Memory Bank is crucial for maintaining a shared understanding of the project's evolving state, especially with detailed documents like the UX specifications.
+
+*(Ensure to replace [Current Date] with the actual date of this update.)*
 
 ## Current Status: Phase 4 (C3D Processing & EMG Analysis) - React Frontend
 
@@ -187,16 +242,6 @@ source_documents: [docs/00_PROJECT_DEFINITION/ressources/2024_ghostly_proposal.m
   - `create_storage_buckets.js` - Script to set up necessary storage buckets.
   - `install_supabase_js.sh` - Utility to install required dependencies.
 - Updated `[docs/development_workflow.md](mdc:docs/development_workflow.md)` to reference the new local setup guides.
-
-## Next Steps (Today)
-
-1.  Further optimize Nginx configuration for handling large file uploads.
-2.  Work on integrating the EMG analysis results with the patient record system.
-3.  Refine EMG analysis components to support metrics outlined in GHOSTLY+ proposal (WP2, Task 2.3), such as:
-    -   Muscle fatigue indicators (e.g., spectral indices, time-frequency analysis features).
-    -   Muscle strength/force estimations (sEMG-force modeling).
-    -   Muscle mass estimations (regression models using sEMG and other parameters, for comparison with ultrasound data from WP4).
-4.  Plan for Dynamic Difficulty Adjustment (DDA) data logging and potential dashboard interfaces if therapist/researcher input is needed for DDA algorithms (as per GHOSTLY+ proposal WP2, Task 2.4).
 
 ## Additional Investigation Needed
 
