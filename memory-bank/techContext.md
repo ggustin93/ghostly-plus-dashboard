@@ -38,17 +38,17 @@ source_documents: [docs/prd.md](mdc:docs/prd.md) (Section 4), [docs/security.md]
 
 - **Framework:** FastAPI
 - **Language:** Python 3.11+
-- **Data Validation:** Pydantic
-- **Database Interaction:** SQLAlchemy (for potential future DB interactions beyond Supabase direct access)
+- **Data Validation:** Pydantic (used for API request/response models, aligning with `docs/00_PROJECT_DEFINITION/database_schema_simplified_research.md` entities where applicable for data transfer objects).
+- **Database Interaction:** SQLAlchemy (for potential future complex DB interactions beyond Supabase direct access or simple ORM needs if FastAPI directly queries PostgreSQL). Primarily, FastAPI will process data and rely on Supabase's PostgreSQL capabilities, interacting with tables like `Patient`, `RehabilitationSession`, `GameSession`, `EMGCalculatedMetric`, `GamePlayStatistic`, `ClinicalAssessment`, etc.
 - **Package Manager:** Poetry
-- **Potential Libraries for sEMG Analysis (as per proposal WP2, Task 2.3)**: Libraries for calculating RMS, MAV/MAD, VAR, spectral indices, time-frequency analysis (e.g., `scipy.signal`, `numpy`, `pandas`, potentially specialized biomechanics libraries). Libraries for sEMG-force modeling and regression (e.g., `scikit-learn`).
+- **Potential Libraries for sEMG Analysis (as per proposal WP2, Task 2.3, and [WP2_proposal_detailed.md](mdc:docs/00_PROJECT_DEFINITION/ressources/WP2_proposal_detailed.md))**: Libraries for calculating RMS, MAV/MAD, VAR, spectral indices (e.g., Dimitrov\'s), time-frequency analysis (e.g., Hilbert-Huang using `PyEMD` or similar, wavelet transforms using `pycwt`), sEMG-force modeling, and regression (e.g., `scipy.signal`, `numpy`, `pandas`, `scikit-learn`, potentially specialized biomechanics libraries like `biosppy`). Results of these analyses would populate tables like `EMGCalculatedMetric`.
 
 ### 1.3. Database & BaaS (Data Infrastructure - WP4)
 
 - **Platform:** Supabase (Self-Hosted on VUB Private VM)
-- **Core Database:** PostgreSQL (v15+)
-- **Authentication:** Supabase Auth (GoTrue)
-- **Storage:** Supabase Storage
+- **Core Database:** PostgreSQL (v15+). The schema is detailed in `docs/00_PROJECT_DEFINITION/database_schema_simplified_research.md`, defining tables such as `User`, `Patient`, `HospitalSite`, `Therapist`, `RehabilitationSession`, `GameSession`, `MVCCalibration`, `GameLevel`, `EMGMetricDefinition`, `EMGCalculatedMetric`, `GamePlayStatistic`, `ClinicalAssessment`, and `ClinicalOutcomeMeasure`.
+- **Authentication:** Supabase Auth (GoTrue) - Manages users stored in the `User` table.
+- **Storage:** Supabase Storage - For C3D files (linked from `GameSession` table), reports, etc.
 - **API Gateway:** Supabase Kong
 - **Realtime:** Supabase Realtime (Currently disabled in local dev)
 - **Edge Functions:** Supabase Edge Functions (Deno Runtime) - *Used for specific privileged operations or transformations.*
@@ -62,9 +62,9 @@ source_documents: [docs/prd.md](mdc:docs/prd.md) (Section 4), [docs/security.md]
 ### 1.5. Game Client & Intervention Hardware (WP2, WP3)
 
 - **Platform:** Android (Tablet)
-- **Framework:** MonoGame (via OpenFeasyo for existing Ghostly game, to be adapted to GHOSTLY+)
+- **Framework:** MonoGame (via OpenFeasyo for existing Ghostly game, to be adapted to GHOSTLY+ as per **WP2.1 of [WP2_proposal_detailed.md](mdc:docs/00_PROJECT_DEFINITION/ressources/WP2_proposal_detailed.md)** - new levels, functionalities like long/short contraction discrimination, DDA).
 - **Language:** C#
-- **EMG Sensors:** Delsys Trigno Avanti (primary for RCT), with WP2 task to explore/integrate other (low-cost) wireless sEMG sensors.
+- **EMG Sensors:** Delsys Trigno Avanti (primary for RCT), with WP2 task (**WP2.2 of [WP2_proposal_detailed.md](mdc:docs/00_PROJECT_DEFINITION/ressources/WP2_proposal_detailed.md)**) to explore/integrate other (low-cost) wireless sEMG sensors.
 - **BFR Cuffs:** Smart Cuffs system (Smart Tools, USA) or similar, for applying Blood Flow Restriction during exercises.
 
 ### 1.6. Clinical Measurement & External Tools (WP4, WP5)
@@ -112,8 +112,8 @@ source_documents: [docs/prd.md](mdc:docs/prd.md) (Section 4), [docs/security.md]
 
 - `fastapi`: Web framework
 - `uvicorn`: ASGI server
-- `pydantic`: Data validation
-- `sqlalchemy`: ORM (for potential future use)
+- `pydantic`: Data validation (for API models reflecting entities in `docs/00_PROJECT_DEFINITION/database_schema_simplified_research.md`)
+- `sqlalchemy`: ORM (for potential direct PG interaction if needed)
 - `python-jose[cryptography]`: JWT handling
 - `supabase-py`: Python client for Supabase (if needed by FastAPI directly)
 - `python-dotenv`: Environment variable management
@@ -123,6 +123,7 @@ source_documents: [docs/prd.md](mdc:docs/prd.md) (Section 4), [docs/security.md]
 - `scikit-learn`: For machine learning models (e.g., sEMG-force modeling, regression for muscle mass estimation).
 - `matplotlib` (optional, for server-side plot generation if needed, or for internal analysis scripting).
 - `ezc3d`: For C3D file parsing.
+- **(Potential additions based on WP2.3 sEMG metrics): `PyEMD` (for Hilbert-Huang), `pycwt` (for wavelet analysis), `biosppy` (for general biosignal processing features).**
 
 ### 4.3. Supabase / Infrastructure
 
@@ -146,9 +147,9 @@ source_documents: [docs/prd.md](mdc:docs/prd.md) (Section 4), [docs/security.md]
 - **Authentication:** JWT-based via Supabase Auth. Tokens issued by Supabase are validated by backend services (FastAPI, Edge Functions).
 - **Authorization:** Primarily handled by RLS policies in Supabase PostgreSQL. Role-based logic can be implemented in backend services or Edge Functions where needed.
 - **CORS:** Configured in Supabase Kong (via `supabase_cors_config.sh` or Studio) and potentially in FastAPI if needed. Nginx proxy configuration also handles routing.
-- **Secrets Management:** API keys, JWT secrets, service keys stored in `.env` files (root for Docker Compose/Supabase, `frontend-2` for Next.js build-time vars, `backend` for FastAPI). **SERVICE_ROLE_KEY and other sensitive keys MUST NOT be exposed client-side.** Edge Functions provide a secure environment for using `service_role`.
+- **Secrets Management:** API keys, JWT secrets, service keys stored in `.env` files (root for Docker Compose/Supabase, `frontend` for React build-time vars, `backend` for FastAPI). **SERVICE_ROLE_KEY and other sensitive keys MUST NOT be exposed client-side.** Edge Functions provide a secure environment for using `service_role`.
 - **Environment Variables:**
-    - `frontend-2`: Uses `NEXT_PUBLIC_` prefix for browser-accessible vars (e.g., `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`). Server-side logic in Next.js can access non-prefixed vars.
+    - `frontend`: Uses `VITE_` prefix for browser-accessible vars (e.g., `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`).
     - `backend`: Loaded via `python-dotenv`.
     - `supabase_config`: Loaded via root `.env` file by Docker Compose.
 
@@ -166,8 +167,8 @@ source_documents: [docs/prd.md](mdc:docs/prd.md) (Section 4), [docs/security.md]
 
 - **`supabase-py` (FastAPI Backend - Optional Use):**
     - The FastAPI service primarily **verifies JWTs** (using `python-jose` or potentially helpers from `supabase-py`) to authorize requests.
-    - For data interaction, FastAPI will often connect **directly to the PostgreSQL database** (e.g., using SQLAlchemy) for complex queries, analytics, and operations where its own logic dictates access.
-    - `supabase-py` *might* be used for convenience for simpler interactions like basic storage access or auth utility functions, but it's not the primary data access method for the dedicated backend.
+    - For data interaction, FastAPI will often connect **directly to the PostgreSQL database** (e.g., using SQLAlchemy or psycopg2) for complex queries, analytics, and operations involving the schema defined in `docs/00_PROJECT_DEFINITION/database_schema_simplified_research.md` (e.g., inserting into `EMGCalculatedMetric`, `GamePlayStatistic`, updating `Patient` records).
+    - `supabase-py` *might* be used for convenience for simpler interactions like basic storage access or auth utility functions, but it's not the primary data access method for the dedicated backend's core business logic concerning the detailed database schema.
 
 ## 7. Known Issues & Troubleshooting
 

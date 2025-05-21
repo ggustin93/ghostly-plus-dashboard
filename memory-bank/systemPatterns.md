@@ -7,16 +7,17 @@ source_documents: [docs/prd.md](mdc:docs/prd.md) (Section 4), [docs/security.md]
 
 ## 1. System Architecture Overview
 
-The GHOSTLY+ system is composed of existing client-side components and a new server-side extension (Web Dashboard and supporting services). The architecture is designed around Work Packages (WP) as defined in [docs/prd.md](mdc:docs/prd.md) (Section 4):
+The GHOSTLY+ system is composed of existing client-side components and a new server-side extension (Web Dashboard and supporting services). The architecture is designed around Work Packages (WP) as defined in [docs/prd.md](mdc:docs/prd.md) (Section 4) **and further detailed for WP2 in [WP2_proposal_detailed.md](mdc:docs/00_PROJECT_DEFINITION/ressources/WP2_proposal_detailed.md)**, now with a clear data structure outlined in `docs/00_PROJECT_DEFINITION/database_schema_simplified_research.md` and user interactions defined in `docs/00_PROJECT_DEFINITION/UX_UI_specifications.md`.
 
--   **WP1: Existing System Integration**: Interfacing with OpenFeasyo game (MonoGame/C# on Android) and Delsys Trigno EMG sensors. Key modification: game will authenticate via Supabase Auth and upload C3D files directly to the backend API. A single **Rehabilitation Session** (overall therapy appointment) can result in one or more C3D files, each representing a distinct **Game Session** (a single instance of playing the game).
--   **WP2: Web Dashboard (Frontend)**: **React** with **React Router**, Tailwind CSS, shadcn/ui, Context API/Zustand. Provides role-based interfaces for therapists and researchers in a single consolidated codebase. *(Migrated from Next.js to standard React with Vite for simplicity and performance, and consolidated into a single directory)*
-    -   Handles UI rendering, client-side validation, and user interactions.
+-   **WP1: Existing System Integration**: Interfacing with OpenFeasyo game (MonoGame/C# on Android) and Delsys Trigno EMG sensors. Key modification: game will authenticate via Supabase Auth and upload C3D files directly to the backend API. A single **Rehabilitation Session** (overall therapy appointment) can result in one or more C3D files, each representing a distinct **Game Session** (a single instance of playing the game). **WP2.2 outlines analysis and potential integration of alternative sEMG sensors.**
+-   **WP2: Web Dashboard (Frontend)**: React with React Router, Tailwind CSS, shadcn/ui, Context API/Zustand. Provides role-based interfaces for **Therapists, Researchers, and Administrators** in a single consolidated codebase, as detailed in `docs/00_PROJECT_DEFINITION/UX_UI_specifications.md`. *(Migrated from Next.js to standard React with Vite for simplicity and performance, and consolidated into a single directory)*
+    -   Handles UI rendering, client-side validation, and user interactions tailored to each persona.
     -   Organized by feature with clean component hierarchy.
     -   Communicates with backend services through secure API calls.
     -   Manages authentication through Supabase client, with custom fetch implementation for token handling.
--   **WP3: Service Layer (Backend API)**: FastAPI (Python), Pydantic, SQLAlchemy. Handles business logic, secure data processing, C3D handling, EMG analysis, JWT verification.
--   **WP4: Data Infrastructure**: Self-hosted Supabase (PostgreSQL for structured data, Supabase Storage for files like C3D and reports). Features RLS and encryption.
+    -   **Will display detailed sEMG-derived metrics (activation, fatigue, force/mass estimations), game engagement/adherence reports (WP2.3, WP2.5), DDA-related data (WP2.4, WP2.5), and comprehensive clinical assessment data.**
+-   **WP3: Service Layer (Backend API)**: FastAPI (Python), Pydantic, SQLAlchemy. Handles business logic, secure data processing, C3D handling (parsing, storing C3D file path), **calculation and processing of sEMG-derived metrics (activation, fatigue, force/mass estimations as per WP2.3)**, game statistic aggregation, DDA parameter logging, JWT verification. Interacts with the database structured as per `docs/00_PROJECT_DEFINITION/database_schema_simplified_research.md`.
+-   **WP4: Data Infrastructure**: Self-hosted Supabase (PostgreSQL for structured data based on `docs/00_PROJECT_DEFINITION/database_schema_simplified_research.md`, Supabase Storage for files like C3D and reports). Features RLS and encryption. **Database will store raw EMG data references (C3D paths), processed sEMG metrics (e.g., `EMGCalculatedMetric` table), game statistics (e.g., `GamePlayStatistic` table), DDA parameters (e.g., in `GameSession` table), clinical assessments (e.g., `ClinicalAssessment`, `ClinicalOutcomeMeasure` tables), patient/user/session management data, and other data as specified in WP2 and the UI/UX specifications.**
 -   **WP5: Security and Compliance**: Focus on pseudonymization (SHA-256), encryption (Fernet), GDPR, role-based access control (RBAC), Row-Level Security (RLS), audit logs, OWASP Top 10 protections. Uses Supabase Auth for authentication (JWTs) with optional 2FA/MFA.
 -   **WP6: Deployment and Operations**: Docker & Docker Compose for containerization, Nginx for reverse proxy in production. Deployment on VUB private VM.
 
@@ -42,16 +43,16 @@ flowchart TD
     subgraph CurrentSystem["🏥 EXISTING SYSTEM"]
         direction LR
         Android["📱 Android Tablet"]:::existing
-        Sensors["💪 EMG Sensors<br>Delsys Trigno"]:::existing
-        Ghostly["🎮 Ghostly Game<br>(OpenFeasyo - MonoGame/C#)"]:::existing
+        Sensors["💪 EMG Sensors<br>Delsys Trigno / Other (WP2.2)"]:::existing
+        Ghostly["🎮 GHOSTLY+ Game<br>(OpenFeasyo - MonoGame/C#)<br>Adapted for WP2.1, WP2.4"]:::existing
         LocalFiles["📄 C3D Files (Local Cache)"]:::existing
     end
 
     %% New system - streamlined
     subgraph DockerEnv["🐳 DOCKER ENVIRONMENT"]
         subgraph NewSystem["🌐 GHOSTLY+ EXTENSION"]
-            subgraph UserDashboard["📊 WEB DASHBOARD"]
-                Dashboard["**React** / Tailwind CSS / shadcn-ui<br>Context API / React Router<br>USER INTERFACES:<br>👨‍⚕️ Therapists (Patient Mgmt, Progress)<br>🔬 Researchers (Analytics, Cohorts)<br>⚙️ Admin (User & System Mgmt)<br>*(Prev: Next.js)*"]:::frontend
+            subgraph UserDashboard["📊 WEB DASHBOARD (React/Vite)"]
+                Dashboard["**UI for Personas (UX/UI Specs)**:<br>👨‍⚕️ Therapists (Patient Mgmt, Clinical Data, Intervention Config, Progress Monitoring)<br>🔬 Researchers (Study Oversight, Data Exploration, Cohort Analysis)<br>⚙️ Admin (User & System Mgmt, Data Integrity)"]:::frontend
             end
             
             API["🔌 REST API<br>(FastAPI - Python)"]:::api
@@ -63,7 +64,7 @@ flowchart TD
             end
             
             subgraph SupabaseCloud["☁️ SUPABASE PLATFORM (Self-Hosted)"]
-                Database["💾 PostgreSQL<br>Database"]:::database
+                Database["💾 PostgreSQL<br>(Schema: database_schema_simplified_research.md)<br>Patient Data, Clinical Assessments, Rehab/Game Sessions, EMG Metrics, Game Stats, User Roles, etc."]:::database
                 FileStore["📁 Supabase Storage<br>(Reports/C3D)"]:::database
                 Auth["🔑 Supabase Auth<br>(JWT)"]:::supabase
             end
@@ -176,11 +177,11 @@ The application follows a **versioned API structure** with clear domain separati
 
 ## 3. Component Relationships
 
--   **Ghostly Game (OpenFeasyo)**: Collects EMG data for each **Game Session** -> Authenticates *directly* with Supabase Auth -> Uploads C3D file(s) (one per Game Session, potentially batched per **Rehabilitation Session**) to FastAPI Backend (sending JWT).
--   **Web Dashboard (React)**: User Interface (React components) -> Authenticates *directly* with Supabase Auth (using `@supabase/js`/`@supabase/ssr`) -> Manages auth state -> Communicates with FastAPI Backend (sending JWT) to manage **Rehabilitation Sessions** and their associated **Game Session** data (C3D files) -> Leverages Next.js server features (Server Components, Route Handlers using `@supabase/ssr`) for integrated backend tasks/data fetching within user context (RLS enforced) -> May call Edge Functions for specific privileged actions.
--   **FastAPI Backend**: Receives requests from Game & Dashboard -> **Verifies JWTs** (issued by Supabase Auth) -> Processes business logic (e.g., associating multiple C3D files/Game Sessions with a single Rehabilitation Session) -> Interacts **directly with Supabase DB (PostgreSQL)** via ORM/driver for complex logic/analytics -> Handles encryption/decryption & pseudonymization -> May use `supabase-py` optionally for simple tasks.
--   **Supabase Auth**: Issues JWTs upon successful authentication.
--   **Supabase Database (PostgreSQL)**: Stores application data, including a clear structure to link multiple **Game Sessions (C3D files)** to a parent **Rehabilitation Session**; enforces RLS based on JWT claims for direct access from React/clients.
+-   **GHOSTLY+ Game (OpenFeasyo Adaptation)**: Collects EMG data for each **Game Session** -> Authenticates *directly* with Supabase Auth -> Uploads C3D file(s) (one per Game Session, potentially batched per **Rehabilitation Session**) to FastAPI Backend (sending JWT). Game stores/sends data related to game levels, DDA parameters used, and basic performance (WP2.1, WP2.3, WP2.4). C3D file path stored in `GameSession` table.
+-   **Web Dashboard (React)**: User Interface (React components specific to Therapist, Researcher, Admin roles) -> Authenticates *directly* with Supabase Auth -> Manages auth state -> Communicates with FastAPI Backend (sending JWT) to manage **Rehabilitation Sessions**, their associated **Game Session** data (C3D file paths, **processed sEMG metrics from `EMGCalculatedMetric`**, **game stats from `GamePlayStatistic`**, DDA data logged in `GameSession`), **clinical assessments from `ClinicalAssessment` & `ClinicalOutcomeMeasure`**, and user/patient data from relevant tables. Fetches and displays this structured data according to persona needs.
+-   **FastAPI Backend**: Receives requests from Game & Dashboard -> **Verifies JWTs** (issued by Supabase Auth) -> Processes business logic (e.g., associating multiple C3D files/Game Sessions with a single Rehabilitation Session, **calculating sEMG metrics per WP2.3 and storing them in `EMGCalculatedMetric`**, aggregating game stats for `GamePlayStatistic`, logging DDA parameters to `GameSession`) -> Interacts **directly with Supabase DB (PostgreSQL)** via ORM/driver according to the schema in `docs/00_PROJECT_DEFINITION/database_schema_simplified_research.md` for complex logic/analytics -> Handles encryption/decryption & pseudonymization -> May use `supabase-py` optionally for simple tasks.
+-   **Supabase Auth**: Issues JWTs upon successful authentication. User roles stored in `User` table are used by backend/RLS.
+-   **Supabase Database (PostgreSQL)**: Stores application data according to `docs/00_PROJECT_DEFINITION/database_schema_simplified_research.md`, including a clear structure for `User`, `Patient`, `HospitalSite`, `Therapist`, `RehabilitationSession`, `GameSession`, `MVCCalibration`, `GameLevel`, `EMGMetricDefinition`, `EMGCalculatedMetric`, `GamePlayStatistic`, `ClinicalAssessment`, `ClinicalOutcomeMeasure`. Enforces RLS based on JWT claims and user roles for direct access from React/clients where appropriate.
 -   **Supabase Storage**: Stores files (C3D from each **Game Session**, reports); access controlled by RLS policies.
 -   **Supabase Edge Functions:** Execute specific backend logic -> Use `supabase-js` client **with `service_role` key** for privileged Supabase operations (bypassing RLS when needed).
 
@@ -188,12 +189,13 @@ See diagrams in [docs/prd.md](mdc:docs/prd.md) (Sections 4.8, 4.9) and [docs/sec
 
 ## 4. Critical Implementation Paths
 
--   **Authentication Flow**: Ensuring seamless and secure JWT-based authentication for both the C# game client and the **React web client** against the central Supabase Auth service, leveraging libraries like `@supabase/ssr`.
+-   **Authentication Flow**: Ensuring seamless and secure JWT-based authentication for both the C# game client and the React web client against the central Supabase Auth service, leveraging libraries like `@supabase/ssr`.
 -   **C3D Data Pipeline**: The flow of C3D files from game generation, authenticated upload to API, processing (parsing, pseudonymization, encryption), storage in Supabase Storage, and retrieval/visualization in the dashboard.
--   **EMG Data Visualization**: Efficiently fetching, decrypting, processing, and rendering potentially large EMG datasets in the **React frontend** (using React components) with interactive charts.
+-   **EMG Data Visualization and Metrics Reporting**: Efficiently fetching, decrypting, processing, and rendering potentially large EMG datasets in the React frontend (using React components) with interactive charts. **This includes the calculation (backend) and display (frontend) of specific sEMG-derived metrics (fatigue, strength, mass trends as per WP2.3) and game engagement/adherence reports.**
 -   **RLS Policy Implementation**: Correctly defining and implementing PostgreSQL RLS policies in Supabase to ensure strict data segregation and access control.
 -   **Security Measures**: Proper implementation of encryption/decryption services, pseudonymization, and other security controls outlined in [docs/security.md](mdc:docs/security.md).
 -   **Hybrid Backend Strategy**: Defining clear boundaries between logic handled by Next.js server-side features, Supabase Edge Functions, and the potential separate FastAPI analytics service. *Refer to Section 5 below for detailed guidance.*
+-   **Dynamic Difficulty Adjustment (DDA) Data Flow and Dashboard Interaction**: If the dashboard is to display or influence DDA parameters (WP2.4, WP2.5), ensuring this data is correctly logged, stored, and presented is critical.
 
 ### 4.1. Authentication
 
