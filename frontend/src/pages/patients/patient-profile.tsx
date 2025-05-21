@@ -7,13 +7,10 @@ import { Button } from '@/components/ui/button';
 import { mockData } from '@/data/mock-data';
 import { Patient } from '@/types/patients';
 import { Session } from '@/types/sessions';
-import { Activity, Calendar, FilePlus, History, ListChecks, Users, BarChart, Brain, FileEdit, ArrowLeft } from 'lucide-react';
+import { Calendar, FilePlus, BarChart, FileEdit, ArrowLeft } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Separator } from '@/components/ui/separator';
-import EmgVisualization from '@/components/visualizations/emg-visualization';
-import TreatmentTimeline from '@/components/patients/treatment-timeline';
 import SessionsList from '@/components/patients/sessions-list';
-import TreatmentConfig from '@/pages/treatments/treatment-config';
+import ClinicalAssessments from '@/components/patients/clinical-assessments';
 
 // Helper function to get initials
 const getInitials = (name: string) => {
@@ -240,37 +237,30 @@ const PatientProfile = () => {
         </Card>
       </div>
       
-      <Tabs defaultValue="overview" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-3 md:w-auto md:grid-cols-4">
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="sessions">Sessions</TabsTrigger>
-          <TabsTrigger value="treatment">Treatment</TabsTrigger>
-          <TabsTrigger value="notes" className="hidden md:block">Notes</TabsTrigger>
+      <Tabs defaultValue="sessions" className="space-y-6">
+        <TabsList className="grid w-auto grid-cols-3 gap-1 rounded-lg border border-border bg-muted/40 p-1 shadow-sm">
+          <TabsTrigger 
+            value="sessions" 
+            className="flex items-center space-x-2 rounded-md px-4 py-2 text-sm font-medium transition-all duration-200 ease-in-out data-[state=active]:bg-background data-[state=active]:text-primary data-[state=active]:shadow-md data-[state=active]:font-semibold data-[state=active]:border-2 data-[state=active]:border-black data-[state=inactive]:text-muted-foreground data-[state=inactive]:hover:bg-background/60 focus:outline-none"
+          >
+            <Calendar className="h-4 w-4" />
+            <span>Sessions</span>
+          </TabsTrigger>
+          <TabsTrigger 
+            value="clinical-assessments" 
+            className="flex items-center space-x-2 rounded-md px-4 py-2 text-sm font-medium transition-all duration-200 ease-in-out data-[state=active]:bg-background data-[state=active]:text-primary data-[state=active]:shadow-md data-[state=active]:font-semibold data-[state=active]:border-2 data-[state=active]:border-black data-[state=inactive]:text-muted-foreground data-[state=inactive]:hover:bg-background/60 focus:outline-none"
+          >
+            <FileEdit className="h-4 w-4" />
+            <span>Clinical Assessments</span>
+          </TabsTrigger>
+          <TabsTrigger 
+            value="notes" 
+            className="flex items-center space-x-2 rounded-md px-4 py-2 text-sm font-medium transition-all duration-200 ease-in-out data-[state=active]:bg-background data-[state=active]:text-primary data-[state=active]:shadow-md data-[state=active]:font-semibold data-[state=active]:border-2 data-[state=active]:border-black data-[state=inactive]:text-muted-foreground data-[state=inactive]:hover:bg-background/60 focus:outline-none"
+          >
+            <FilePlus className="h-4 w-4" />
+            <span>Notes</span>
+          </TabsTrigger>
         </TabsList>
-        
-        <TabsContent value="overview">
-          <div className="grid gap-6 md:grid-cols-2">
-            <Card>
-              <CardHeader>
-                <CardTitle>Recent EMG Activity</CardTitle>
-                <CardDescription>Last 30 days muscle activity</CardDescription>
-              </CardHeader>
-              <CardContent className="h-80">
-                <EmgVisualization simplified />
-              </CardContent>
-            </Card>
-            
-            <Card>
-              <CardHeader>
-                <CardTitle>Treatment Timeline</CardTitle>
-                <CardDescription>Recent treatment sessions</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <TreatmentTimeline sessions={sessions.slice(0, 5)} />
-              </CardContent>
-            </Card>
-          </div>
-        </TabsContent>
         
         <TabsContent value="sessions">
           <Card>
@@ -295,11 +285,11 @@ const PatientProfile = () => {
           </Card>
         </TabsContent>
         
-        <TabsContent value="treatment">
+        <TabsContent value="clinical-assessments">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between">
               <div>
-                <CardTitle className="text-left text-xl py-1">Treatment Plan</CardTitle>
+                <CardTitle className="text-left text-xl py-1">Clinical Assessments</CardTitle>
                 <CardDescription>Current treatment configuration and goals</CardDescription>
               </div>
               <div className="flex space-x-2">
@@ -312,14 +302,14 @@ const PatientProfile = () => {
                 </Button>
                 <Button size="sm" variant="default" asChild>
                   <Link to={`/treatments/configure/${patient.id}`}>
-                    <FileEdit className="mr-2 h-4 w-4" />
-                    Edit treatment
+                    <FilePlus className="mr-2 h-4 w-4" />
+                    Add Assessment
                   </Link>
                 </Button>
               </div>
             </CardHeader>
             <CardContent className="pt-4">
-              <TreatmentConfig patientId={patient.id} isEmbedded={true} />
+              <ClinicalAssessments patientId={patient.id} isEmbedded={true} />
             </CardContent>
           </Card>
         </TabsContent>
