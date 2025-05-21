@@ -6,6 +6,7 @@ export interface Patient {
   gender: string;
   room?: string;
   status: 'active' | 'inactive' | 'discharged';
+  studyArm?: 'Intervention' | 'Control' | 'Ghostly' | string;
   admissionDate?: string;
   diagnosis?: string;
   mobility?: string;

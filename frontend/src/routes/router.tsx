@@ -13,6 +13,8 @@ const TreatmentConfig = lazy(() => import('@/pages/treatments/treatment-config')
 const PatientsList = lazy(() => import('@/pages/patients/patients-list'));
 const ProgressReports = lazy(() => import('@/pages/reports/progress-reports'));
 const SessionsPage = lazy(() => import('@/pages/sessions/session-list-all'));
+const C3DUploadPage = lazy(() => import('@/pages/sessions/c3d-upload-page'));
+const C3DPage = lazy(() => import('@/pages/c3d/c3d-page'));
 const NotFound = lazy(() => import('@/pages/not-found'));
 
 // Loading component
@@ -98,6 +100,22 @@ const router = createBrowserRouter([
         ),
       },
       {
+        path: 'sessions/upload',
+        element: (
+          <Suspense fallback={<PageLoader />}>
+            <C3DUploadPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: 'patients/:patientId/upload',
+        element: (
+          <Suspense fallback={<PageLoader />}>
+            <C3DUploadPage />
+          </Suspense>
+        ),
+      },
+      {
         path: 'treatments/configure',
         element: (
           <Suspense fallback={<PageLoader />}>
@@ -110,6 +128,14 @@ const router = createBrowserRouter([
         element: (
           <Suspense fallback={<PageLoader />}>
             <ProgressReports />
+          </Suspense>
+        ),
+      },
+      {
+        path: 'c3d',
+        element: (
+          <Suspense fallback={<PageLoader />}>
+            <C3DPage />
           </Suspense>
         ),
       },

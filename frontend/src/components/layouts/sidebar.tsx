@@ -5,14 +5,13 @@ import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/auth-context';
 import {
   Users,
-  Brain,
   ListChecks,
   Settings,
   Activity,
   Home,
   BarChart,
   X,
-  UserCircle,
+  FileText,
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -44,6 +43,11 @@ const Sidebar = ({ open, setOpen }: SidebarProps) => {
         name: 'Sessions',
         href: '/sessions',
         icon: <ListChecks className="h-5 w-5" />,
+      },
+      {
+        name: 'C3D Files',
+        href: '/c3d',
+        icon: <FileText className="h-5 w-5" />,
       },
       {
         name: 'Reports',

@@ -8,12 +8,57 @@ import { mockData } from '@/data/mock-data';
 import { Patient } from '@/types/patients';
 import { Session } from '@/types/sessions';
 import { Activity, Calendar, FilePlus, History, ListChecks, Users, BarChart, Brain, FileEdit, ArrowLeft } from 'lucide-react';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
 import EmgVisualization from '@/components/visualizations/emg-visualization';
 import TreatmentTimeline from '@/components/patients/treatment-timeline';
 import SessionsList from '@/components/patients/sessions-list';
 import TreatmentConfig from '@/pages/treatments/treatment-config';
+
+// Helper function to get initials
+const getInitials = (name: string) => {
+  if (!name) return '';
+  const nameParts = name.split(' ');
+  if (nameParts.length === 1) return nameParts[0][0]?.toUpperCase() || '';
+  return (nameParts[0][0] + (nameParts[nameParts.length - 1][0] || '')).toUpperCase();
+};
+
+// Color palette - using hex codes for direct style application
+const avatarColorPalette = [
+  { backgroundColor: '#ef4444', color: '#ffffff' }, // red-500
+  { backgroundColor: '#f97316', color: '#ffffff' }, // orange-500
+  { backgroundColor: '#f59e0b', color: '#000000' }, // amber-500
+  { backgroundColor: '#eab308', color: '#000000' }, // yellow-500
+  { backgroundColor: '#84cc16', color: '#000000' }, // lime-500
+  { backgroundColor: '#22c55e', color: '#ffffff' }, // green-500
+  { backgroundColor: '#10b981', color: '#ffffff' }, // emerald-500
+  { backgroundColor: '#14b8a6', color: '#ffffff' }, // teal-500
+  { backgroundColor: '#06b6d4', color: '#000000' }, // cyan-500
+  { backgroundColor: '#0ea5e9', color: '#ffffff' }, // sky-500
+  { backgroundColor: '#3b82f6', color: '#ffffff' }, // blue-500
+  { backgroundColor: '#6366f1', color: '#ffffff' }, // indigo-500
+  { backgroundColor: '#8b5cf6', color: '#ffffff' }, // violet-500
+  { backgroundColor: '#a855f7', color: '#ffffff' }, // purple-500
+  { backgroundColor: '#d946ef', color: '#ffffff' }, // fuchsia-500
+  { backgroundColor: '#ec4899', color: '#ffffff' }, // pink-500
+  { backgroundColor: '#f43f5e', color: '#ffffff' }, // rose-500
+];
+
+// Helper function to get a color based on patient ID for random, distinct colors
+const getAvatarColor = (id: string) => {
+  if (!id) { 
+    return avatarColorPalette[0]; // Default color if id is not provided
+  }
+  // Simple hash function
+  let hash = 0;
+  for (let i = 0; i < id.length; i++) {
+    const char = id.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash |= 0; // Convert to 32bit integer
+  }
+  const index = Math.abs(hash) % avatarColorPalette.length;
+  return avatarColorPalette[index];
+};
 
 const PatientProfile = () => {
   const { id } = useParams<{ id: string }>();
@@ -54,6 +99,8 @@ const PatientProfile = () => {
     );
   }
   
+  const avatarStyle = getAvatarColor(patient.id);
+  
   return (
     <div className="space-y-6">
       <div className="mb-4 flex justify-start">
@@ -64,32 +111,57 @@ const PatientProfile = () => {
           </Link>
         </Button>
       </div>
-      <div className="flex flex-col justify-center sm:flex-row sm:items-center">
+      <div className="flex flex-col justify-between sm:flex-row sm:items-center">
         <div className="flex items-center space-x-4 mx-auto sm:mx-0">
           <Avatar className="h-16 w-16 border-2 border-primary/20">
-            <AvatarImage src={patient.avatar} alt={patient.name} />
-            <AvatarFallback className="text-lg">
-              {patient.name.split(' ').map(n => n[0]).join('').toUpperCase()}
+            <AvatarFallback 
+              style={avatarStyle}
+              className="flex items-center justify-center h-full w-full text-lg font-semibold"
+            >
+              {getInitials(patient.name)}
             </AvatarFallback>
           </Avatar>
           <div className="text-center sm:text-left">
             <h1 className="text-2xl font-bold md:text-3xl">{patient.name}</h1>
-            <div className="flex items-center space-x-2">
-              <Badge variant={
-                patient.status === 'active' ? 'default' :
-                patient.status === 'inactive' ? 'secondary' :
-                'outline'
-              }>
-                {patient.status}
-              </Badge>
+            <div className="flex flex-wrap items-center gap-2">
+              {patient.studyArm === 'Intervention' ? (
+                <Badge variant="static" className="bg-blue-100 text-blue-700 dark:bg-blue-700 dark:text-blue-100 border-blue-300 dark:border-blue-600">
+                  Intervention
+                </Badge>
+              ) : patient.studyArm === 'Control' ? (
+                <Badge variant="static" className="bg-orange-100 text-orange-700 dark:bg-orange-700 dark:text-orange-100 border-orange-300 dark:border-orange-600">
+                  Control
+                </Badge>
+              ) : patient.studyArm === 'Ghostly' ? (
+                <Badge variant="static" className="bg-purple-100 text-purple-700 dark:bg-purple-700 dark:text-purple-100 border-purple-300 dark:border-purple-600">
+                  Ghostly
+                </Badge>
+              ) : (
+                <Badge variant="static" className="text-foreground border-foreground">
+                  {patient.studyArm || 'N/A'}
+                </Badge>
+              )}
+              
+              {patient.status === 'active' ? (
+                <Badge variant="static" className="bg-green-100 text-green-700 dark:bg-green-700 dark:text-green-100 border-green-300 dark:border-green-600">
+                  Active
+                </Badge>
+              ) : patient.status === 'inactive' ? (
+                <Badge variant="static" className="bg-red-100 text-red-700 dark:bg-red-700 dark:text-red-100 border-red-300 dark:border-red-600">
+                  Dropped Out
+                </Badge>
+              ) : (
+                <Badge variant="static" className="text-foreground border-foreground">
+                  {patient.status || 'Unknown'}
+                </Badge>
+              )}
+              
               <span className="text-sm text-muted-foreground">
                 ID: {patient.id}
               </span>
             </div>
           </div>
         </div>
-        
-     
       </div>
       
       <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
@@ -147,11 +219,6 @@ const PatientProfile = () => {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="text-base">Treatment Summary</CardTitle>
-            <Button variant="ghost" size="icon" className="h-8 w-8">
-              <span className="inline-flex items-center justify-center">
-                <FileEdit className="h-5 w-5" />
-              </span>
-            </Button>
           </CardHeader>
           <CardContent className="space-y-2">
             <div className="grid grid-cols-2 gap-1">

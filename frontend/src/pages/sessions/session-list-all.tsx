@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button';
-import { PlusCircle, Upload } from 'lucide-react';
-import { mockData } from '@/data/mock-data'; // Import the entire mockData object
+import { PlusCircle, Search } from 'lucide-react';
+import { mockData } from '@/data/mock-data';
 import {
   Card,
   CardContent,
@@ -8,10 +8,17 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import AllSessionsView from '@/components/sessions/all-sessions-view'; // Import the new component
-import { Link } from 'react-router-dom';
+import SessionsList from '@/components/patients/sessions-list';
+import { Input } from '@/components/ui/input';
+import { useState } from 'react';
 
 const SessionsPage = () => {
+  const [searchTerm, setSearchTerm] = useState('');
+
+  const filteredSessions = mockData.sessions.filter(session =>
+    session.patientName?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
     <div className="container mx-auto py-10">
       <div className="flex items-center mb-6">
@@ -33,7 +40,21 @@ const SessionsPage = () => {
           </div>
         </CardHeader>
         <CardContent>
-          <AllSessionsView allSessions={mockData.sessions} />
+          <div className="flex items-center justify-between mb-4">
+            <div className="relative w-full max-w-sm">
+              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input
+                type="search"
+                placeholder="Search by patient name..."
+                className="pl-8"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+          </div>
+          <div className="space-y-4">
+            <SessionsList sessions={filteredSessions} />
+          </div>
         </CardContent>
       </Card>
     </div>
