@@ -61,6 +61,13 @@ description: Tracks what works, what's left to build, current status, known issu
    - Integrated with routes for `/sessions/upload` and `/patients/:patientId/upload`
    - Added upload buttons to sessions list and patient profile pages
    - ⚠️ EMG waveform visualization API implemented but currently displays placeholder data instead of actual C3D data
+7. ✅ **Patient Profile UI Enhancements (`PatientProfile.tsx`, `ClinicalAssessments.tsx`)**:
+    -   `PatientProfile.tsx` tabs updated to "Sessions", "Clinical Assessments", "Notes"; "Overview" removed.
+    -   `ClinicalAssessments.tsx` component created and iteratively developed (category list -> card view -> table view with mock data).
+    -   Table view now shows "Category" (badge), "Measure", "Last Assessed"; "Last Value" removed.
+    -   Mock data (`mockPatientAssessments`) populates the table, filtered to show only measures with data.
+    -   Tab styling in `PatientProfile.tsx` updated to match dashboard, including icons.
+    -   Linter warnings and unused imports addressed.
 
 *(Previous Vue and Next.js components have been completely removed)*
 
@@ -531,3 +538,2003 @@ The GHOSTLY+ dashboard development is progressing with a refined understanding o
 3. Develop the USE questionnaire data collection and analysis features
 4. Enhance the therapy compliance tracking system
 5. Refine the muscle heatmap component for greater anatomical accuracy 
+
+# Active Development Context
+
+## Current Focus
+
+We are currently working on **fixing API endpoint routing and file upload functionality** in the GHOSTLY+ Dashboard, specifically:
+
+1. Resolving 502 Bad Gateway errors occurring when uploading C3D files
+2. Aligning frontend API requests with backend endpoints
+3. Configuring nginx properly to handle API requests
+4. Ensuring all required backend dependencies for C3D processing are properly installed
+
+We are also **refining the UI for the Patient Profile page, particularly the Clinical Assessments tab**, ensuring mock data is displayed correctly and styling is consistent.
+
+## Recent Changes
+
+### API Endpoint Restructuring (2025-05-24)
+- Renamed router prefix from `/api/v1/ghostly` to `/api/v1/c3d` for clearer domain separation
+- Added system dependencies for runtime support of scientific libraries
+
+### Nginx Configuration Refinement (2025-05-24)
+- Added proper location block for `/v1/` paths to proxy to backend
+- Ensured consistent routing for all API endpoints
+
+### UI Enhancements for Patient Profile & Clinical Assessments (2025-05-26)
+-   **`PatientProfile.tsx`**:
+    -   Tabs modified to "Sessions", "Clinical Assessments", "Notes". "Overview" tab and its content (e.g., `EmgVisualization`, `TreatmentTimeline`) were removed.
+    -   "Clinical Assessments" tab now uses the new `ClinicalAssessments` component instead of `TreatmentConfig`.
+    -   "Edit Assessment" button in the "Clinical Assessments" tab header changed to "Manage Assessments" (subsequently updated to "Add Assessment" and "View Progress" buttons).
+    -   Tab styling ( `TabsList` and `TabsTrigger` in `PatientProfile.tsx`) updated to align with the styling in `frontend/src/pages/dashboard/index.tsx`, including icons (`Calendar`, `FileEdit`, `FilePlus`).
+    -   Removed unused imports like `PlusCircle`.
+-   **`ClinicalAssessments.tsx`** (`frontend/src/components/patients/clinical-assessments.tsx`):
+    -   Created as a new component.
+    -   UI evolved from a simple list of assessment categories to a card-based layout, and finally to a table-based layout.
+    -   The table displays columns for "Category" (using a colored `Badge` with a `Tooltip`), "Measure", and "Last Assessed". The "Last Value" column was removed.
+    -   Mock data (`mockPatientAssessments`) was introduced and integrated to populate the table. The displayed data is filtered to only include measures for which mock data exists.
+    -   Keys in `mockPatientAssessments` were corrected to use hyphens (e.g., `muscle-strength_0`) to match the dynamically generated measure IDs, resolving data display issues.
+    -   The "Measure" column header is now left-aligned.
+    -   Linter warnings (unused imports, `hasOwnProperty`) addressed.
+    -   A message "No assessment data available." is shown if the filtered list of measures with mock data is empty.
+
+## Active Decisions & Considerations
+
+### API Path Structure
+- **Date**: 2025-05-26
+- **Focus**: Refining UI for Patient Profile, specifically the Clinical Assessments tab. Ongoing backend integration for EMG data.
+- **Recent Changes**:
+    - **UI Enhancements for `PatientProfile.tsx` and `ClinicalAssessments.tsx`**:
+        -   In `PatientProfile.tsx`:
+            -   Tabs updated to "Sessions", "Clinical Assessments", "Notes". "Overview" tab and its content (e.g., `EmgVisualization`, `TreatmentTimeline`) were removed.
+            -   "Clinical Assessments" tab now uses the new `ClinicalAssessments` component instead of `TreatmentConfig`.
+            -   "Edit Assessment" button in the "Clinical Assessments" tab header changed to "Manage Assessments" (subsequently updated to "Add Assessment" and "View Progress" buttons).
+            -   Tab styling ( `TabsList` and `TabsTrigger` in `PatientProfile.tsx`) updated to align with the styling in `frontend/src/pages/dashboard/index.tsx`, including icons (`Calendar`, `FileEdit`, `FilePlus`).
+        -   In `ClinicalAssessments.tsx`:
+            -   Component created in `frontend/src/components/patients/clinical-assessments.tsx`.
+            -   Initial implementation listed assessment categories.
+            -   Iteratively improved UI:
+                -   Card view with reduced padding and two-column grid for measures.
+                -   Table view implemented with colored badges for categories (with tooltips), "Measure", "Last Value" (later removed), and "Last Assessed" columns.
+                -   Mock data (`mockPatientAssessments`) added to populate the table, with logic to display data or "N/A".
+                -   Corrected mock data keys to match generated measure IDs (hyphens vs. underscores).
+                -   Filtered measures to display only those with mock data.
+                -   "Last Value" column removed.
+                -   "Measure" column header aligned to the left.
+            -   Linter warnings (unused imports, `hasOwnProperty`) addressed.
+    - **C3D Processing & EMG Analysis Components** (previous focus, largely stable):
+        - Successfully fixed C3D file upload functionality by aligning API route prefixes
+        - Fixed Docker configuration for ezc3d library dependencies using a single-stage build approach
+        - Added system dependencies for runtime support of scientific libraries
+        - Added proper location block for `/v1/` paths to proxy to backend
+        - Ensured consistent routing for all API endpoints
+
+### Nginx Configuration Refinement (2025-05-24)
+- Added proper location block for `/v1/` paths to proxy to backend
+- Ensured consistent routing for all API endpoints
+
+### UI Enhancements for Patient Profile & Clinical Assessments (2025-05-26)
+-   **`PatientProfile.tsx`**:
+    -   Tabs modified to "Sessions", "Clinical Assessments", "Notes". "Overview" tab and its content (e.g., `EmgVisualization`, `TreatmentTimeline`) were removed.
+    -   "Clinical Assessments" tab now uses the new `ClinicalAssessments` component instead of `TreatmentConfig`.
+    -   "Edit Assessment" button in the "Clinical Assessments" tab header changed to "Manage Assessments" (subsequently updated to "Add Assessment" and "View Progress" buttons).
+    -   Tab styling ( `TabsList` and `TabsTrigger` in `PatientProfile.tsx`) updated to align with the styling in `frontend/src/pages/dashboard/index.tsx`, including icons (`Calendar`, `FileEdit`, `FilePlus`).
+-   **`ClinicalAssessments.tsx`** (`frontend/src/components/patients/clinical-assessments.tsx`):
+    -   Created as a new component.
+    -   UI evolved from a simple list of assessment categories to a card-based layout, and finally to a table-based layout.
+    -   The table displays columns for "Category" (using a colored `Badge` with a `Tooltip`), "Measure", and "Last Assessed". The "Last Value" column was removed.
+    -   Mock data (`mockPatientAssessments`) was introduced and integrated to populate the table. The displayed data is filtered to only include measures for which mock data exists.
+    -   Keys in `mockPatientAssessments` were corrected to use hyphens (e.g., `muscle-strength_0`) to match the dynamically generated measure IDs, resolving data display issues.
+    -   The "Measure" column header is now left-aligned.
+    -   Linter warnings (unused imports, `hasOwnProperty`) addressed.
+    -   A message "No assessment data available." is shown if the filtered list of measures with mock data is empty.
+
+## Active Decisions & Considerations
+
+### API Path Structure
+- **Date**: 2025-05-26
+- **Focus**: Refining UI for Patient Profile, specifically the Clinical Assessments tab. Ongoing backend integration for EMG data.
+- **Recent Changes**:
+    - **UI Enhancements for `PatientProfile.tsx` and `ClinicalAssessments.tsx`**:
+        -   In `PatientProfile.tsx`:
+            -   Tabs updated to "Sessions", "Clinical Assessments", "Notes". "Overview" tab and its content (e.g., `EmgVisualization`, `TreatmentTimeline`) were removed.
+            -   "Clinical Assessments" tab now uses the new `ClinicalAssessments` component instead of `TreatmentConfig`.
+            -   "Edit Assessment" button in the "Clinical Assessments" tab header changed to "Manage Assessments" (subsequently updated to "Add Assessment" and "View Progress" buttons).
+            -   Tab styling ( `TabsList` and `TabsTrigger` in `PatientProfile.tsx`) updated to align with the styling in `frontend/src/pages/dashboard/index.tsx`, including icons (`Calendar`, `FileEdit`, `FilePlus`).
+        -   In `ClinicalAssessments.tsx`:
+            -   Component created in `frontend/src/components/patients/clinical-assessments.tsx`.
+            -   Initial implementation listed assessment categories.
+            -   Iteratively improved UI:
+                -   Card view with reduced padding and two-column grid for measures.
+                -   Table view implemented with colored badges for categories (with tooltips), "Measure", "Last Value" (later removed), and "Last Assessed" columns.
+                -   Mock data (`mockPatientAssessments`) added to populate the table, with logic to display data or "N/A".
+                -   Corrected mock data keys to match generated measure IDs (hyphens vs. underscores).
+                -   Filtered measures to display only those with mock data.
+                -   "Last Value" column removed.
+                -   "Measure" column header aligned to the left.
+            -   Linter warnings (unused imports, `hasOwnProperty`) addressed.
+    - **C3D Processing & EMG Analysis Components** (previous focus, largely stable):
+        - Successfully fixed C3D file upload functionality by aligning API route prefixes
+        - Fixed Docker configuration for ezc3d library dependencies using a single-stage build approach
+        - Added system dependencies for runtime support of scientific libraries
+        - Added proper location block for `/v1/` paths to proxy to backend
+        - Ensured consistent routing for all API endpoints
+
+### Nginx Configuration Refinement (2025-05-24)
+- Added proper location block for `/v1/` paths to proxy to backend
+- Ensured consistent routing for all API endpoints
+
+### UI Enhancements for Patient Profile & Clinical Assessments (2025-05-26)
+-   **`PatientProfile.tsx`**:
+    -   Tabs modified to "Sessions", "Clinical Assessments", "Notes". "Overview" tab and its content (e.g., `EmgVisualization`, `TreatmentTimeline`) were removed.
+    -   "Clinical Assessments" tab now uses the new `ClinicalAssessments` component instead of `TreatmentConfig`.
+    -   "Edit Assessment" button in the "Clinical Assessments" tab header changed to "Manage Assessments" (subsequently updated to "Add Assessment" and "View Progress" buttons).
+    -   Tab styling ( `TabsList` and `TabsTrigger` in `PatientProfile.tsx`) updated to align with the styling in `frontend/src/pages/dashboard/index.tsx`, including icons (`Calendar`, `FileEdit`, `FilePlus`).
+-   **`ClinicalAssessments.tsx`** (`frontend/src/components/patients/clinical-assessments.tsx`):
+    -   Created as a new component.
+    -   UI evolved from a simple list of assessment categories to a card-based layout, and finally to a table-based layout.
+    -   The table displays columns for "Category" (using a colored `Badge` with a `Tooltip`), "Measure", and "Last Assessed". The "Last Value" column was removed.
+    -   Mock data (`mockPatientAssessments`) was introduced and integrated to populate the table. The displayed data is filtered to only include measures for which mock data exists.
+    -   Keys in `mockPatientAssessments` were corrected to use hyphens (e.g., `muscle-strength_0`) to match the dynamically generated measure IDs, resolving data display issues.
+    -   The "Measure" column header is now left-aligned.
+    -   Linter warnings (unused imports, `hasOwnProperty`) addressed.
+    -   A message "No assessment data available." is shown if the filtered list of measures with mock data is empty.
+
+## Active Decisions & Considerations
+
+### API Path Structure
+- **Date**: 2025-05-26
+- **Focus**: Refining UI for Patient Profile, specifically the Clinical Assessments tab. Ongoing backend integration for EMG data.
+- **Recent Changes**:
+    - **UI Enhancements for `PatientProfile.tsx` and `ClinicalAssessments.tsx`**:
+        -   In `PatientProfile.tsx`:
+            -   Tabs updated to "Sessions", "Clinical Assessments", "Notes". "Overview" tab and its content (e.g., `EmgVisualization`, `TreatmentTimeline`) were removed.
+            -   "Clinical Assessments" tab now uses the new `ClinicalAssessments` component instead of `TreatmentConfig`.
+            -   "Edit Assessment" button in the "Clinical Assessments" tab header changed to "Manage Assessments" (subsequently updated to "Add Assessment" and "View Progress" buttons).
+            -   Tab styling ( `TabsList` and `TabsTrigger` in `PatientProfile.tsx`) updated to align with the styling in `frontend/src/pages/dashboard/index.tsx`, including icons (`Calendar`, `FileEdit`, `FilePlus`).
+        -   In `ClinicalAssessments.tsx`:
+            -   Component created in `frontend/src/components/patients/clinical-assessments.tsx`.
+            -   Initial implementation listed assessment categories.
+            -   Iteratively improved UI:
+                -   Card view with reduced padding and two-column grid for measures.
+                -   Table view implemented with colored badges for categories (with tooltips), "Measure", "Last Value" (later removed), and "Last Assessed" columns.
+                -   Mock data (`mockPatientAssessments`) added to populate the table, with logic to display data or "N/A".
+                -   Corrected mock data keys to match generated measure IDs (hyphens vs. underscores).
+                -   Filtered measures to display only those with mock data.
+                -   "Last Value" column removed.
+                -   "Measure" column header aligned to the left.
+            -   Linter warnings (unused imports, `hasOwnProperty`) addressed.
+    - **C3D Processing & EMG Analysis Components** (previous focus, largely stable):
+        - Successfully fixed C3D file upload functionality by aligning API route prefixes
+        - Fixed Docker configuration for ezc3d library dependencies using a single-stage build approach
+        - Added system dependencies for runtime support of scientific libraries
+        - Added proper location block for `/v1/` paths to proxy to backend
+        - Ensured consistent routing for all API endpoints
+
+### Nginx Configuration Refinement (2025-05-24)
+- Added proper location block for `/v1/` paths to proxy to backend
+- Ensured consistent routing for all API endpoints
+
+### UI Enhancements for Patient Profile & Clinical Assessments (2025-05-26)
+-   **`PatientProfile.tsx`**:
+    -   Tabs modified to "Sessions", "Clinical Assessments", "Notes". "Overview" tab and its content (e.g., `EmgVisualization`, `TreatmentTimeline`) were removed.
+    -   "Clinical Assessments" tab now uses the new `ClinicalAssessments` component instead of `TreatmentConfig`.
+    -   "Edit Assessment" button in the "Clinical Assessments" tab header changed to "Manage Assessments" (subsequently updated to "Add Assessment" and "View Progress" buttons).
+    -   Tab styling ( `TabsList` and `TabsTrigger` in `PatientProfile.tsx`) updated to align with the styling in `frontend/src/pages/dashboard/index.tsx`, including icons (`Calendar`, `FileEdit`, `FilePlus`).
+-   **`ClinicalAssessments.tsx`** (`frontend/src/components/patients/clinical-assessments.tsx`):
+    -   Created as a new component.
+    -   UI evolved from a simple list of assessment categories to a card-based layout, and finally to a table-based layout.
+    -   The table displays columns for "Category" (using a colored `Badge` with a `Tooltip`), "Measure", and "Last Assessed". The "Last Value" column was removed.
+    -   Mock data (`mockPatientAssessments`) was introduced and integrated to populate the table. The displayed data is filtered to only include measures for which mock data exists.
+    -   Keys in `mockPatientAssessments` were corrected to use hyphens (e.g., `muscle-strength_0`) to match the dynamically generated measure IDs, resolving data display issues.
+    -   The "Measure" column header is now left-aligned.
+    -   Linter warnings (unused imports, `hasOwnProperty`) addressed.
+    -   A message "No assessment data available." is shown if the filtered list of measures with mock data is empty.
+
+## Active Decisions & Considerations
+
+### API Path Structure
+- **Date**: 2025-05-26
+- **Focus**: Refining UI for Patient Profile, specifically the Clinical Assessments tab. Ongoing backend integration for EMG data.
+- **Recent Changes**:
+    - **UI Enhancements for `PatientProfile.tsx` and `ClinicalAssessments.tsx`**:
+        -   In `PatientProfile.tsx`:
+            -   Tabs updated to "Sessions", "Clinical Assessments", "Notes". "Overview" tab and its content (e.g., `EmgVisualization`, `TreatmentTimeline`) were removed.
+            -   "Clinical Assessments" tab now uses the new `ClinicalAssessments` component instead of `TreatmentConfig`.
+            -   "Edit Assessment" button in the "Clinical Assessments" tab header changed to "Manage Assessments" (subsequently updated to "Add Assessment" and "View Progress" buttons).
+            -   Tab styling ( `TabsList` and `TabsTrigger` in `PatientProfile.tsx`) updated to align with the styling in `frontend/src/pages/dashboard/index.tsx`, including icons (`Calendar`, `FileEdit`, `FilePlus`).
+        -   In `ClinicalAssessments.tsx`:
+            -   Component created in `frontend/src/components/patients/clinical-assessments.tsx`.
+            -   Initial implementation listed assessment categories.
+            -   Iteratively improved UI:
+                -   Card view with reduced padding and two-column grid for measures.
+                -   Table view implemented with colored badges for categories (with tooltips), "Measure", "Last Value" (later removed), and "Last Assessed" columns.
+                -   Mock data (`mockPatientAssessments`) added to populate the table, with logic to display data or "N/A".
+                -   Corrected mock data keys to match generated measure IDs (hyphens vs. underscores).
+                -   Filtered measures to display only those with mock data.
+                -   "Last Value" column removed.
+                -   "Measure" column header aligned to the left.
+            -   Linter warnings (unused imports, `hasOwnProperty`) addressed.
+    - **C3D Processing & EMG Analysis Components** (previous focus, largely stable):
+        - Successfully fixed C3D file upload functionality by aligning API route prefixes
+        - Fixed Docker configuration for ezc3d library dependencies using a single-stage build approach
+        - Added system dependencies for runtime support of scientific libraries
+        - Added proper location block for `/v1/` paths to proxy to backend
+        - Ensured consistent routing for all API endpoints
+
+### Nginx Configuration Refinement (2025-05-24)
+- Added proper location block for `/v1/` paths to proxy to backend
+- Ensured consistent routing for all API endpoints
+
+### UI Enhancements for Patient Profile & Clinical Assessments (2025-05-26)
+-   **`PatientProfile.tsx`**:
+    -   Tabs modified to "Sessions", "Clinical Assessments", "Notes". "Overview" tab and its content (e.g., `EmgVisualization`, `TreatmentTimeline`) were removed.
+    -   "Clinical Assessments" tab now uses the new `ClinicalAssessments` component instead of `TreatmentConfig`.
+    -   "Edit Assessment" button in the "Clinical Assessments" tab header changed to "Manage Assessments" (subsequently updated to "Add Assessment" and "View Progress" buttons).
+    -   Tab styling ( `TabsList` and `TabsTrigger` in `PatientProfile.tsx`) updated to align with the styling in `frontend/src/pages/dashboard/index.tsx`, including icons (`Calendar`, `FileEdit`, `FilePlus`).
+-   **`ClinicalAssessments.tsx`** (`frontend/src/components/patients/clinical-assessments.tsx`):
+    -   Created as a new component.
+    -   UI evolved from a simple list of assessment categories to a card-based layout, and finally to a table-based layout.
+    -   The table displays columns for "Category" (using a colored `Badge` with a `Tooltip`), "Measure", and "Last Assessed". The "Last Value" column was removed.
+    -   Mock data (`mockPatientAssessments`) was introduced and integrated to populate the table. The displayed data is filtered to only include measures for which mock data exists.
+    -   Keys in `mockPatientAssessments` were corrected to use hyphens (e.g., `muscle-strength_0`) to match the dynamically generated measure IDs, resolving data display issues.
+    -   The "Measure" column header is now left-aligned.
+    -   Linter warnings (unused imports, `hasOwnProperty`) addressed.
+    -   A message "No assessment data available." is shown if the filtered list of measures with mock data is empty.
+
+## Active Decisions & Considerations
+
+### API Path Structure
+- **Date**: 2025-05-26
+- **Focus**: Refining UI for Patient Profile, specifically the Clinical Assessments tab. Ongoing backend integration for EMG data.
+- **Recent Changes**:
+    - **UI Enhancements for `PatientProfile.tsx` and `ClinicalAssessments.tsx`**:
+        -   In `PatientProfile.tsx`:
+            -   Tabs updated to "Sessions", "Clinical Assessments", "Notes". "Overview" tab and its content (e.g., `EmgVisualization`, `TreatmentTimeline`) were removed.
+            -   "Clinical Assessments" tab now uses the new `ClinicalAssessments` component instead of `TreatmentConfig`.
+            -   "Edit Assessment" button in the "Clinical Assessments" tab header changed to "Manage Assessments" (subsequently updated to "Add Assessment" and "View Progress" buttons).
+            -   Tab styling ( `TabsList` and `TabsTrigger` in `PatientProfile.tsx`) updated to align with the styling in `frontend/src/pages/dashboard/index.tsx`, including icons (`Calendar`, `FileEdit`, `FilePlus`).
+        -   In `ClinicalAssessments.tsx`:
+            -   Component created in `frontend/src/components/patients/clinical-assessments.tsx`.
+            -   Initial implementation listed assessment categories.
+            -   Iteratively improved UI:
+                -   Card view with reduced padding and two-column grid for measures.
+                -   Table view implemented with colored badges for categories (with tooltips), "Measure", "Last Value" (later removed), and "Last Assessed" columns.
+                -   Mock data (`mockPatientAssessments`) added to populate the table, with logic to display data or "N/A".
+                -   Corrected mock data keys to match generated measure IDs (hyphens vs. underscores).
+                -   Filtered measures to display only those with mock data.
+                -   "Last Value" column removed.
+                -   "Measure" column header aligned to the left.
+            -   Linter warnings (unused imports, `hasOwnProperty`) addressed.
+    - **C3D Processing & EMG Analysis Components** (previous focus, largely stable):
+        - Successfully fixed C3D file upload functionality by aligning API route prefixes
+        - Fixed Docker configuration for ezc3d library dependencies using a single-stage build approach
+        - Added system dependencies for runtime support of scientific libraries
+        - Added proper location block for `/v1/` paths to proxy to backend
+        - Ensured consistent routing for all API endpoints
+
+### Nginx Configuration Refinement (2025-05-24)
+- Added proper location block for `/v1/` paths to proxy to backend
+- Ensured consistent routing for all API endpoints
+
+### UI Enhancements for Patient Profile & Clinical Assessments (2025-05-26)
+-   **`PatientProfile.tsx`**:
+    -   Tabs modified to "Sessions", "Clinical Assessments", "Notes". "Overview" tab and its content (e.g., `EmgVisualization`, `TreatmentTimeline`) were removed.
+    -   "Clinical Assessments" tab now uses the new `ClinicalAssessments` component instead of `TreatmentConfig`.
+    -   "Edit Assessment" button in the "Clinical Assessments" tab header changed to "Manage Assessments" (subsequently updated to "Add Assessment" and "View Progress" buttons).
+    -   Tab styling ( `TabsList` and `TabsTrigger` in `PatientProfile.tsx`) updated to align with the styling in `frontend/src/pages/dashboard/index.tsx`, including icons (`Calendar`, `FileEdit`, `FilePlus`).
+-   **`ClinicalAssessments.tsx`** (`frontend/src/components/patients/clinical-assessments.tsx`):
+    -   Created as a new component.
+    -   UI evolved from a simple list of assessment categories to a card-based layout, and finally to a table-based layout.
+    -   The table displays columns for "Category" (using a colored `Badge` with a `Tooltip`), "Measure", and "Last Assessed". The "Last Value" column was removed.
+    -   Mock data (`mockPatientAssessments`) was introduced and integrated to populate the table. The displayed data is filtered to only include measures for which mock data exists.
+    -   Keys in `mockPatientAssessments` were corrected to use hyphens (e.g., `muscle-strength_0`) to match the dynamically generated measure IDs, resolving data display issues.
+    -   The "Measure" column header is now left-aligned.
+    -   Linter warnings (unused imports, `hasOwnProperty`) addressed.
+    -   A message "No assessment data available." is shown if the filtered list of measures with mock data is empty.
+
+## Active Decisions & Considerations
+
+### API Path Structure
+- **Date**: 2025-05-26
+- **Focus**: Refining UI for Patient Profile, specifically the Clinical Assessments tab. Ongoing backend integration for EMG data.
+- **Recent Changes**:
+    - **UI Enhancements for `PatientProfile.tsx` and `ClinicalAssessments.tsx`**:
+        -   In `PatientProfile.tsx`:
+            -   Tabs updated to "Sessions", "Clinical Assessments", "Notes". "Overview" tab and its content (e.g., `EmgVisualization`, `TreatmentTimeline`) were removed.
+            -   "Clinical Assessments" tab now uses the new `ClinicalAssessments` component instead of `TreatmentConfig`.
+            -   "Edit Assessment" button in the "Clinical Assessments" tab header changed to "Manage Assessments" (subsequently updated to "Add Assessment" and "View Progress" buttons).
+            -   Tab styling ( `TabsList` and `TabsTrigger` in `PatientProfile.tsx`) updated to align with the styling in `frontend/src/pages/dashboard/index.tsx`, including icons (`Calendar`, `FileEdit`, `FilePlus`).
+        -   In `ClinicalAssessments.tsx`:
+            -   Component created in `frontend/src/components/patients/clinical-assessments.tsx`.
+            -   Initial implementation listed assessment categories.
+            -   Iteratively improved UI:
+                -   Card view with reduced padding and two-column grid for measures.
+                -   Table view implemented with colored badges for categories (with tooltips), "Measure", "Last Value" (later removed), and "Last Assessed" columns.
+                -   Mock data (`mockPatientAssessments`) added to populate the table, with logic to display data or "N/A".
+                -   Corrected mock data keys to match generated measure IDs (hyphens vs. underscores).
+                -   Filtered measures to display only those with mock data.
+                -   "Last Value" column removed.
+                -   "Measure" column header aligned to the left.
+            -   Linter warnings (unused imports, `hasOwnProperty`) addressed.
+    - **C3D Processing & EMG Analysis Components** (previous focus, largely stable):
+        - Successfully fixed C3D file upload functionality by aligning API route prefixes
+        - Fixed Docker configuration for ezc3d library dependencies using a single-stage build approach
+        - Added system dependencies for runtime support of scientific libraries
+        - Added proper location block for `/v1/` paths to proxy to backend
+        - Ensured consistent routing for all API endpoints
+
+### Nginx Configuration Refinement (2025-05-24)
+- Added proper location block for `/v1/` paths to proxy to backend
+- Ensured consistent routing for all API endpoints
+
+### UI Enhancements for Patient Profile & Clinical Assessments (2025-05-26)
+-   **`PatientProfile.tsx`**:
+    -   Tabs modified to "Sessions", "Clinical Assessments", "Notes". "Overview" tab and its content (e.g., `EmgVisualization`, `TreatmentTimeline`) were removed.
+    -   "Clinical Assessments" tab now uses the new `ClinicalAssessments` component instead of `TreatmentConfig`.
+    -   "Edit Assessment" button in the "Clinical Assessments" tab header changed to "Manage Assessments" (subsequently updated to "Add Assessment" and "View Progress" buttons).
+    -   Tab styling ( `TabsList` and `TabsTrigger` in `PatientProfile.tsx`) updated to align with the styling in `frontend/src/pages/dashboard/index.tsx`, including icons (`Calendar`, `FileEdit`, `FilePlus`).
+-   **`ClinicalAssessments.tsx`** (`frontend/src/components/patients/clinical-assessments.tsx`):
+    -   Created as a new component.
+    -   UI evolved from a simple list of assessment categories to a card-based layout, and finally to a table-based layout.
+    -   The table displays columns for "Category" (using a colored `Badge` with a `Tooltip`), "Measure", and "Last Assessed". The "Last Value" column was removed.
+    -   Mock data (`mockPatientAssessments`) was introduced and integrated to populate the table. The displayed data is filtered to only include measures for which mock data exists.
+    -   Keys in `mockPatientAssessments` were corrected to use hyphens (e.g., `muscle-strength_0`) to match the dynamically generated measure IDs, resolving data display issues.
+    -   The "Measure" column header is now left-aligned.
+    -   Linter warnings (unused imports, `hasOwnProperty`) addressed.
+    -   A message "No assessment data available." is shown if the filtered list of measures with mock data is empty.
+
+## Active Decisions & Considerations
+
+### API Path Structure
+- **Date**: 2025-05-26
+- **Focus**: Refining UI for Patient Profile, specifically the Clinical Assessments tab. Ongoing backend integration for EMG data.
+- **Recent Changes**:
+    - **UI Enhancements for `PatientProfile.tsx` and `ClinicalAssessments.tsx`**:
+        -   In `PatientProfile.tsx`:
+            -   Tabs updated to "Sessions", "Clinical Assessments", "Notes". "Overview" tab and its content (e.g., `EmgVisualization`, `TreatmentTimeline`) were removed.
+            -   "Clinical Assessments" tab now uses the new `ClinicalAssessments` component instead of `TreatmentConfig`.
+            -   "Edit Assessment" button in the "Clinical Assessments" tab header changed to "Manage Assessments" (subsequently updated to "Add Assessment" and "View Progress" buttons).
+            -   Tab styling ( `TabsList` and `TabsTrigger` in `PatientProfile.tsx`) updated to align with the styling in `frontend/src/pages/dashboard/index.tsx`, including icons (`Calendar`, `FileEdit`, `FilePlus`).
+        -   In `ClinicalAssessments.tsx`:
+            -   Component created in `frontend/src/components/patients/clinical-assessments.tsx`.
+            -   Initial implementation listed assessment categories.
+            -   Iteratively improved UI:
+                -   Card view with reduced padding and two-column grid for measures.
+                -   Table view implemented with colored badges for categories (with tooltips), "Measure", "Last Value" (later removed), and "Last Assessed" columns.
+                -   Mock data (`mockPatientAssessments`) added to populate the table, with logic to display data or "N/A".
+                -   Corrected mock data keys to match generated measure IDs (hyphens vs. underscores).
+                -   Filtered measures to display only those with mock data.
+                -   "Last Value" column removed.
+                -   "Measure" column header aligned to the left.
+            -   Linter warnings (unused imports, `hasOwnProperty`) addressed.
+    - **C3D Processing & EMG Analysis Components** (previous focus, largely stable):
+        - Successfully fixed C3D file upload functionality by aligning API route prefixes
+        - Fixed Docker configuration for ezc3d library dependencies using a single-stage build approach
+        - Added system dependencies for runtime support of scientific libraries
+        - Added proper location block for `/v1/` paths to proxy to backend
+        - Ensured consistent routing for all API endpoints
+
+### Nginx Configuration Refinement (2025-05-24)
+- Added proper location block for `/v1/` paths to proxy to backend
+- Ensured consistent routing for all API endpoints
+
+### UI Enhancements for Patient Profile & Clinical Assessments (2025-05-26)
+-   **`PatientProfile.tsx`**:
+    -   Tabs modified to "Sessions", "Clinical Assessments", "Notes". "Overview" tab and its content (e.g., `EmgVisualization`, `TreatmentTimeline`) were removed.
+    -   "Clinical Assessments" tab now uses the new `ClinicalAssessments` component instead of `TreatmentConfig`.
+    -   "Edit Assessment" button in the "Clinical Assessments" tab header changed to "Manage Assessments" (subsequently updated to "Add Assessment" and "View Progress" buttons).
+    -   Tab styling ( `TabsList` and `TabsTrigger` in `PatientProfile.tsx`) updated to align with the styling in `frontend/src/pages/dashboard/index.tsx`, including icons (`Calendar`, `FileEdit`, `FilePlus`).
+-   **`ClinicalAssessments.tsx`** (`frontend/src/components/patients/clinical-assessments.tsx`):
+    -   Created as a new component.
+    -   UI evolved from a simple list of assessment categories to a card-based layout, and finally to a table-based layout.
+    -   The table displays columns for "Category" (using a colored `Badge` with a `Tooltip`), "Measure", and "Last Assessed". The "Last Value" column was removed.
+    -   Mock data (`mockPatientAssessments`) was introduced and integrated to populate the table. The displayed data is filtered to only include measures for which mock data exists.
+    -   Keys in `mockPatientAssessments` were corrected to use hyphens (e.g., `muscle-strength_0`) to match the dynamically generated measure IDs, resolving data display issues.
+    -   The "Measure" column header is now left-aligned.
+    -   Linter warnings (unused imports, `hasOwnProperty`) addressed.
+    -   A message "No assessment data available." is shown if the filtered list of measures with mock data is empty.
+
+## Active Decisions & Considerations
+
+### API Path Structure
+- **Date**: 2025-05-26
+- **Focus**: Refining UI for Patient Profile, specifically the Clinical Assessments tab. Ongoing backend integration for EMG data.
+- **Recent Changes**:
+    - **UI Enhancements for `PatientProfile.tsx` and `ClinicalAssessments.tsx`**:
+        -   In `PatientProfile.tsx`:
+            -   Tabs updated to "Sessions", "Clinical Assessments", "Notes". "Overview" tab and its content (e.g., `EmgVisualization`, `TreatmentTimeline`) were removed.
+            -   "Clinical Assessments" tab now uses the new `ClinicalAssessments` component instead of `TreatmentConfig`.
+            -   "Edit Assessment" button in the "Clinical Assessments" tab header changed to "Manage Assessments" (subsequently updated to "Add Assessment" and "View Progress" buttons).
+            -   Tab styling ( `TabsList` and `TabsTrigger` in `PatientProfile.tsx`) updated to align with the styling in `frontend/src/pages/dashboard/index.tsx`, including icons (`Calendar`, `FileEdit`, `FilePlus`).
+        -   In `ClinicalAssessments.tsx`:
+            -   Component created in `frontend/src/components/patients/clinical-assessments.tsx`.
+            -   Initial implementation listed assessment categories.
+            -   Iteratively improved UI:
+                -   Card view with reduced padding and two-column grid for measures.
+                -   Table view implemented with colored badges for categories (with tooltips), "Measure", "Last Value" (later removed), and "Last Assessed" columns.
+                -   Mock data (`mockPatientAssessments`) added to populate the table, with logic to display data or "N/A".
+                -   Corrected mock data keys to match generated measure IDs (hyphens vs. underscores).
+                -   Filtered measures to display only those with mock data.
+                -   "Last Value" column removed.
+                -   "Measure" column header aligned to the left.
+            -   Linter warnings (unused imports, `hasOwnProperty`) addressed.
+    - **C3D Processing & EMG Analysis Components** (previous focus, largely stable):
+        - Successfully fixed C3D file upload functionality by aligning API route prefixes
+        - Fixed Docker configuration for ezc3d library dependencies using a single-stage build approach
+        - Added system dependencies for runtime support of scientific libraries
+        - Added proper location block for `/v1/` paths to proxy to backend
+        - Ensured consistent routing for all API endpoints
+
+### Nginx Configuration Refinement (2025-05-24)
+- Added proper location block for `/v1/` paths to proxy to backend
+- Ensured consistent routing for all API endpoints
+
+### UI Enhancements for Patient Profile & Clinical Assessments (2025-05-26)
+-   **`PatientProfile.tsx`**:
+    -   Tabs modified to "Sessions", "Clinical Assessments", "Notes". "Overview" tab and its content (e.g., `EmgVisualization`, `TreatmentTimeline`) were removed.
+    -   "Clinical Assessments" tab now uses the new `ClinicalAssessments` component instead of `TreatmentConfig`.
+    -   "Edit Assessment" button in the "Clinical Assessments" tab header changed to "Manage Assessments" (subsequently updated to "Add Assessment" and "View Progress" buttons).
+    -   Tab styling ( `TabsList` and `TabsTrigger` in `PatientProfile.tsx`) updated to align with the styling in `frontend/src/pages/dashboard/index.tsx`, including icons (`Calendar`, `FileEdit`, `FilePlus`).
+-   **`ClinicalAssessments.tsx`** (`frontend/src/components/patients/clinical-assessments.tsx`):
+    -   Created as a new component.
+    -   UI evolved from a simple list of assessment categories to a card-based layout, and finally to a table-based layout.
+    -   The table displays columns for "Category" (using a colored `Badge` with a `Tooltip`), "Measure", and "Last Assessed". The "Last Value" column was removed.
+    -   Mock data (`mockPatientAssessments`) was introduced and integrated to populate the table. The displayed data is filtered to only include measures for which mock data exists.
+    -   Keys in `mockPatientAssessments` were corrected to use hyphens (e.g., `muscle-strength_0`) to match the dynamically generated measure IDs, resolving data display issues.
+    -   The "Measure" column header is now left-aligned.
+    -   Linter warnings (unused imports, `hasOwnProperty`) addressed.
+    -   A message "No assessment data available." is shown if the filtered list of measures with mock data is empty.
+
+## Active Decisions & Considerations
+
+### API Path Structure
+- **Date**: 2025-05-26
+- **Focus**: Refining UI for Patient Profile, specifically the Clinical Assessments tab. Ongoing backend integration for EMG data.
+- **Recent Changes**:
+    - **UI Enhancements for `PatientProfile.tsx` and `ClinicalAssessments.tsx`**:
+        -   In `PatientProfile.tsx`:
+            -   Tabs updated to "Sessions", "Clinical Assessments", "Notes". "Overview" tab and its content (e.g., `EmgVisualization`, `TreatmentTimeline`) were removed.
+            -   "Clinical Assessments" tab now uses the new `ClinicalAssessments` component instead of `TreatmentConfig`.
+            -   "Edit Assessment" button in the "Clinical Assessments" tab header changed to "Manage Assessments" (subsequently updated to "Add Assessment" and "View Progress" buttons).
+            -   Tab styling ( `TabsList` and `TabsTrigger` in `PatientProfile.tsx`) updated to align with the styling in `frontend/src/pages/dashboard/index.tsx`, including icons (`Calendar`, `FileEdit`, `FilePlus`).
+        -   In `ClinicalAssessments.tsx`:
+            -   Component created in `frontend/src/components/patients/clinical-assessments.tsx`.
+            -   Initial implementation listed assessment categories.
+            -   Iteratively improved UI:
+                -   Card view with reduced padding and two-column grid for measures.
+                -   Table view implemented with colored badges for categories (with tooltips), "Measure", "Last Value" (later removed), and "Last Assessed" columns.
+                -   Mock data (`mockPatientAssessments`) added to populate the table, with logic to display data or "N/A".
+                -   Corrected mock data keys to match generated measure IDs (hyphens vs. underscores).
+                -   Filtered measures to display only those with mock data.
+                -   "Last Value" column removed.
+                -   "Measure" column header aligned to the left.
+            -   Linter warnings (unused imports, `hasOwnProperty`) addressed.
+    - **C3D Processing & EMG Analysis Components** (previous focus, largely stable):
+        - Successfully fixed C3D file upload functionality by aligning API route prefixes
+        - Fixed Docker configuration for ezc3d library dependencies using a single-stage build approach
+        - Added system dependencies for runtime support of scientific libraries
+        - Added proper location block for `/v1/` paths to proxy to backend
+        - Ensured consistent routing for all API endpoints
+
+### Nginx Configuration Refinement (2025-05-24)
+- Added proper location block for `/v1/` paths to proxy to backend
+- Ensured consistent routing for all API endpoints
+
+### UI Enhancements for Patient Profile & Clinical Assessments (2025-05-26)
+-   **`PatientProfile.tsx`**:
+    -   Tabs modified to "Sessions", "Clinical Assessments", "Notes". "Overview" tab and its content (e.g., `EmgVisualization`, `TreatmentTimeline`) were removed.
+    -   "Clinical Assessments" tab now uses the new `ClinicalAssessments` component instead of `TreatmentConfig`.
+    -   "Edit Assessment" button in the "Clinical Assessments" tab header changed to "Manage Assessments" (subsequently updated to "Add Assessment" and "View Progress" buttons).
+    -   Tab styling ( `TabsList` and `TabsTrigger` in `PatientProfile.tsx`) updated to align with the styling in `frontend/src/pages/dashboard/index.tsx`, including icons (`Calendar`, `FileEdit`, `FilePlus`).
+-   **`ClinicalAssessments.tsx`** (`frontend/src/components/patients/clinical-assessments.tsx`):
+    -   Created as a new component.
+    -   UI evolved from a simple list of assessment categories to a card-based layout, and finally to a table-based layout.
+    -   The table displays columns for "Category" (using a colored `Badge` with a `Tooltip`), "Measure", and "Last Assessed". The "Last Value" column was removed.
+    -   Mock data (`mockPatientAssessments`) was introduced and integrated to populate the table. The displayed data is filtered to only include measures for which mock data exists.
+    -   Keys in `mockPatientAssessments` were corrected to use hyphens (e.g., `muscle-strength_0`) to match the dynamically generated measure IDs, resolving data display issues.
+    -   The "Measure" column header is now left-aligned.
+    -   Linter warnings (unused imports, `hasOwnProperty`) addressed.
+    -   A message "No assessment data available." is shown if the filtered list of measures with mock data is empty.
+
+## Active Decisions & Considerations
+
+### API Path Structure
+- **Date**: 2025-05-26
+- **Focus**: Refining UI for Patient Profile, specifically the Clinical Assessments tab. Ongoing backend integration for EMG data.
+- **Recent Changes**:
+    - **UI Enhancements for `PatientProfile.tsx` and `ClinicalAssessments.tsx`**:
+        -   In `PatientProfile.tsx`:
+            -   Tabs updated to "Sessions", "Clinical Assessments", "Notes". "Overview" tab and its content (e.g., `EmgVisualization`, `TreatmentTimeline`) were removed.
+            -   "Clinical Assessments" tab now uses the new `ClinicalAssessments` component instead of `TreatmentConfig`.
+            -   "Edit Assessment" button in the "Clinical Assessments" tab header changed to "Manage Assessments" (subsequently updated to "Add Assessment" and "View Progress" buttons).
+            -   Tab styling ( `TabsList` and `TabsTrigger` in `PatientProfile.tsx`) updated to align with the styling in `frontend/src/pages/dashboard/index.tsx`, including icons (`Calendar`, `FileEdit`, `FilePlus`).
+        -   In `ClinicalAssessments.tsx`:
+            -   Component created in `frontend/src/components/patients/clinical-assessments.tsx`.
+            -   Initial implementation listed assessment categories.
+            -   Iteratively improved UI:
+                -   Card view with reduced padding and two-column grid for measures.
+                -   Table view implemented with colored badges for categories (with tooltips), "Measure", "Last Value" (later removed), and "Last Assessed" columns.
+                -   Mock data (`mockPatientAssessments`) added to populate the table, with logic to display data or "N/A".
+                -   Corrected mock data keys to match generated measure IDs (hyphens vs. underscores).
+                -   Filtered measures to display only those with mock data.
+                -   "Last Value" column removed.
+                -   "Measure" column header aligned to the left.
+            -   Linter warnings (unused imports, `hasOwnProperty`) addressed.
+    - **C3D Processing & EMG Analysis Components** (previous focus, largely stable):
+        - Successfully fixed C3D file upload functionality by aligning API route prefixes
+        - Fixed Docker configuration for ezc3d library dependencies using a single-stage build approach
+        - Added system dependencies for runtime support of scientific libraries
+        - Added proper location block for `/v1/` paths to proxy to backend
+        - Ensured consistent routing for all API endpoints
+
+### Nginx Configuration Refinement (2025-05-24)
+- Added proper location block for `/v1/` paths to proxy to backend
+- Ensured consistent routing for all API endpoints
+
+### UI Enhancements for Patient Profile & Clinical Assessments (2025-05-26)
+-   **`PatientProfile.tsx`**:
+    -   Tabs modified to "Sessions", "Clinical Assessments", "Notes". "Overview" tab and its content (e.g., `EmgVisualization`, `TreatmentTimeline`) were removed.
+    -   "Clinical Assessments" tab now uses the new `ClinicalAssessments` component instead of `TreatmentConfig`.
+    -   "Edit Assessment" button in the "Clinical Assessments" tab header changed to "Manage Assessments" (subsequently updated to "Add Assessment" and "View Progress" buttons).
+    -   Tab styling ( `TabsList` and `TabsTrigger` in `PatientProfile.tsx`) updated to align with the styling in `frontend/src/pages/dashboard/index.tsx`, including icons (`Calendar`, `FileEdit`, `FilePlus`).
+-   **`ClinicalAssessments.tsx`** (`frontend/src/components/patients/clinical-assessments.tsx`):
+    -   Created as a new component.
+    -   UI evolved from a simple list of assessment categories to a card-based layout, and finally to a table-based layout.
+    -   The table displays columns for "Category" (using a colored `Badge` with a `Tooltip`), "Measure", and "Last Assessed". The "Last Value" column was removed.
+    -   Mock data (`mockPatientAssessments`) was introduced and integrated to populate the table. The displayed data is filtered to only include measures for which mock data exists.
+    -   Keys in `mockPatientAssessments` were corrected to use hyphens (e.g., `muscle-strength_0`) to match the dynamically generated measure IDs, resolving data display issues.
+    -   The "Measure" column header is now left-aligned.
+    -   Linter warnings (unused imports, `hasOwnProperty`) addressed.
+    -   A message "No assessment data available." is shown if the filtered list of measures with mock data is empty.
+
+## Active Decisions & Considerations
+
+### API Path Structure
+- **Date**: 2025-05-26
+- **Focus**: Refining UI for Patient Profile, specifically the Clinical Assessments tab. Ongoing backend integration for EMG data.
+- **Recent Changes**:
+    - **UI Enhancements for `PatientProfile.tsx` and `ClinicalAssessments.tsx`**:
+        -   In `PatientProfile.tsx`:
+            -   Tabs updated to "Sessions", "Clinical Assessments", "Notes". "Overview" tab and its content (e.g., `EmgVisualization`, `TreatmentTimeline`) were removed.
+            -   "Clinical Assessments" tab now uses the new `ClinicalAssessments` component instead of `TreatmentConfig`.
+            -   "Edit Assessment" button in the "Clinical Assessments" tab header changed to "Manage Assessments" (subsequently updated to "Add Assessment" and "View Progress" buttons).
+            -   Tab styling ( `TabsList` and `TabsTrigger` in `PatientProfile.tsx`) updated to align with the styling in `frontend/src/pages/dashboard/index.tsx`, including icons (`Calendar`, `FileEdit`, `FilePlus`).
+        -   In `ClinicalAssessments.tsx`:
+            -   Component created in `frontend/src/components/patients/clinical-assessments.tsx`.
+            -   Initial implementation listed assessment categories.
+            -   Iteratively improved UI:
+                -   Card view with reduced padding and two-column grid for measures.
+                -   Table view implemented with colored badges for categories (with tooltips), "Measure", "Last Value" (later removed), and "Last Assessed" columns.
+                -   Mock data (`mockPatientAssessments`) added to populate the table, with logic to display data or "N/A".
+                -   Corrected mock data keys to match generated measure IDs (hyphens vs. underscores).
+                -   Filtered measures to display only those with mock data.
+                -   "Last Value" column removed.
+                -   "Measure" column header aligned to the left.
+            -   Linter warnings (unused imports, `hasOwnProperty`) addressed.
+    - **C3D Processing & EMG Analysis Components** (previous focus, largely stable):
+        - Successfully fixed C3D file upload functionality by aligning API route prefixes
+        - Fixed Docker configuration for ezc3d library dependencies using a single-stage build approach
+        - Added system dependencies for runtime support of scientific libraries
+        - Added proper location block for `/v1/` paths to proxy to backend
+        - Ensured consistent routing for all API endpoints
+
+### Nginx Configuration Refinement (2025-05-24)
+- Added proper location block for `/v1/` paths to proxy to backend
+- Ensured consistent routing for all API endpoints
+
+### UI Enhancements for Patient Profile & Clinical Assessments (2025-05-26)
+-   **`PatientProfile.tsx`**:
+    -   Tabs modified to "Sessions", "Clinical Assessments", "Notes". "Overview" tab and its content (e.g., `EmgVisualization`, `TreatmentTimeline`) were removed.
+    -   "Clinical Assessments" tab now uses the new `ClinicalAssessments` component instead of `TreatmentConfig`.
+    -   "Edit Assessment" button in the "Clinical Assessments" tab header changed to "Manage Assessments" (subsequently updated to "Add Assessment" and "View Progress" buttons).
+    -   Tab styling ( `TabsList` and `TabsTrigger` in `PatientProfile.tsx`) updated to align with the styling in `frontend/src/pages/dashboard/index.tsx`, including icons (`Calendar`, `FileEdit`, `FilePlus`).
+-   **`ClinicalAssessments.tsx`** (`frontend/src/components/patients/clinical-assessments.tsx`):
+    -   Created as a new component.
+    -   UI evolved from a simple list of assessment categories to a card-based layout, and finally to a table-based layout.
+    -   The table displays columns for "Category" (using a colored `Badge` with a `Tooltip`), "Measure", and "Last Assessed". The "Last Value" column was removed.
+    -   Mock data (`mockPatientAssessments`) was introduced and integrated to populate the table. The displayed data is filtered to only include measures for which mock data exists.
+    -   Keys in `mockPatientAssessments` were corrected to use hyphens (e.g., `muscle-strength_0`) to match the dynamically generated measure IDs, resolving data display issues.
+    -   The "Measure" column header is now left-aligned.
+    -   Linter warnings (unused imports, `hasOwnProperty`) addressed.
+    -   A message "No assessment data available." is shown if the filtered list of measures with mock data is empty.
+
+## Active Decisions & Considerations
+
+### API Path Structure
+- **Date**: 2025-05-26
+- **Focus**: Refining UI for Patient Profile, specifically the Clinical Assessments tab. Ongoing backend integration for EMG data.
+- **Recent Changes**:
+    - **UI Enhancements for `PatientProfile.tsx` and `ClinicalAssessments.tsx`**:
+        -   In `PatientProfile.tsx`:
+            -   Tabs updated to "Sessions", "Clinical Assessments", "Notes". "Overview" tab and its content (e.g., `EmgVisualization`, `TreatmentTimeline`) were removed.
+            -   "Clinical Assessments" tab now uses the new `ClinicalAssessments` component instead of `TreatmentConfig`.
+            -   "Edit Assessment" button in the "Clinical Assessments" tab header changed to "Manage Assessments" (subsequently updated to "Add Assessment" and "View Progress" buttons).
+            -   Tab styling ( `TabsList` and `TabsTrigger` in `PatientProfile.tsx`) updated to align with the styling in `frontend/src/pages/dashboard/index.tsx`, including icons (`Calendar`, `FileEdit`, `FilePlus`).
+        -   In `ClinicalAssessments.tsx`:
+            -   Component created in `frontend/src/components/patients/clinical-assessments.tsx`.
+            -   Initial implementation listed assessment categories.
+            -   Iteratively improved UI:
+                -   Card view with reduced padding and two-column grid for measures.
+                -   Table view implemented with colored badges for categories (with tooltips), "Measure", "Last Value" (later removed), and "Last Assessed" columns.
+                -   Mock data (`mockPatientAssessments`) added to populate the table, with logic to display data or "N/A".
+                -   Corrected mock data keys to match generated measure IDs (hyphens vs. underscores).
+                -   Filtered measures to display only those with mock data.
+                -   "Last Value" column removed.
+                -   "Measure" column header aligned to the left.
+            -   Linter warnings (unused imports, `hasOwnProperty`) addressed.
+    - **C3D Processing & EMG Analysis Components** (previous focus, largely stable):
+        - Successfully fixed C3D file upload functionality by aligning API route prefixes
+        - Fixed Docker configuration for ezc3d library dependencies using a single-stage build approach
+        - Added system dependencies for runtime support of scientific libraries
+        - Added proper location block for `/v1/` paths to proxy to backend
+        - Ensured consistent routing for all API endpoints
+
+### Nginx Configuration Refinement (2025-05-24)
+- Added proper location block for `/v1/` paths to proxy to backend
+- Ensured consistent routing for all API endpoints
+
+### UI Enhancements for Patient Profile & Clinical Assessments (2025-05-26)
+-   **`PatientProfile.tsx`**:
+    -   Tabs modified to "Sessions", "Clinical Assessments", "Notes". "Overview" tab and its content (e.g., `EmgVisualization`, `TreatmentTimeline`) were removed.
+    -   "Clinical Assessments" tab now uses the new `ClinicalAssessments` component instead of `TreatmentConfig`.
+    -   "Edit Assessment" button in the "Clinical Assessments" tab header changed to "Manage Assessments" (subsequently updated to "Add Assessment" and "View Progress" buttons).
+    -   Tab styling ( `TabsList` and `TabsTrigger` in `PatientProfile.tsx`) updated to align with the styling in `frontend/src/pages/dashboard/index.tsx`, including icons (`Calendar`, `FileEdit`, `FilePlus`).
+-   **`ClinicalAssessments.tsx`** (`frontend/src/components/patients/clinical-assessments.tsx`):
+    -   Created as a new component.
+    -   UI evolved from a simple list of assessment categories to a card-based layout, and finally to a table-based layout.
+    -   The table displays columns for "Category" (using a colored `Badge` with a `Tooltip`), "Measure", and "Last Assessed". The "Last Value" column was removed.
+    -   Mock data (`mockPatientAssessments`) was introduced and integrated to populate the table. The displayed data is filtered to only include measures for which mock data exists.
+    -   Keys in `mockPatientAssessments` were corrected to use hyphens (e.g., `muscle-strength_0`) to match the dynamically generated measure IDs, resolving data display issues.
+    -   The "Measure" column header is now left-aligned.
+    -   Linter warnings (unused imports, `hasOwnProperty`) addressed.
+    -   A message "No assessment data available." is shown if the filtered list of measures with mock data is empty.
+
+## Active Decisions & Considerations
+
+### API Path Structure
+- **Date**: 2025-05-26
+- **Focus**: Refining UI for Patient Profile, specifically the Clinical Assessments tab. Ongoing backend integration for EMG data.
+- **Recent Changes**:
+    - **UI Enhancements for `PatientProfile.tsx` and `ClinicalAssessments.tsx`**:
+        -   In `PatientProfile.tsx`:
+            -   Tabs updated to "Sessions", "Clinical Assessments", "Notes". "Overview" tab and its content (e.g., `EmgVisualization`, `TreatmentTimeline`) were removed.
+            -   "Clinical Assessments" tab now uses the new `ClinicalAssessments` component instead of `TreatmentConfig`.
+            -   "Edit Assessment" button in the "Clinical Assessments" tab header changed to "Manage Assessments" (subsequently updated to "Add Assessment" and "View Progress" buttons).
+            -   Tab styling ( `TabsList` and `TabsTrigger` in `PatientProfile.tsx`) updated to align with the styling in `frontend/src/pages/dashboard/index.tsx`, including icons (`Calendar`, `FileEdit`, `FilePlus`).
+        -   In `ClinicalAssessments.tsx`:
+            -   Component created in `frontend/src/components/patients/clinical-assessments.tsx`.
+            -   Initial implementation listed assessment categories.
+            -   Iteratively improved UI:
+                -   Card view with reduced padding and two-column grid for measures.
+                -   Table view implemented with colored badges for categories (with tooltips), "Measure", "Last Value" (later removed), and "Last Assessed" columns.
+                -   Mock data (`mockPatientAssessments`) added to populate the table, with logic to display data or "N/A".
+                -   Corrected mock data keys to match generated measure IDs (hyphens vs. underscores).
+                -   Filtered measures to display only those with mock data.
+                -   "Last Value" column removed.
+                -   "Measure" column header aligned to the left.
+            -   Linter warnings (unused imports, `hasOwnProperty`) addressed.
+    - **C3D Processing & EMG Analysis Components** (previous focus, largely stable):
+        - Successfully fixed C3D file upload functionality by aligning API route prefixes
+        - Fixed Docker configuration for ezc3d library dependencies using a single-stage build approach
+        - Added system dependencies for runtime support of scientific libraries
+        - Added proper location block for `/v1/` paths to proxy to backend
+        - Ensured consistent routing for all API endpoints
+
+### Nginx Configuration Refinement (2025-05-24)
+- Added proper location block for `/v1/` paths to proxy to backend
+- Ensured consistent routing for all API endpoints
+
+### UI Enhancements for Patient Profile & Clinical Assessments (2025-05-26)
+-   **`PatientProfile.tsx`**:
+    -   Tabs modified to "Sessions", "Clinical Assessments", "Notes". "Overview" tab and its content (e.g., `EmgVisualization`, `TreatmentTimeline`) were removed.
+    -   "Clinical Assessments" tab now uses the new `ClinicalAssessments` component instead of `TreatmentConfig`.
+    -   "Edit Assessment" button in the "Clinical Assessments" tab header changed to "Manage Assessments" (subsequently updated to "Add Assessment" and "View Progress" buttons).
+    -   Tab styling ( `TabsList` and `TabsTrigger` in `PatientProfile.tsx`) updated to align with the styling in `frontend/src/pages/dashboard/index.tsx`, including icons (`Calendar`, `FileEdit`, `FilePlus`).
+-   **`ClinicalAssessments.tsx`** (`frontend/src/components/patients/clinical-assessments.tsx`):
+    -   Created as a new component.
+    -   UI evolved from a simple list of assessment categories to a card-based layout, and finally to a table-based layout.
+    -   The table displays columns for "Category" (using a colored `Badge` with a `Tooltip`), "Measure", and "Last Assessed". The "Last Value" column was removed.
+    -   Mock data (`mockPatientAssessments`) was introduced and integrated to populate the table. The displayed data is filtered to only include measures for which mock data exists.
+    -   Keys in `mockPatientAssessments` were corrected to use hyphens (e.g., `muscle-strength_0`) to match the dynamically generated measure IDs, resolving data display issues.
+    -   The "Measure" column header is now left-aligned.
+    -   Linter warnings (unused imports, `hasOwnProperty`) addressed.
+    -   A message "No assessment data available." is shown if the filtered list of measures with mock data is empty.
+
+## Active Decisions & Considerations
+
+### API Path Structure
+- **Date**: 2025-05-26
+- **Focus**: Refining UI for Patient Profile, specifically the Clinical Assessments tab. Ongoing backend integration for EMG data.
+- **Recent Changes**:
+    - **UI Enhancements for `PatientProfile.tsx` and `ClinicalAssessments.tsx`**:
+        -   In `PatientProfile.tsx`:
+            -   Tabs updated to "Sessions", "Clinical Assessments", "Notes". "Overview" tab and its content (e.g., `EmgVisualization`, `TreatmentTimeline`) were removed.
+            -   "Clinical Assessments" tab now uses the new `ClinicalAssessments` component instead of `TreatmentConfig`.
+            -   "Edit Assessment" button in the "Clinical Assessments" tab header changed to "Manage Assessments" (subsequently updated to "Add Assessment" and "View Progress" buttons).
+            -   Tab styling ( `TabsList` and `TabsTrigger` in `PatientProfile.tsx`) updated to align with the styling in `frontend/src/pages/dashboard/index.tsx`, including icons (`Calendar`, `FileEdit`, `FilePlus`).
+        -   In `ClinicalAssessments.tsx`:
+            -   Component created in `frontend/src/components/patients/clinical-assessments.tsx`.
+            -   Initial implementation listed assessment categories.
+            -   Iteratively improved UI:
+                -   Card view with reduced padding and two-column grid for measures.
+                -   Table view implemented with colored badges for categories (with tooltips), "Measure", "Last Value" (later removed), and "Last Assessed" columns.
+                -   Mock data (`mockPatientAssessments`) added to populate the table, with logic to display data or "N/A".
+                -   Corrected mock data keys to match generated measure IDs (hyphens vs. underscores).
+                -   Filtered measures to display only those with mock data.
+                -   "Last Value" column removed.
+                -   "Measure" column header aligned to the left.
+            -   Linter warnings (unused imports, `hasOwnProperty`) addressed.
+    - **C3D Processing & EMG Analysis Components** (previous focus, largely stable):
+        - Successfully fixed C3D file upload functionality by aligning API route prefixes
+        - Fixed Docker configuration for ezc3d library dependencies using a single-stage build approach
+        - Added system dependencies for runtime support of scientific libraries
+        - Added proper location block for `/v1/` paths to proxy to backend
+        - Ensured consistent routing for all API endpoints
+
+### Nginx Configuration Refinement (2025-05-24)
+- Added proper location block for `/v1/` paths to proxy to backend
+- Ensured consistent routing for all API endpoints
+
+### UI Enhancements for Patient Profile & Clinical Assessments (2025-05-26)
+-   **`PatientProfile.tsx`**:
+    -   Tabs modified to "Sessions", "Clinical Assessments", "Notes". "Overview" tab and its content (e.g., `EmgVisualization`, `TreatmentTimeline`) were removed.
+    -   "Clinical Assessments" tab now uses the new `ClinicalAssessments` component instead of `TreatmentConfig`.
+    -   "Edit Assessment" button in the "Clinical Assessments" tab header changed to "Manage Assessments" (subsequently updated to "Add Assessment" and "View Progress" buttons).
+    -   Tab styling ( `TabsList` and `TabsTrigger` in `PatientProfile.tsx`) updated to align with the styling in `frontend/src/pages/dashboard/index.tsx`, including icons (`Calendar`, `FileEdit`, `FilePlus`).
+-   **`ClinicalAssessments.tsx`** (`frontend/src/components/patients/clinical-assessments.tsx`):
+    -   Created as a new component.
+    -   UI evolved from a simple list of assessment categories to a card-based layout, and finally to a table-based layout.
+    -   The table displays columns for "Category" (using a colored `Badge` with a `Tooltip`), "Measure", and "Last Assessed". The "Last Value" column was removed.
+    -   Mock data (`mockPatientAssessments`) was introduced and integrated to populate the table. The displayed data is filtered to only include measures for which mock data exists.
+    -   Keys in `mockPatientAssessments` were corrected to use hyphens (e.g., `muscle-strength_0`) to match the dynamically generated measure IDs, resolving data display issues.
+    -   The "Measure" column header is now left-aligned.
+    -   Linter warnings (unused imports, `hasOwnProperty`) addressed.
+    -   A message "No assessment data available." is shown if the filtered list of measures with mock data is empty.
+
+## Active Decisions & Considerations
+
+### API Path Structure
+- **Date**: 2025-05-26
+- **Focus**: Refining UI for Patient Profile, specifically the Clinical Assessments tab. Ongoing backend integration for EMG data.
+- **Recent Changes**:
+    - **UI Enhancements for `PatientProfile.tsx` and `ClinicalAssessments.tsx`**:
+        -   In `PatientProfile.tsx`:
+            -   Tabs updated to "Sessions", "Clinical Assessments", "Notes". "Overview" tab and its content (e.g., `EmgVisualization`, `TreatmentTimeline`) were removed.
+            -   "Clinical Assessments" tab now uses the new `ClinicalAssessments` component instead of `TreatmentConfig`.
+            -   "Edit Assessment" button in the "Clinical Assessments" tab header changed to "Manage Assessments" (subsequently updated to "Add Assessment" and "View Progress" buttons).
+            -   Tab styling ( `TabsList` and `TabsTrigger` in `PatientProfile.tsx`) updated to align with the styling in `frontend/src/pages/dashboard/index.tsx`, including icons (`Calendar`, `FileEdit`, `FilePlus`).
+        -   In `ClinicalAssessments.tsx`:
+            -   Component created in `frontend/src/components/patients/clinical-assessments.tsx`.
+            -   Initial implementation listed assessment categories.
+            -   Iteratively improved UI:
+                -   Card view with reduced padding and two-column grid for measures.
+                -   Table view implemented with colored badges for categories (with tooltips), "Measure", "Last Value" (later removed), and "Last Assessed" columns.
+                -   Mock data (`mockPatientAssessments`) added to populate the table, with logic to display data or "N/A".
+                -   Corrected mock data keys to match generated measure IDs (hyphens vs. underscores).
+                -   Filtered measures to display only those with mock data.
+                -   "Last Value" column removed.
+                -   "Measure" column header aligned to the left.
+            -   Linter warnings (unused imports, `hasOwnProperty`) addressed.
+    - **C3D Processing & EMG Analysis Components** (previous focus, largely stable):
+        - Successfully fixed C3D file upload functionality by aligning API route prefixes
+        - Fixed Docker configuration for ezc3d library dependencies using a single-stage build approach
+        - Added system dependencies for runtime support of scientific libraries
+        - Added proper location block for `/v1/` paths to proxy to backend
+        - Ensured consistent routing for all API endpoints
+
+### Nginx Configuration Refinement (2025-05-24)
+- Added proper location block for `/v1/` paths to proxy to backend
+- Ensured consistent routing for all API endpoints
+
+### UI Enhancements for Patient Profile & Clinical Assessments (2025-05-26)
+-   **`PatientProfile.tsx`**:
+    -   Tabs modified to "Sessions", "Clinical Assessments", "Notes". "Overview" tab and its content (e.g., `EmgVisualization`, `TreatmentTimeline`) were removed.
+    -   "Clinical Assessments" tab now uses the new `ClinicalAssessments` component instead of `TreatmentConfig`.
+    -   "Edit Assessment" button in the "Clinical Assessments" tab header changed to "Manage Assessments" (subsequently updated to "Add Assessment" and "View Progress" buttons).
+    -   Tab styling ( `TabsList` and `TabsTrigger` in `PatientProfile.tsx`) updated to align with the styling in `frontend/src/pages/dashboard/index.tsx`, including icons (`Calendar`, `FileEdit`, `FilePlus`).
+-   **`ClinicalAssessments.tsx`** (`frontend/src/components/patients/clinical-assessments.tsx`):
+    -   Created as a new component.
+    -   UI evolved from a simple list of assessment categories to a card-based layout, and finally to a table-based layout.
+    -   The table displays columns for "Category" (using a colored `Badge` with a `Tooltip`), "Measure", and "Last Assessed". The "Last Value" column was removed.
+    -   Mock data (`mockPatientAssessments`) was introduced and integrated to populate the table. The displayed data is filtered to only include measures for which mock data exists.
+    -   Keys in `mockPatientAssessments` were corrected to use hyphens (e.g., `muscle-strength_0`) to match the dynamically generated measure IDs, resolving data display issues.
+    -   The "Measure" column header is now left-aligned.
+    -   Linter warnings (unused imports, `hasOwnProperty`) addressed.
+    -   A message "No assessment data available." is shown if the filtered list of measures with mock data is empty.
+
+## Active Decisions & Considerations
+
+### API Path Structure
+- **Date**: 2025-05-26
+- **Focus**: Refining UI for Patient Profile, specifically the Clinical Assessments tab. Ongoing backend integration for EMG data.
+- **Recent Changes**:
+    - **UI Enhancements for `PatientProfile.tsx` and `ClinicalAssessments.tsx`**:
+        -   In `PatientProfile.tsx`:
+            -   Tabs updated to "Sessions", "Clinical Assessments", "Notes". "Overview" tab and its content (e.g., `EmgVisualization`, `TreatmentTimeline`) were removed.
+            -   "Clinical Assessments" tab now uses the new `ClinicalAssessments` component instead of `TreatmentConfig`.
+            -   "Edit Assessment" button in the "Clinical Assessments" tab header changed to "Manage Assessments" (subsequently updated to "Add Assessment" and "View Progress" buttons).
+            -   Tab styling ( `TabsList` and `TabsTrigger` in `PatientProfile.tsx`) updated to align with the styling in `frontend/src/pages/dashboard/index.tsx`, including icons (`Calendar`, `FileEdit`, `FilePlus`).
+        -   In `ClinicalAssessments.tsx`:
+            -   Component created in `frontend/src/components/patients/clinical-assessments.tsx`.
+            -   Initial implementation listed assessment categories.
+            -   Iteratively improved UI:
+                -   Card view with reduced padding and two-column grid for measures.
+                -   Table view implemented with colored badges for categories (with tooltips), "Measure", "Last Value" (later removed), and "Last Assessed" columns.
+                -   Mock data (`mockPatientAssessments`) added to populate the table, with logic to display data or "N/A".
+                -   Corrected mock data keys to match generated measure IDs (hyphens vs. underscores).
+                -   Filtered measures to display only those with mock data.
+                -   "Last Value" column removed.
+                -   "Measure" column header aligned to the left.
+            -   Linter warnings (unused imports, `hasOwnProperty`) addressed.
+    - **C3D Processing & EMG Analysis Components** (previous focus, largely stable):
+        - Successfully fixed C3D file upload functionality by aligning API route prefixes
+        - Fixed Docker configuration for ezc3d library dependencies using a single-stage build approach
+        - Added system dependencies for runtime support of scientific libraries
+        - Added proper location block for `/v1/` paths to proxy to backend
+        - Ensured consistent routing for all API endpoints
+
+### Nginx Configuration Refinement (2025-05-24)
+- Added proper location block for `/v1/` paths to proxy to backend
+- Ensured consistent routing for all API endpoints
+
+### UI Enhancements for Patient Profile & Clinical Assessments (2025-05-26)
+-   **`PatientProfile.tsx`**:
+    -   Tabs modified to "Sessions", "Clinical Assessments", "Notes". "Overview" tab and its content (e.g., `EmgVisualization`, `TreatmentTimeline`) were removed.
+    -   "Clinical Assessments" tab now uses the new `ClinicalAssessments` component instead of `TreatmentConfig`.
+    -   "Edit Assessment" button in the "Clinical Assessments" tab header changed to "Manage Assessments" (subsequently updated to "Add Assessment" and "View Progress" buttons).
+    -   Tab styling ( `TabsList` and `TabsTrigger` in `PatientProfile.tsx`) updated to align with the styling in `frontend/src/pages/dashboard/index.tsx`, including icons (`Calendar`, `FileEdit`, `FilePlus`).
+-   **`ClinicalAssessments.tsx`** (`frontend/src/components/patients/clinical-assessments.tsx`):
+    -   Created as a new component.
+    -   UI evolved from a simple list of assessment categories to a card-based layout, and finally to a table-based layout.
+    -   The table displays columns for "Category" (using a colored `Badge` with a `Tooltip`), "Measure", and "Last Assessed". The "Last Value" column was removed.
+    -   Mock data (`mockPatientAssessments`) was introduced and integrated to populate the table. The displayed data is filtered to only include measures for which mock data exists.
+    -   Keys in `mockPatientAssessments` were corrected to use hyphens (e.g., `muscle-strength_0`) to match the dynamically generated measure IDs, resolving data display issues.
+    -   The "Measure" column header is now left-aligned.
+    -   Linter warnings (unused imports, `hasOwnProperty`) addressed.
+    -   A message "No assessment data available." is shown if the filtered list of measures with mock data is empty.
+
+## Active Decisions & Considerations
+
+### API Path Structure
+- **Date**: 2025-05-26
+- **Focus**: Refining UI for Patient Profile, specifically the Clinical Assessments tab. Ongoing backend integration for EMG data.
+- **Recent Changes**:
+    - **UI Enhancements for `PatientProfile.tsx` and `ClinicalAssessments.tsx`**:
+        -   In `PatientProfile.tsx`:
+            -   Tabs updated to "Sessions", "Clinical Assessments", "Notes". "Overview" tab and its content (e.g., `EmgVisualization`, `TreatmentTimeline`) were removed.
+            -   "Clinical Assessments" tab now uses the new `ClinicalAssessments` component instead of `TreatmentConfig`.
+            -   "Edit Assessment" button in the "Clinical Assessments" tab header changed to "Manage Assessments" (subsequently updated to "Add Assessment" and "View Progress" buttons).
+            -   Tab styling ( `TabsList` and `TabsTrigger` in `PatientProfile.tsx`) updated to align with the styling in `frontend/src/pages/dashboard/index.tsx`, including icons (`Calendar`, `FileEdit`, `FilePlus`).
+        -   In `ClinicalAssessments.tsx`:
+            -   Component created in `frontend/src/components/patients/clinical-assessments.tsx`.
+            -   Initial implementation listed assessment categories.
+            -   Iteratively improved UI:
+                -   Card view with reduced padding and two-column grid for measures.
+                -   Table view implemented with colored badges for categories (with tooltips), "Measure", "Last Value" (later removed), and "Last Assessed" columns.
+                -   Mock data (`mockPatientAssessments`) added to populate the table, with logic to display data or "N/A".
+                -   Corrected mock data keys to match generated measure IDs (hyphens vs. underscores).
+                -   Filtered measures to display only those with mock data.
+                -   "Last Value" column removed.
+                -   "Measure" column header aligned to the left.
+            -   Linter warnings (unused imports, `hasOwnProperty`) addressed.
+    - **C3D Processing & EMG Analysis Components** (previous focus, largely stable):
+        - Successfully fixed C3D file upload functionality by aligning API route prefixes
+        - Fixed Docker configuration for ezc3d library dependencies using a single-stage build approach
+        - Added system dependencies for runtime support of scientific libraries
+        - Added proper location block for `/v1/` paths to proxy to backend
+        - Ensured consistent routing for all API endpoints
+
+### Nginx Configuration Refinement (2025-05-24)
+- Added proper location block for `/v1/` paths to proxy to backend
+- Ensured consistent routing for all API endpoints
+
+### UI Enhancements for Patient Profile & Clinical Assessments (2025-05-26)
+-   **`PatientProfile.tsx`**:
+    -   Tabs modified to "Sessions", "Clinical Assessments", "Notes". "Overview" tab and its content (e.g., `EmgVisualization`, `TreatmentTimeline`) were removed.
+    -   "Clinical Assessments" tab now uses the new `ClinicalAssessments` component instead of `TreatmentConfig`.
+    -   "Edit Assessment" button in the "Clinical Assessments" tab header changed to "Manage Assessments" (subsequently updated to "Add Assessment" and "View Progress" buttons).
+    -   Tab styling ( `TabsList` and `TabsTrigger` in `PatientProfile.tsx`) updated to align with the styling in `frontend/src/pages/dashboard/index.tsx`, including icons (`Calendar`, `FileEdit`, `FilePlus`).
+-   **`ClinicalAssessments.tsx`** (`frontend/src/components/patients/clinical-assessments.tsx`):
+    -   Created as a new component.
+    -   UI evolved from a simple list of assessment categories to a card-based layout, and finally to a table-based layout.
+    -   The table displays columns for "Category" (using a colored `Badge` with a `Tooltip`), "Measure", and "Last Assessed". The "Last Value" column was removed.
+    -   Mock data (`mockPatientAssessments`) was introduced and integrated to populate the table. The displayed data is filtered to only include measures for which mock data exists.
+    -   Keys in `mockPatientAssessments` were corrected to use hyphens (e.g., `muscle-strength_0`) to match the dynamically generated measure IDs, resolving data display issues.
+    -   The "Measure" column header is now left-aligned.
+    -   Linter warnings (unused imports, `hasOwnProperty`) addressed.
+    -   A message "No assessment data available." is shown if the filtered list of measures with mock data is empty.
+
+## Active Decisions & Considerations
+
+### API Path Structure
+- **Date**: 2025-05-26
+- **Focus**: Refining UI for Patient Profile, specifically the Clinical Assessments tab. Ongoing backend integration for EMG data.
+- **Recent Changes**:
+    - **UI Enhancements for `PatientProfile.tsx` and `ClinicalAssessments.tsx`**:
+        -   In `PatientProfile.tsx`:
+            -   Tabs updated to "Sessions", "Clinical Assessments", "Notes". "Overview" tab and its content (e.g., `EmgVisualization`, `TreatmentTimeline`) were removed.
+            -   "Clinical Assessments" tab now uses the new `ClinicalAssessments` component instead of `TreatmentConfig`.
+            -   "Edit Assessment" button in the "Clinical Assessments" tab header changed to "Manage Assessments" (subsequently updated to "Add Assessment" and "View Progress" buttons).
+            -   Tab styling ( `TabsList` and `TabsTrigger` in `PatientProfile.tsx`) updated to align with the styling in `frontend/src/pages/dashboard/index.tsx`, including icons (`Calendar`, `FileEdit`, `FilePlus`).
+        -   In `ClinicalAssessments.tsx`:
+            -   Component created in `frontend/src/components/patients/clinical-assessments.tsx`.
+            -   Initial implementation listed assessment categories.
+            -   Iteratively improved UI:
+                -   Card view with reduced padding and two-column grid for measures.
+                -   Table view implemented with colored badges for categories (with tooltips), "Measure", "Last Value" (later removed), and "Last Assessed" columns.
+                -   Mock data (`mockPatientAssessments`) added to populate the table, with logic to display data or "N/A".
+                -   Corrected mock data keys to match generated measure IDs (hyphens vs. underscores).
+                -   Filtered measures to display only those with mock data.
+                -   "Last Value" column removed.
+                -   "Measure" column header aligned to the left.
+            -   Linter warnings (unused imports, `hasOwnProperty`) addressed.
+    - **C3D Processing & EMG Analysis Components** (previous focus, largely stable):
+        - Successfully fixed C3D file upload functionality by aligning API route prefixes
+        - Fixed Docker configuration for ezc3d library dependencies using a single-stage build approach
+        - Added system dependencies for runtime support of scientific libraries
+        - Added proper location block for `/v1/` paths to proxy to backend
+        - Ensured consistent routing for all API endpoints
+
+### Nginx Configuration Refinement (2025-05-24)
+- Added proper location block for `/v1/` paths to proxy to backend
+- Ensured consistent routing for all API endpoints
+
+### UI Enhancements for Patient Profile & Clinical Assessments (2025-05-26)
+-   **`PatientProfile.tsx`**:
+    -   Tabs modified to "Sessions", "Clinical Assessments", "Notes". "Overview" tab and its content (e.g., `EmgVisualization`, `TreatmentTimeline`) were removed.
+    -   "Clinical Assessments" tab now uses the new `ClinicalAssessments` component instead of `TreatmentConfig`.
+    -   "Edit Assessment" button in the "Clinical Assessments" tab header changed to "Manage Assessments" (subsequently updated to "Add Assessment" and "View Progress" buttons).
+    -   Tab styling ( `TabsList` and `TabsTrigger` in `PatientProfile.tsx`) updated to align with the styling in `frontend/src/pages/dashboard/index.tsx`, including icons (`Calendar`, `FileEdit`, `FilePlus`).
+-   **`ClinicalAssessments.tsx`** (`frontend/src/components/patients/clinical-assessments.tsx`):
+    -   Created as a new component.
+    -   UI evolved from a simple list of assessment categories to a card-based layout, and finally to a table-based layout.
+    -   The table displays columns for "Category" (using a colored `Badge` with a `Tooltip`), "Measure", and "Last Assessed". The "Last Value" column was removed.
+    -   Mock data (`mockPatientAssessments`) was introduced and integrated to populate the table. The displayed data is filtered to only include measures for which mock data exists.
+    -   Keys in `mockPatientAssessments` were corrected to use hyphens (e.g., `muscle-strength_0`) to match the dynamically generated measure IDs, resolving data display issues.
+    -   The "Measure" column header is now left-aligned.
+    -   Linter warnings (unused imports, `hasOwnProperty`) addressed.
+    -   A message "No assessment data available." is shown if the filtered list of measures with mock data is empty.
+
+## Active Decisions & Considerations
+
+### API Path Structure
+- **Date**: 2025-05-26
+- **Focus**: Refining UI for Patient Profile, specifically the Clinical Assessments tab. Ongoing backend integration for EMG data.
+- **Recent Changes**:
+    - **UI Enhancements for `PatientProfile.tsx` and `ClinicalAssessments.tsx`**:
+        -   In `PatientProfile.tsx`:
+            -   Tabs updated to "Sessions", "Clinical Assessments", "Notes". "Overview" tab and its content (e.g., `EmgVisualization`, `TreatmentTimeline`) were removed.
+            -   "Clinical Assessments" tab now uses the new `ClinicalAssessments` component instead of `TreatmentConfig`.
+            -   "Edit Assessment" button in the "Clinical Assessments" tab header changed to "Manage Assessments" (subsequently updated to "Add Assessment" and "View Progress" buttons).
+            -   Tab styling ( `TabsList` and `TabsTrigger` in `PatientProfile.tsx`) updated to align with the styling in `frontend/src/pages/dashboard/index.tsx`, including icons (`Calendar`, `FileEdit`, `FilePlus`).
+        -   In `ClinicalAssessments.tsx`:
+            -   Component created in `frontend/src/components/patients/clinical-assessments.tsx`.
+            -   Initial implementation listed assessment categories.
+            -   Iteratively improved UI:
+                -   Card view with reduced padding and two-column grid for measures.
+                -   Table view implemented with colored badges for categories (with tooltips), "Measure", "Last Value" (later removed), and "Last Assessed" columns.
+                -   Mock data (`mockPatientAssessments`) added to populate the table, with logic to display data or "N/A".
+                -   Corrected mock data keys to match generated measure IDs (hyphens vs. underscores).
+                -   Filtered measures to display only those with mock data.
+                -   "Last Value" column removed.
+                -   "Measure" column header aligned to the left.
+            -   Linter warnings (unused imports, `hasOwnProperty`) addressed.
+    - **C3D Processing & EMG Analysis Components** (previous focus, largely stable):
+        - Successfully fixed C3D file upload functionality by aligning API route prefixes
+        - Fixed Docker configuration for ezc3d library dependencies using a single-stage build approach
+        - Added system dependencies for runtime support of scientific libraries
+        - Added proper location block for `/v1/` paths to proxy to backend
+        - Ensured consistent routing for all API endpoints
+
+### Nginx Configuration Refinement (2025-05-24)
+- Added proper location block for `/v1/` paths to proxy to backend
+- Ensured consistent routing for all API endpoints
+
+### UI Enhancements for Patient Profile & Clinical Assessments (2025-05-26)
+-   **`PatientProfile.tsx`**:
+    -   Tabs modified to "Sessions", "Clinical Assessments", "Notes". "Overview" tab and its content (e.g., `EmgVisualization`, `TreatmentTimeline`) were removed.
+    -   "Clinical Assessments" tab now uses the new `ClinicalAssessments` component instead of `TreatmentConfig`.
+    -   "Edit Assessment" button in the "Clinical Assessments" tab header changed to "Manage Assessments" (subsequently updated to "Add Assessment" and "View Progress" buttons).
+    -   Tab styling ( `TabsList` and `TabsTrigger` in `PatientProfile.tsx`) updated to align with the styling in `frontend/src/pages/dashboard/index.tsx`, including icons (`Calendar`, `FileEdit`, `FilePlus`).
+-   **`ClinicalAssessments.tsx`** (`frontend/src/components/patients/clinical-assessments.tsx`):
+    -   Created as a new component.
+    -   UI evolved from a simple list of assessment categories to a card-based layout, and finally to a table-based layout.
+    -   The table displays columns for "Category" (using a colored `Badge` with a `Tooltip`), "Measure", and "Last Assessed". The "Last Value" column was removed.
+    -   Mock data (`mockPatientAssessments`) was introduced and integrated to populate the table. The displayed data is filtered to only include measures for which mock data exists.
+    -   Keys in `mockPatientAssessments` were corrected to use hyphens (e.g., `muscle-strength_0`) to match the dynamically generated measure IDs, resolving data display issues.
+    -   The "Measure" column header is now left-aligned.
+    -   Linter warnings (unused imports, `hasOwnProperty`) addressed.
+    -   A message "No assessment data available." is shown if the filtered list of measures with mock data is empty.
+
+## Active Decisions & Considerations
+
+### API Path Structure
+- **Date**: 2025-05-26
+- **Focus**: Refining UI for Patient Profile, specifically the Clinical Assessments tab. Ongoing backend integration for EMG data.
+- **Recent Changes**:
+    - **UI Enhancements for `PatientProfile.tsx` and `ClinicalAssessments.tsx`**:
+        -   In `PatientProfile.tsx`:
+            -   Tabs updated to "Sessions", "Clinical Assessments", "Notes". "Overview" tab and its content (e.g., `EmgVisualization`, `TreatmentTimeline`) were removed.
+            -   "Clinical Assessments" tab now uses the new `ClinicalAssessments` component instead of `TreatmentConfig`.
+            -   "Edit Assessment" button in the "Clinical Assessments" tab header changed to "Manage Assessments" (subsequently updated to "Add Assessment" and "View Progress" buttons).
+            -   Tab styling ( `TabsList` and `TabsTrigger` in `PatientProfile.tsx`) updated to align with the styling in `frontend/src/pages/dashboard/index.tsx`, including icons (`Calendar`, `FileEdit`, `FilePlus`).
+        -   In `ClinicalAssessments.tsx`:
+            -   Component created in `frontend/src/components/patients/clinical-assessments.tsx`.
+            -   Initial implementation listed assessment categories.
+            -   Iteratively improved UI:
+                -   Card view with reduced padding and two-column grid for measures.
+                -   Table view implemented with colored badges for categories (with tooltips), "Measure", "Last Value" (later removed), and "Last Assessed" columns.
+                -   Mock data (`mockPatientAssessments`) added to populate the table, with logic to display data or "N/A".
+                -   Corrected mock data keys to match generated measure IDs (hyphens vs. underscores).
+                -   Filtered measures to display only those with mock data.
+                -   "Last Value" column removed.
+                -   "Measure" column header aligned to the left.
+            -   Linter warnings (unused imports, `hasOwnProperty`) addressed.
+    - **C3D Processing & EMG Analysis Components** (previous focus, largely stable):
+        - Successfully fixed C3D file upload functionality by aligning API route prefixes
+        - Fixed Docker configuration for ezc3d library dependencies using a single-stage build approach
+        - Added system dependencies for runtime support of scientific libraries
+        - Added proper location block for `/v1/` paths to proxy to backend
+        - Ensured consistent routing for all API endpoints
+
+### Nginx Configuration Refinement (2025-05-24)
+- Added proper location block for `/v1/` paths to proxy to backend
+- Ensured consistent routing for all API endpoints
+
+### UI Enhancements for Patient Profile & Clinical Assessments (2025-05-26)
+-   **`PatientProfile.tsx`**:
+    -   Tabs modified to "Sessions", "Clinical Assessments", "Notes". "Overview" tab and its content (e.g., `EmgVisualization`, `TreatmentTimeline`) were removed.
+    -   "Clinical Assessments" tab now uses the new `ClinicalAssessments` component instead of `TreatmentConfig`.
+    -   "Edit Assessment" button in the "Clinical Assessments" tab header changed to "Manage Assessments" (subsequently updated to "Add Assessment" and "View Progress" buttons).
+    -   Tab styling ( `TabsList` and `TabsTrigger` in `PatientProfile.tsx`) updated to align with the styling in `frontend/src/pages/dashboard/index.tsx`, including icons (`Calendar`, `FileEdit`, `FilePlus`).
+-   **`ClinicalAssessments.tsx`** (`frontend/src/components/patients/clinical-assessments.tsx`):
+    -   Created as a new component.
+    -   UI evolved from a simple list of assessment categories to a card-based layout, and finally to a table-based layout.
+    -   The table displays columns for "Category" (using a colored `Badge` with a `Tooltip`), "Measure", and "Last Assessed". The "Last Value" column was removed.
+    -   Mock data (`mockPatientAssessments`) was introduced and integrated to populate the table. The displayed data is filtered to only include measures for which mock data exists.
+    -   Keys in `mockPatientAssessments` were corrected to use hyphens (e.g., `muscle-strength_0`) to match the dynamically generated measure IDs, resolving data display issues.
+    -   The "Measure" column header is now left-aligned.
+    -   Linter warnings (unused imports, `hasOwnProperty`) addressed.
+    -   A message "No assessment data available." is shown if the filtered list of measures with mock data is empty.
+
+## Active Decisions & Considerations
+
+### API Path Structure
+- **Date**: 2025-05-26
+- **Focus**: Refining UI for Patient Profile, specifically the Clinical Assessments tab. Ongoing backend integration for EMG data.
+- **Recent Changes**:
+    - **UI Enhancements for `PatientProfile.tsx` and `ClinicalAssessments.tsx`**:
+        -   In `PatientProfile.tsx`:
+            -   Tabs updated to "Sessions", "Clinical Assessments", "Notes". "Overview" tab and its content (e.g., `EmgVisualization`, `TreatmentTimeline`) were removed.
+            -   "Clinical Assessments" tab now uses the new `ClinicalAssessments` component instead of `TreatmentConfig`.
+            -   "Edit Assessment" button in the "Clinical Assessments" tab header changed to "Manage Assessments" (subsequently updated to "Add Assessment" and "View Progress" buttons).
+            -   Tab styling ( `TabsList` and `TabsTrigger` in `PatientProfile.tsx`) updated to align with the styling in `frontend/src/pages/dashboard/index.tsx`, including icons (`Calendar`, `FileEdit`, `FilePlus`).
+        -   In `ClinicalAssessments.tsx`:
+            -   Component created in `frontend/src/components/patients/clinical-assessments.tsx`.
+            -   Initial implementation listed assessment categories.
+            -   Iteratively improved UI:
+                -   Card view with reduced padding and two-column grid for measures.
+                -   Table view implemented with colored badges for categories (with tooltips), "Measure", "Last Value" (later removed), and "Last Assessed" columns.
+                -   Mock data (`mockPatientAssessments`) added to populate the table, with logic to display data or "N/A".
+                -   Corrected mock data keys to match generated measure IDs (hyphens vs. underscores).
+                -   Filtered measures to display only those with mock data.
+                -   "Last Value" column removed.
+                -   "Measure" column header aligned to the left.
+            -   Linter warnings (unused imports, `hasOwnProperty`) addressed.
+    - **C3D Processing & EMG Analysis Components** (previous focus, largely stable):
+        - Successfully fixed C3D file upload functionality by aligning API route prefixes
+        - Fixed Docker configuration for ezc3d library dependencies using a single-stage build approach
+        - Added system dependencies for runtime support of scientific libraries
+        - Added proper location block for `/v1/` paths to proxy to backend
+        - Ensured consistent routing for all API endpoints
+
+### Nginx Configuration Refinement (2025-05-24)
+- Added proper location block for `/v1/` paths to proxy to backend
+- Ensured consistent routing for all API endpoints
+
+### UI Enhancements for Patient Profile & Clinical Assessments (2025-05-26)
+-   **`PatientProfile.tsx`**:
+    -   Tabs modified to "Sessions", "Clinical Assessments", "Notes". "Overview" tab and its content (e.g., `EmgVisualization`, `TreatmentTimeline`) were removed.
+    -   "Clinical Assessments" tab now uses the new `ClinicalAssessments` component instead of `TreatmentConfig`.
+    -   "Edit Assessment" button in the "Clinical Assessments" tab header changed to "Manage Assessments" (subsequently updated to "Add Assessment" and "View Progress" buttons).
+    -   Tab styling ( `TabsList` and `TabsTrigger` in `PatientProfile.tsx`) updated to align with the styling in `frontend/src/pages/dashboard/index.tsx`, including icons (`Calendar`, `FileEdit`, `FilePlus`).
+-   **`ClinicalAssessments.tsx`** (`frontend/src/components/patients/clinical-assessments.tsx`):
+    -   Created as a new component.
+    -   UI evolved from a simple list of assessment categories to a card-based layout, and finally to a table-based layout.
+    -   The table displays columns for "Category" (using a colored `Badge` with a `Tooltip`), "Measure", and "Last Assessed". The "Last Value" column was removed.
+    -   Mock data (`mockPatientAssessments`) was introduced and integrated to populate the table. The displayed data is filtered to only include measures for which mock data exists.
+    -   Keys in `mockPatientAssessments` were corrected to use hyphens (e.g., `muscle-strength_0`) to match the dynamically generated measure IDs, resolving data display issues.
+    -   The "Measure" column header is now left-aligned.
+    -   Linter warnings (unused imports, `hasOwnProperty`) addressed.
+    -   A message "No assessment data available." is shown if the filtered list of measures with mock data is empty.
+
+## Active Decisions & Considerations
+
+### API Path Structure
+- **Date**: 2025-05-26
+- **Focus**: Refining UI for Patient Profile, specifically the Clinical Assessments tab. Ongoing backend integration for EMG data.
+- **Recent Changes**:
+    - **UI Enhancements for `PatientProfile.tsx` and `ClinicalAssessments.tsx`**:
+        -   In `PatientProfile.tsx`:
+            -   Tabs updated to "Sessions", "Clinical Assessments", "Notes". "Overview" tab and its content (e.g., `EmgVisualization`, `TreatmentTimeline`) were removed.
+            -   "Clinical Assessments" tab now uses the new `ClinicalAssessments` component instead of `TreatmentConfig`.
+            -   "Edit Assessment" button in the "Clinical Assessments" tab header changed to "Manage Assessments" (subsequently updated to "Add Assessment" and "View Progress" buttons).
+            -   Tab styling ( `TabsList` and `TabsTrigger` in `PatientProfile.tsx`) updated to align with the styling in `frontend/src/pages/dashboard/index.tsx`, including icons (`Calendar`, `FileEdit`, `FilePlus`).
+        -   In `ClinicalAssessments.tsx`:
+            -   Component created in `frontend/src/components/patients/clinical-assessments.tsx`.
+            -   Initial implementation listed assessment categories.
+            -   Iteratively improved UI:
+                -   Card view with reduced padding and two-column grid for measures.
+                -   Table view implemented with colored badges for categories (with tooltips), "Measure", "Last Value" (later removed), and "Last Assessed" columns.
+                -   Mock data (`mockPatientAssessments`) added to populate the table, with logic to display data or "N/A".
+                -   Corrected mock data keys to match generated measure IDs (hyphens vs. underscores).
+                -   Filtered measures to display only those with mock data.
+                -   "Last Value" column removed.
+                -   "Measure" column header aligned to the left.
+            -   Linter warnings (unused imports, `hasOwnProperty`) addressed.
+    - **C3D Processing & EMG Analysis Components** (previous focus, largely stable):
+        - Successfully fixed C3D file upload functionality by aligning API route prefixes
+        - Fixed Docker configuration for ezc3d library dependencies using a single-stage build approach
+        - Added system dependencies for runtime support of scientific libraries
+        - Added proper location block for `/v1/` paths to proxy to backend
+        - Ensured consistent routing for all API endpoints
+
+### Nginx Configuration Refinement (2025-05-24)
+- Added proper location block for `/v1/` paths to proxy to backend
+- Ensured consistent routing for all API endpoints
+
+### UI Enhancements for Patient Profile & Clinical Assessments (2025-05-26)
+-   **`PatientProfile.tsx`**:
+    -   Tabs modified to "Sessions", "Clinical Assessments", "Notes". "Overview" tab and its content (e.g., `EmgVisualization`, `TreatmentTimeline`) were removed.
+    -   "Clinical Assessments" tab now uses the new `ClinicalAssessments` component instead of `TreatmentConfig`.
+    -   "Edit Assessment" button in the "Clinical Assessments" tab header changed to "Manage Assessments" (subsequently updated to "Add Assessment" and "View Progress" buttons).
+    -   Tab styling ( `TabsList` and `TabsTrigger` in `PatientProfile.tsx`) updated to align with the styling in `frontend/src/pages/dashboard/index.tsx`, including icons (`Calendar`, `FileEdit`, `FilePlus`).
+-   **`ClinicalAssessments.tsx`** (`frontend/src/components/patients/clinical-assessments.tsx`):
+    -   Created as a new component.
+    -   UI evolved from a simple list of assessment categories to a card-based layout, and finally to a table-based layout.
+    -   The table displays columns for "Category" (using a colored `Badge` with a `Tooltip`), "Measure", and "Last Assessed". The "Last Value" column was removed.
+    -   Mock data (`mockPatientAssessments`) was introduced and integrated to populate the table. The displayed data is filtered to only include measures for which mock data exists.
+    -   Keys in `mockPatientAssessments` were corrected to use hyphens (e.g., `muscle-strength_0`) to match the dynamically generated measure IDs, resolving data display issues.
+    -   The "Measure" column header is now left-aligned.
+    -   Linter warnings (unused imports, `hasOwnProperty`) addressed.
+    -   A message "No assessment data available." is shown if the filtered list of measures with mock data is empty.
+
+## Active Decisions & Considerations
+
+### API Path Structure
+- **Date**: 2025-05-26
+- **Focus**: Refining UI for Patient Profile, specifically the Clinical Assessments tab. Ongoing backend integration for EMG data.
+- **Recent Changes**:
+    - **UI Enhancements for `PatientProfile.tsx` and `ClinicalAssessments.tsx`**:
+        -   In `PatientProfile.tsx`:
+            -   Tabs updated to "Sessions", "Clinical Assessments", "Notes". "Overview" tab and its content (e.g., `EmgVisualization`, `TreatmentTimeline`) were removed.
+            -   "Clinical Assessments" tab now uses the new `ClinicalAssessments` component instead of `TreatmentConfig`.
+            -   "Edit Assessment" button in the "Clinical Assessments" tab header changed to "Manage Assessments" (subsequently updated to "Add Assessment" and "View Progress" buttons).
+            -   Tab styling ( `TabsList` and `TabsTrigger` in `PatientProfile.tsx`) updated to align with the styling in `frontend/src/pages/dashboard/index.tsx`, including icons (`Calendar`, `FileEdit`, `FilePlus`).
+        -   In `ClinicalAssessments.tsx`:
+            -   Component created in `frontend/src/components/patients/clinical-assessments.tsx`.
+            -   Initial implementation listed assessment categories.
+            -   Iteratively improved UI:
+                -   Card view with reduced padding and two-column grid for measures.
+                -   Table view implemented with colored badges for categories (with tooltips), "Measure", "Last Value" (later removed), and "Last Assessed" columns.
+                -   Mock data (`mockPatientAssessments`) added to populate the table, with logic to display data or "N/A".
+                -   Corrected mock data keys to match generated measure IDs (hyphens vs. underscores).
+                -   Filtered measures to display only those with mock data.
+                -   "Last Value" column removed.
+                -   "Measure" column header aligned to the left.
+            -   Linter warnings (unused imports, `hasOwnProperty`) addressed.
+    - **C3D Processing & EMG Analysis Components** (previous focus, largely stable):
+        - Successfully fixed C3D file upload functionality by aligning API route prefixes
+        - Fixed Docker configuration for ezc3d library dependencies using a single-stage build approach
+        - Added system dependencies for runtime support of scientific libraries
+        - Added proper location block for `/v1/` paths to proxy to backend
+        - Ensured consistent routing for all API endpoints
+
+### Nginx Configuration Refinement (2025-05-24)
+- Added proper location block for `/v1/` paths to proxy to backend
+- Ensured consistent routing for all API endpoints
+
+### UI Enhancements for Patient Profile & Clinical Assessments (2025-05-26)
+-   **`PatientProfile.tsx`**:
+    -   Tabs modified to "Sessions", "Clinical Assessments", "Notes". "Overview" tab and its content (e.g., `EmgVisualization`, `TreatmentTimeline`) were removed.
+    -   "Clinical Assessments" tab now uses the new `ClinicalAssessments` component instead of `TreatmentConfig`.
+    -   "Edit Assessment" button in the "Clinical Assessments" tab header changed to "Manage Assessments" (subsequently updated to "Add Assessment" and "View Progress" buttons).
+    -   Tab styling ( `TabsList` and `TabsTrigger` in `PatientProfile.tsx`) updated to align with the styling in `frontend/src/pages/dashboard/index.tsx`, including icons (`Calendar`, `FileEdit`, `FilePlus`).
+-   **`ClinicalAssessments.tsx`** (`frontend/src/components/patients/clinical-assessments.tsx`):
+    -   Created as a new component.
+    -   UI evolved from a simple list of assessment categories to a card-based layout, and finally to a table-based layout.
+    -   The table displays columns for "Category" (using a colored `Badge` with a `Tooltip`), "Measure", and "Last Assessed". The "Last Value" column was removed.
+    -   Mock data (`mockPatientAssessments`) was introduced and integrated to populate the table. The displayed data is filtered to only include measures for which mock data exists.
+    -   Keys in `mockPatientAssessments` were corrected to use hyphens (e.g., `muscle-strength_0`) to match the dynamically generated measure IDs, resolving data display issues.
+    -   The "Measure" column header is now left-aligned.
+    -   Linter warnings (unused imports, `hasOwnProperty`) addressed.
+    -   A message "No assessment data available." is shown if the filtered list of measures with mock data is empty.
+
+## Active Decisions & Considerations
+
+### API Path Structure
+- **Date**: 2025-05-26
+- **Focus**: Refining UI for Patient Profile, specifically the Clinical Assessments tab. Ongoing backend integration for EMG data.
+- **Recent Changes**:
+    - **UI Enhancements for `PatientProfile.tsx` and `ClinicalAssessments.tsx`**:
+        -   In `PatientProfile.tsx`:
+            -   Tabs updated to "Sessions", "Clinical Assessments", "Notes". "Overview" tab and its content (e.g., `EmgVisualization`, `TreatmentTimeline`) were removed.
+            -   "Clinical Assessments" tab now uses the new `ClinicalAssessments` component instead of `TreatmentConfig`.
+            -   "Edit Assessment" button in the "Clinical Assessments" tab header changed to "Manage Assessments" (subsequently updated to "Add Assessment" and "View Progress" buttons).
+            -   Tab styling ( `TabsList` and `TabsTrigger` in `PatientProfile.tsx`) updated to align with the styling in `frontend/src/pages/dashboard/index.tsx`, including icons (`Calendar`, `FileEdit`, `FilePlus`).
+        -   In `ClinicalAssessments.tsx`:
+            -   Component created in `frontend/src/components/patients/clinical-assessments.tsx`.
+            -   Initial implementation listed assessment categories.
+            -   Iteratively improved UI:
+                -   Card view with reduced padding and two-column grid for measures.
+                -   Table view implemented with colored badges for categories (with tooltips), "Measure", "Last Value" (later removed), and "Last Assessed" columns.
+                -   Mock data (`mockPatientAssessments`) added to populate the table, with logic to display data or "N/A".
+                -   Corrected mock data keys to match generated measure IDs (hyphens vs. underscores).
+                -   Filtered measures to display only those with mock data.
+                -   "Last Value" column removed.
+                -   "Measure" column header aligned to the left.
+            -   Linter warnings (unused imports, `hasOwnProperty`) addressed.
+    - **C3D Processing & EMG Analysis Components** (previous focus, largely stable):
+        - Successfully fixed C3D file upload functionality by aligning API route prefixes
+        - Fixed Docker configuration for ezc3d library dependencies using a single-stage build approach
+        - Added system dependencies for runtime support of scientific libraries
+        - Added proper location block for `/v1/` paths to proxy to backend
+        - Ensured consistent routing for all API endpoints
+
+### Nginx Configuration Refinement (2025-05-24)
+- Added proper location block for `/v1/` paths to proxy to backend
+- Ensured consistent routing for all API endpoints
+
+### UI Enhancements for Patient Profile & Clinical Assessments (2025-05-26)
+-   **`PatientProfile.tsx`**:
+    -   Tabs modified to "Sessions", "Clinical Assessments", "Notes". "Overview" tab and its content (e.g., `EmgVisualization`, `TreatmentTimeline`) were removed.
+    -   "Clinical Assessments" tab now uses the new `ClinicalAssessments` component instead of `TreatmentConfig`.
+    -   "Edit Assessment" button in the "Clinical Assessments" tab header changed to "Manage Assessments" (subsequently updated to "Add Assessment" and "View Progress" buttons).
+    -   Tab styling ( `TabsList` and `TabsTrigger` in `PatientProfile.tsx`) updated to align with the styling in `frontend/src/pages/dashboard/index.tsx`, including icons (`Calendar`, `FileEdit`, `FilePlus`).
+-   **`ClinicalAssessments.tsx`** (`frontend/src/components/patients/clinical-assessments.tsx`):
+    -   Created as a new component.
+    -   UI evolved from a simple list of assessment categories to a card-based layout, and finally to a table-based layout.
+    -   The table displays columns for "Category" (using a colored `Badge` with a `Tooltip`), "Measure", and "Last Assessed". The "Last Value" column was removed.
+    -   Mock data (`mockPatientAssessments`) was introduced and integrated to populate the table. The displayed data is filtered to only include measures for which mock data exists.
+    -   Keys in `mockPatientAssessments` were corrected to use hyphens (e.g., `muscle-strength_0`) to match the dynamically generated measure IDs, resolving data display issues.
+    -   The "Measure" column header is now left-aligned.
+    -   Linter warnings (unused imports, `hasOwnProperty`) addressed.
+    -   A message "No assessment data available." is shown if the filtered list of measures with mock data is empty.
+
+## Active Decisions & Considerations
+
+### API Path Structure
+- **Date**: 2025-05-26
+- **Focus**: Refining UI for Patient Profile, specifically the Clinical Assessments tab. Ongoing backend integration for EMG data.
+- **Recent Changes**:
+    - **UI Enhancements for `PatientProfile.tsx` and `ClinicalAssessments.tsx`**:
+        -   In `PatientProfile.tsx`:
+            -   Tabs updated to "Sessions", "Clinical Assessments", "Notes". "Overview" tab and its content (e.g., `EmgVisualization`, `TreatmentTimeline`) were removed.
+            -   "Clinical Assessments" tab now uses the new `ClinicalAssessments` component instead of `TreatmentConfig`.
+            -   "Edit Assessment" button in the "Clinical Assessments" tab header changed to "Manage Assessments" (subsequently updated to "Add Assessment" and "View Progress" buttons).
+            -   Tab styling ( `TabsList` and `TabsTrigger` in `PatientProfile.tsx`) updated to align with the styling in `frontend/src/pages/dashboard/index.tsx`, including icons (`Calendar`, `FileEdit`, `FilePlus`).
+        -   In `ClinicalAssessments.tsx`:
+            -   Component created in `frontend/src/components/patients/clinical-assessments.tsx`.
+            -   Initial implementation listed assessment categories.
+            -   Iteratively improved UI:
+                -   Card view with reduced padding and two-column grid for measures.
+                -   Table view implemented with colored badges for categories (with tooltips), "Measure", "Last Value" (later removed), and "Last Assessed" columns.
+                -   Mock data (`mockPatientAssessments`) added to populate the table, with logic to display data or "N/A".
+                -   Corrected mock data keys to match generated measure IDs (hyphens vs. underscores).
+                -   Filtered measures to display only those with mock data.
+                -   "Last Value" column removed.
+                -   "Measure" column header aligned to the left.
+            -   Linter warnings (unused imports, `hasOwnProperty`) addressed.
+    - **C3D Processing & EMG Analysis Components** (previous focus, largely stable):
+        - Successfully fixed C3D file upload functionality by aligning API route prefixes
+        - Fixed Docker configuration for ezc3d library dependencies using a single-stage build approach
+        - Added system dependencies for runtime support of scientific libraries
+        - Added proper location block for `/v1/` paths to proxy to backend
+        - Ensured consistent routing for all API endpoints
+
+### Nginx Configuration Refinement (2025-05-24)
+- Added proper location block for `/v1/` paths to proxy to backend
+- Ensured consistent routing for all API endpoints
+
+### UI Enhancements for Patient Profile & Clinical Assessments (2025-05-26)
+-   **`PatientProfile.tsx`**:
+    -   Tabs modified to "Sessions", "Clinical Assessments", "Notes". "Overview" tab and its content (e.g., `EmgVisualization`, `TreatmentTimeline`) were removed.
+    -   "Clinical Assessments" tab now uses the new `ClinicalAssessments` component instead of `TreatmentConfig`.
+    -   "Edit Assessment" button in the "Clinical Assessments" tab header changed to "Manage Assessments" (subsequently updated to "Add Assessment" and "View Progress" buttons).
+    -   Tab styling ( `TabsList` and `TabsTrigger` in `PatientProfile.tsx`) updated to align with the styling in `frontend/src/pages/dashboard/index.tsx`, including icons (`Calendar`, `FileEdit`, `FilePlus`).
+-   **`ClinicalAssessments.tsx`** (`frontend/src/components/patients/clinical-assessments.tsx`):
+    -   Created as a new component.
+    -   UI evolved from a simple list of assessment categories to a card-based layout, and finally to a table-based layout.
+    -   The table displays columns for "Category" (using a colored `Badge` with a `Tooltip`), "Measure", and "Last Assessed". The "Last Value" column was removed.
+    -   Mock data (`mockPatientAssessments`) was introduced and integrated to populate the table. The displayed data is filtered to only include measures for which mock data exists.
+    -   Keys in `mockPatientAssessments` were corrected to use hyphens (e.g., `muscle-strength_0`) to match the dynamically generated measure IDs, resolving data display issues.
+    -   The "Measure" column header is now left-aligned.
+    -   Linter warnings (unused imports, `hasOwnProperty`) addressed.
+    -   A message "No assessment data available." is shown if the filtered list of measures with mock data is empty.
+
+## Active Decisions & Considerations
+
+### API Path Structure
+- **Date**: 2025-05-26
+- **Focus**: Refining UI for Patient Profile, specifically the Clinical Assessments tab. Ongoing backend integration for EMG data.
+- **Recent Changes**:
+    - **UI Enhancements for `PatientProfile.tsx` and `ClinicalAssessments.tsx`**:
+        -   In `PatientProfile.tsx`:
+            -   Tabs updated to "Sessions", "Clinical Assessments", "Notes". "Overview" tab and its content (e.g., `EmgVisualization`, `TreatmentTimeline`) were removed.
+            -   "Clinical Assessments" tab now uses the new `ClinicalAssessments` component instead of `TreatmentConfig`.
+            -   "Edit Assessment" button in the "Clinical Assessments" tab header changed to "Manage Assessments" (subsequently updated to "Add Assessment" and "View Progress" buttons).
+            -   Tab styling ( `TabsList` and `TabsTrigger` in `PatientProfile.tsx`) updated to align with the styling in `frontend/src/pages/dashboard/index.tsx`, including icons (`Calendar`, `FileEdit`, `FilePlus`).
+        -   In `ClinicalAssessments.tsx`:
+            -   Component created in `frontend/src/components/patients/clinical-assessments.tsx`.
+            -   Initial implementation listed assessment categories.
+            -   Iteratively improved UI:
+                -   Card view with reduced padding and two-column grid for measures.
+                -   Table view implemented with colored badges for categories (with tooltips), "Measure", "Last Value" (later removed), and "Last Assessed" columns.
+                -   Mock data (`mockPatientAssessments`) added to populate the table, with logic to display data or "N/A".
+                -   Corrected mock data keys to match generated measure IDs (hyphens vs. underscores).
+                -   Filtered measures to display only those with mock data.
+                -   "Last Value" column removed.
+                -   "Measure" column header aligned to the left.
+            -   Linter warnings (unused imports, `hasOwnProperty`) addressed.
+    - **C3D Processing & EMG Analysis Components** (previous focus, largely stable):
+        - Successfully fixed C3D file upload functionality by aligning API route prefixes
+        - Fixed Docker configuration for ezc3d library dependencies using a single-stage build approach
+        - Added system dependencies for runtime support of scientific libraries
+        - Added proper location block for `/v1/` paths to proxy to backend
+        - Ensured consistent routing for all API endpoints
+
+### Nginx Configuration Refinement (2025-05-24)
+- Added proper location block for `/v1/` paths to proxy to backend
+- Ensured consistent routing for all API endpoints
+
+### UI Enhancements for Patient Profile & Clinical Assessments (2025-05-26)
+-   **`PatientProfile.tsx`**:
+    -   Tabs modified to "Sessions", "Clinical Assessments", "Notes". "Overview" tab and its content (e.g., `EmgVisualization`, `TreatmentTimeline`) were removed.
+    -   "Clinical Assessments" tab now uses the new `ClinicalAssessments` component instead of `TreatmentConfig`.
+    -   "Edit Assessment" button in the "Clinical Assessments" tab header changed to "Manage Assessments" (subsequently updated to "Add Assessment" and "View Progress" buttons).
+    -   Tab styling ( `TabsList` and `TabsTrigger` in `PatientProfile.tsx`) updated to align with the styling in `frontend/src/pages/dashboard/index.tsx`, including icons (`Calendar`, `FileEdit`, `FilePlus`).
+-   **`ClinicalAssessments.tsx`** (`frontend/src/components/patients/clinical-assessments.tsx`):
+    -   Created as a new component.
+    -   UI evolved from a simple list of assessment categories to a card-based layout, and finally to a table-based layout.
+    -   The table displays columns for "Category" (using a colored `Badge` with a `Tooltip`), "Measure", and "Last Assessed". The "Last Value" column was removed.
+    -   Mock data (`mockPatientAssessments`) was introduced and integrated to populate the table. The displayed data is filtered to only include measures for which mock data exists.
+    -   Keys in `mockPatientAssessments` were corrected to use hyphens (e.g., `muscle-strength_0`) to match the dynamically generated measure IDs, resolving data display issues.
+    -   The "Measure" column header is now left-aligned.
+    -   Linter warnings (unused imports, `hasOwnProperty`) addressed.
+    -   A message "No assessment data available." is shown if the filtered list of measures with mock data is empty.
+
+## Active Decisions & Considerations
+
+### API Path Structure
+- **Date**: 2025-05-26
+- **Focus**: Refining UI for Patient Profile, specifically the Clinical Assessments tab. Ongoing backend integration for EMG data.
+- **Recent Changes**:
+    - **UI Enhancements for `PatientProfile.tsx` and `ClinicalAssessments.tsx`**:
+        -   In `PatientProfile.tsx`:
+            -   Tabs updated to "Sessions", "Clinical Assessments", "Notes". "Overview" tab and its content (e.g., `EmgVisualization`, `TreatmentTimeline`) were removed.
+            -   "Clinical Assessments" tab now uses the new `ClinicalAssessments` component instead of `TreatmentConfig`.
+            -   "Edit Assessment" button in the "Clinical Assessments" tab header changed to "Manage Assessments" (subsequently updated to "Add Assessment" and "View Progress" buttons).
+            -   Tab styling ( `TabsList` and `TabsTrigger` in `PatientProfile.tsx`) updated to align with the styling in `frontend/src/pages/dashboard/index.tsx`, including icons (`Calendar`, `FileEdit`, `FilePlus`).
+        -   In `ClinicalAssessments.tsx`:
+            -   Component created in `frontend/src/components/patients/clinical-assessments.tsx`.
+            -   Initial implementation listed assessment categories.
+            -   Iteratively improved UI:
+                -   Card view with reduced padding and two-column grid for measures.
+                -   Table view implemented with colored badges for categories (with tooltips), "Measure", "Last Value" (later removed), and "Last Assessed" columns.
+                -   Mock data (`mockPatientAssessments`) added to populate the table, with logic to display data or "N/A".
+                -   Corrected mock data keys to match generated measure IDs (hyphens vs. underscores).
+                -   Filtered measures to display only those with mock data.
+                -   "Last Value" column removed.
+                -   "Measure" column header aligned to the left.
+            -   Linter warnings (unused imports, `hasOwnProperty`) addressed.
+    - **C3D Processing & EMG Analysis Components** (previous focus, largely stable):
+        - Successfully fixed C3D file upload functionality by aligning API route prefixes
+        - Fixed Docker configuration for ezc3d library dependencies using a single-stage build approach
+        - Added system dependencies for runtime support of scientific libraries
+        - Added proper location block for `/v1/` paths to proxy to backend
+        - Ensured consistent routing for all API endpoints
+
+### Nginx Configuration Refinement (2025-05-24)
+- Added proper location block for `/v1/` paths to proxy to backend
+- Ensured consistent routing for all API endpoints
+
+### UI Enhancements for Patient Profile & Clinical Assessments (2025-05-26)
+-   **`PatientProfile.tsx`**:
+    -   Tabs modified to "Sessions", "Clinical Assessments", "Notes". "Overview" tab and its content (e.g., `EmgVisualization`, `TreatmentTimeline`) were removed.
+    -   "Clinical Assessments" tab now uses the new `ClinicalAssessments` component instead of `TreatmentConfig`.
+    -   "Edit Assessment" button in the "Clinical Assessments" tab header changed to "Manage Assessments" (subsequently updated to "Add Assessment" and "View Progress" buttons).
+    -   Tab styling ( `TabsList` and `TabsTrigger` in `PatientProfile.tsx`) updated to align with the styling in `frontend/src/pages/dashboard/index.tsx`, including icons (`Calendar`, `FileEdit`, `FilePlus`).
+-   **`ClinicalAssessments.tsx`** (`frontend/src/components/patients/clinical-assessments.tsx`):
+    -   Created as a new component.
+    -   UI evolved from a simple list of assessment categories to a card-based layout, and finally to a table-based layout.
+    -   The table displays columns for "Category" (using a colored `Badge` with a `Tooltip`), "Measure", and "Last Assessed". The "Last Value" column was removed.
+    -   Mock data (`mockPatientAssessments`) was introduced and integrated to populate the table. The displayed data is filtered to only include measures for which mock data exists.
+    -   Keys in `mockPatientAssessments` were corrected to use hyphens (e.g., `muscle-strength_0`) to match the dynamically generated measure IDs, resolving data display issues.
+    -   The "Measure" column header is now left-aligned.
+    -   Linter warnings (unused imports, `hasOwnProperty`) addressed.
+    -   A message "No assessment data available." is shown if the filtered list of measures with mock data is empty.
+
+## Active Decisions & Considerations
+
+### API Path Structure
+- **Date**: 2025-05-26
+- **Focus**: Refining UI for Patient Profile, specifically the Clinical Assessments tab. Ongoing backend integration for EMG data.
+- **Recent Changes**:
+    - **UI Enhancements for `PatientProfile.tsx` and `ClinicalAssessments.tsx`**:
+        -   In `PatientProfile.tsx`:
+            -   Tabs updated to "Sessions", "Clinical Assessments", "Notes". "Overview" tab and its content (e.g., `EmgVisualization`, `TreatmentTimeline`) were removed.
+            -   "Clinical Assessments" tab now uses the new `ClinicalAssessments` component instead of `TreatmentConfig`.
+            -   "Edit Assessment" button in the "Clinical Assessments" tab header changed to "Manage Assessments" (subsequently updated to "Add Assessment" and "View Progress" buttons).
+            -   Tab styling ( `TabsList` and `TabsTrigger` in `PatientProfile.tsx`) updated to align with the styling in `frontend/src/pages/dashboard/index.tsx`, including icons (`Calendar`, `FileEdit`, `FilePlus`).
+        -   In `ClinicalAssessments.tsx`:
+            -   Component created in `frontend/src/components/patients/clinical-assessments.tsx`.
+            -   Initial implementation listed assessment categories.
+            -   Iteratively improved UI:
+                -   Card view with reduced padding and two-column grid for measures.
+                -   Table view implemented with colored badges for categories (with tooltips), "Measure", "Last Value" (later removed), and "Last Assessed" columns.
+                -   Mock data (`mockPatientAssessments`) added to populate the table, with logic to display data or "N/A".
+                -   Corrected mock data keys to match generated measure IDs (hyphens vs. underscores).
+                -   Filtered measures to display only those with mock data.
+                -   "Last Value" column removed.
+                -   "Measure" column header aligned to the left.
+            -   Linter warnings (unused imports, `hasOwnProperty`) addressed.
+    - **C3D Processing & EMG Analysis Components** (previous focus, largely stable):
+        - Successfully fixed C3D file upload functionality by aligning API route prefixes
+        - Fixed Docker configuration for ezc3d library dependencies using a single-stage build approach
+        - Added system dependencies for runtime support of scientific libraries
+        - Added proper location block for `/v1/` paths to proxy to backend
+        - Ensured consistent routing for all API endpoints
+
+### Nginx Configuration Refinement (2025-05-24)
+- Added proper location block for `/v1/` paths to proxy to backend
+- Ensured consistent routing for all API endpoints
+
+### UI Enhancements for Patient Profile & Clinical Assessments (2025-05-26)
+-   **`PatientProfile.tsx`**:
+    -   Tabs modified to "Sessions", "Clinical Assessments", "Notes". "Overview" tab and its content (e.g., `EmgVisualization`, `TreatmentTimeline`) were removed.
+    -   "Clinical Assessments" tab now uses the new `ClinicalAssessments` component instead of `TreatmentConfig`.
+    -   "Edit Assessment" button in the "Clinical Assessments" tab header changed to "Manage Assessments" (subsequently updated to "Add Assessment" and "View Progress" buttons).
+    -   Tab styling ( `TabsList` and `TabsTrigger` in `PatientProfile.tsx`) updated to align with the styling in `frontend/src/pages/dashboard/index.tsx`, including icons (`Calendar`, `FileEdit`, `FilePlus`).
+-   **`ClinicalAssessments.tsx`** (`frontend/src/components/patients/clinical-assessments.tsx`):
+    -   Created as a new component.
+    -   UI evolved from a simple list of assessment categories to a card-based layout, and finally to a table-based layout.
+    -   The table displays columns for "Category" (using a colored `Badge` with a `Tooltip`), "Measure", and "Last Assessed". The "Last Value" column was removed.
+    -   Mock data (`mockPatientAssessments`) was introduced and integrated to populate the table. The displayed data is filtered to only include measures for which mock data exists.
+    -   Keys in `mockPatientAssessments` were corrected to use hyphens (e.g., `muscle-strength_0`) to match the dynamically generated measure IDs, resolving data display issues.
+    -   The "Measure" column header is now left-aligned.
+    -   Linter warnings (unused imports, `hasOwnProperty`) addressed.
+    -   A message "No assessment data available." is shown if the filtered list of measures with mock data is empty.
+
+## Active Decisions & Considerations
+
+### API Path Structure
+- **Date**: 2025-05-26
+- **Focus**: Refining UI for Patient Profile, specifically the Clinical Assessments tab. Ongoing backend integration for EMG data.
+- **Recent Changes**:
+    - **UI Enhancements for `PatientProfile.tsx` and `ClinicalAssessments.tsx`**:
+        -   In `PatientProfile.tsx`:
+            -   Tabs updated to "Sessions", "Clinical Assessments", "Notes". "Overview" tab and its content (e.g., `EmgVisualization`, `TreatmentTimeline`) were removed.
+            -   "Clinical Assessments" tab now uses the new `ClinicalAssessments` component instead of `TreatmentConfig`.
+            -   "Edit Assessment" button in the "Clinical Assessments" tab header changed to "Manage Assessments" (subsequently updated to "Add Assessment" and "View Progress" buttons).
+            -   Tab styling ( `TabsList` and `TabsTrigger` in `PatientProfile.tsx`) updated to align with the styling in `frontend/src/pages/dashboard/index.tsx`, including icons (`Calendar`, `FileEdit`, `FilePlus`).
+        -   In `ClinicalAssessments.tsx`:
+            -   Component created in `frontend/src/components/patients/clinical-assessments.tsx`.
+            -   Initial implementation listed assessment categories.
+            -   Iteratively improved UI:
+                -   Card view with reduced padding and two-column grid for measures.
+                -   Table view implemented with colored badges for categories (with tooltips), "Measure", "Last Value" (later removed), and "Last Assessed" columns.
+                -   Mock data (`mockPatientAssessments`) added to populate the table, with logic to display data or "N/A".
+                -   Corrected mock data keys to match generated measure IDs (hyphens vs. underscores).
+                -   Filtered measures to display only those with mock data.
+                -   "Last Value" column removed.
+                -   "Measure" column header aligned to the left.
+            -   Linter warnings (unused imports, `hasOwnProperty`) addressed.
+    - **C3D Processing & EMG Analysis Components** (previous focus, largely stable):
+        - Successfully fixed C3D file upload functionality by aligning API route prefixes
+        - Fixed Docker configuration for ezc3d library dependencies using a single-stage build approach
+        - Added system dependencies for runtime support of scientific libraries
+        - Added proper location block for `/v1/` paths to proxy to backend
+        - Ensured consistent routing for all API endpoints
+
+### Nginx Configuration Refinement (2025-05-24)
+- Added proper location block for `/v1/` paths to proxy to backend
+- Ensured consistent routing for all API endpoints
+
+### UI Enhancements for Patient Profile & Clinical Assessments (2025-05-26)
+-   **`PatientProfile.tsx`**:
+    -   Tabs modified to "Sessions", "Clinical Assessments", "Notes". "Overview" tab and its content (e.g., `EmgVisualization`, `TreatmentTimeline`) were removed.
+    -   "Clinical Assessments" tab now uses the new `ClinicalAssessments` component instead of `TreatmentConfig`.
+    -   "Edit Assessment" button in the "Clinical Assessments" tab header changed to "Manage Assessments" (subsequently updated to "Add Assessment" and "View Progress" buttons).
+    -   Tab styling ( `TabsList` and `TabsTrigger` in `PatientProfile.tsx`) updated to align with the styling in `frontend/src/pages/dashboard/index.tsx`, including icons (`Calendar`, `FileEdit`, `FilePlus`).
+-   **`ClinicalAssessments.tsx`** (`frontend/src/components/patients/clinical-assessments.tsx`):
+    -   Created as a new component.
+    -   UI evolved from a simple list of assessment categories to a card-based layout, and finally to a table-based layout.
+    -   The table displays columns for "Category" (using a colored `Badge` with a `Tooltip`), "Measure", and "Last Assessed". The "Last Value" column was removed.
+    -   Mock data (`mockPatientAssessments`) was introduced and integrated to populate the table. The displayed data is filtered to only include measures for which mock data exists.
+    -   Keys in `mockPatientAssessments` were corrected to use hyphens (e.g., `muscle-strength_0`) to match the dynamically generated measure IDs, resolving data display issues.
+    -   The "Measure" column header is now left-aligned.
+    -   Linter warnings (unused imports, `hasOwnProperty`) addressed.
+    -   A message "No assessment data available." is shown if the filtered list of measures with mock data is empty.
+
+## Active Decisions & Considerations
+
+### API Path Structure
+- **Date**: 2025-05-26
+- **Focus**: Refining UI for Patient Profile, specifically the Clinical Assessments tab. Ongoing backend integration for EMG data.
+- **Recent Changes**:
+    - **UI Enhancements for `PatientProfile.tsx` and `ClinicalAssessments.tsx`**:
+        -   In `PatientProfile.tsx`:
+            -   Tabs updated to "Sessions", "Clinical Assessments", "Notes". "Overview" tab and its content (e.g., `EmgVisualization`, `TreatmentTimeline`) were removed.
+            -   "Clinical Assessments" tab now uses the new `ClinicalAssessments` component instead of `TreatmentConfig`.
+            -   "Edit Assessment" button in the "Clinical Assessments" tab header changed to "Manage Assessments" (subsequently updated to "Add Assessment" and "View Progress" buttons).
+            -   Tab styling ( `TabsList` and `TabsTrigger` in `PatientProfile.tsx`) updated to align with the styling in `frontend/src/pages/dashboard/index.tsx`, including icons (`Calendar`, `FileEdit`, `FilePlus`).
+        -   In `ClinicalAssessments.tsx`:
+            -   Component created in `frontend/src/components/patients/clinical-assessments.tsx`.
+            -   Initial implementation listed assessment categories.
+            -   Iteratively improved UI:
+                -   Card view with reduced padding and two-column grid for measures.
+                -   Table view implemented with colored badges for categories (with tooltips), "Measure", "Last Value" (later removed), and "Last Assessed" columns.
+                -   Mock data (`mockPatientAssessments`) added to populate the table, with logic to display data or "N/A".
+                -   Corrected mock data keys to match generated measure IDs (hyphens vs. underscores).
+                -   Filtered measures to display only those with mock data.
+                -   "Last Value" column removed.
+                -   "Measure" column header aligned to the left.
+            -   Linter warnings (unused imports, `hasOwnProperty`) addressed.
+    - **C3D Processing & EMG Analysis Components** (previous focus, largely stable):
+        - Successfully fixed C3D file upload functionality by aligning API route prefixes
+        - Fixed Docker configuration for ezc3d library dependencies using a single-stage build approach
+        - Added system dependencies for runtime support of scientific libraries
+        - Added proper location block for `/v1/` paths to proxy to backend
+        - Ensured consistent routing for all API endpoints
+
+### Nginx Configuration Refinement (2025-05-24)
+- Added proper location block for `/v1/` paths to proxy to backend
+- Ensured consistent routing for all API endpoints
+
+### UI Enhancements for Patient Profile & Clinical Assessments (2025-05-26)
+-   **`PatientProfile.tsx`**:
+    -   Tabs modified to "Sessions", "Clinical Assessments", "Notes". "Overview" tab and its content (e.g., `EmgVisualization`, `TreatmentTimeline`) were removed.
+    -   "Clinical Assessments" tab now uses the new `ClinicalAssessments` component instead of `TreatmentConfig`.
+    -   "Edit Assessment" button in the "Clinical Assessments" tab header changed to "Manage Assessments" (subsequently updated to "Add Assessment" and "View Progress" buttons).
+    -   Tab styling ( `TabsList` and `TabsTrigger` in `PatientProfile.tsx`) updated to align with the styling in `frontend/src/pages/dashboard/index.tsx`, including icons (`Calendar`, `FileEdit`, `FilePlus`).
+-   **`ClinicalAssessments.tsx`** (`frontend/src/components/patients/clinical-assessments.tsx`):
+    -   Created as a new component.
+    -   UI evolved from a simple list of assessment categories to a card-based layout, and finally to a table-based layout.
+    -   The table displays columns for "Category" (using a colored `Badge` with a `Tooltip`), "Measure", and "Last Assessed". The "Last Value" column was removed.
+    -   Mock data (`mockPatientAssessments`) was introduced and integrated to populate the table. The displayed data is filtered to only include measures for which mock data exists.
+    -   Keys in `mockPatientAssessments` were corrected to use hyphens (e.g., `muscle-strength_0`) to match the dynamically generated measure IDs, resolving data display issues.
+    -   The "Measure" column header is now left-aligned.
+    -   Linter warnings (unused imports, `hasOwnProperty`) addressed.
+    -   A message "No assessment data available." is shown if the filtered list of measures with mock data is empty.
+
+## Active Decisions & Considerations
+
+### API Path Structure
+- **Date**: 2025-05-26
+- **Focus**: Refining UI for Patient Profile, specifically the Clinical Assessments tab. Ongoing backend integration for EMG data.
+- **Recent Changes**:
+    - **UI Enhancements for `PatientProfile.tsx` and `ClinicalAssessments.tsx`**:
+        -   In `PatientProfile.tsx`:
+            -   Tabs updated to "Sessions", "Clinical Assessments", "Notes". "Overview" tab and its content (e.g., `EmgVisualization`, `TreatmentTimeline`) were removed.
+            -   "Clinical Assessments" tab now uses the new `ClinicalAssessments` component instead of `TreatmentConfig`.
+            -   "Edit Assessment" button in the "Clinical Assessments" tab header changed to "Manage Assessments" (subsequently updated to "Add Assessment" and "View Progress" buttons).
+            -   Tab styling ( `TabsList` and `TabsTrigger` in `PatientProfile.tsx`) updated to align with the styling in `frontend/src/pages/dashboard/index.tsx`, including icons (`Calendar`, `FileEdit`, `FilePlus`).
+        -   In `ClinicalAssessments.tsx`:
+            -   Component created in `frontend/src/components/patients/clinical-assessments.tsx`.
+            -   Initial implementation listed assessment categories.
+            -   Iteratively improved UI:
+                -   Card view with reduced padding and two-column grid for measures.
+                -   Table view implemented with colored badges for categories (with tooltips), "Measure", "Last Value" (later removed), and "Last Assessed" columns.
+                -   Mock data (`mockPatientAssessments`) added to populate the table, with logic to display data or "N/A".
+                -   Corrected mock data keys to match generated measure IDs (hyphens vs. underscores).
+                -   Filtered measures to display only those with mock data.
+                -   "Last Value" column removed.
+                -   "Measure" column header aligned to the left.
+            -   Linter warnings (unused imports, `hasOwnProperty`) addressed.
+    - **C3D Processing & EMG Analysis Components** (previous focus, largely stable):
+        - Successfully fixed C3D file upload functionality by aligning API route prefixes
+        - Fixed Docker configuration for ezc3d library dependencies using a single-stage build approach
+        - Added system dependencies for runtime support of scientific libraries
+        - Added proper location block for `/v1/` paths to proxy to backend
+        - Ensured consistent routing for all API endpoints
+
+### Nginx Configuration Refinement (2025-05-24)
+- Added proper location block for `/v1/` paths to proxy to backend
+- Ensured consistent routing for all API endpoints
+
+### UI Enhancements for Patient Profile & Clinical Assessments (2025-05-26)
+-   **`PatientProfile.tsx`**:
+    -   Tabs modified to "Sessions", "Clinical Assessments", "Notes". "Overview" tab and its content (e.g., `EmgVisualization`, `TreatmentTimeline`) were removed.
+    -   "Clinical Assessments" tab now uses the new `ClinicalAssessments` component instead of `TreatmentConfig`.
+    -   "Edit Assessment" button in the "Clinical Assessments" tab header changed to "Manage Assessments" (subsequently updated to "Add Assessment" and "View Progress" buttons).
+    -   Tab styling ( `TabsList` and `TabsTrigger` in `PatientProfile.tsx`) updated to align with the styling in `frontend/src/pages/dashboard/index.tsx`, including icons (`Calendar`, `FileEdit`, `FilePlus`).
+-   **`ClinicalAssessments.tsx`** (`frontend/src/components/patients/clinical-assessments.tsx`):
+    -   Created as a new component.
+    -   UI evolved from a simple list of assessment categories to a card-based layout, and finally to a table-based layout.
+    -   The table displays columns for "Category" (using a colored `Badge` with a `Tooltip`), "Measure", and "Last Assessed". The "Last Value" column was removed.
+    -   Mock data (`mockPatientAssessments`) was introduced and integrated to populate the table. The displayed data is filtered to only include measures for which mock data exists.
+    -   Keys in `mockPatientAssessments` were corrected to use hyphens (e.g., `muscle-strength_0`) to match the dynamically generated measure IDs, resolving data display issues.
+    -   The "Measure" column header is now left-aligned.
+    -   Linter warnings (unused imports, `hasOwnProperty`) addressed.
+    -   A message "No assessment data available." is shown if the filtered list of measures with mock data is empty.
+
+## Active Decisions & Considerations
+
+### API Path Structure
+- **Date**: 2025-05-26
+- **Focus**: Refining UI for Patient Profile, specifically the Clinical Assessments tab. Ongoing backend integration for EMG data.
+- **Recent Changes**:
+    - **UI Enhancements for `PatientProfile.tsx` and `ClinicalAssessments.tsx`**:
+        -   In `PatientProfile.tsx`:
+            -   Tabs updated to "Sessions", "Clinical Assessments", "Notes". "Overview" tab and its content (e.g., `EmgVisualization`, `TreatmentTimeline`) were removed.
+            -   "Clinical Assessments" tab now uses the new `ClinicalAssessments` component instead of `TreatmentConfig`.
+            -   "Edit Assessment" button in the "Clinical Assessments" tab header changed to "Manage Assessments" (subsequently updated to "Add Assessment" and "View Progress" buttons).
+            -   Tab styling ( `TabsList` and `TabsTrigger` in `PatientProfile.tsx`) updated to align with the styling in `frontend/src/pages/dashboard/index.tsx`, including icons (`Calendar`, `FileEdit`, `FilePlus`).
+        -   In `ClinicalAssessments.tsx`:
+            -   Component created in `frontend/src/components/patients/clinical-assessments.tsx`.
+            -   Initial implementation listed assessment categories.
+            -   Iteratively improved UI:
+                -   Card view with reduced padding and two-column grid for measures.
+                -   Table view implemented with colored badges for categories (with tooltips), "Measure", "Last Value" (later removed), and "Last Assessed" columns.
+                -   Mock data (`mockPatientAssessments`) added to populate the table, with logic to display data or "N/A".
+                -   Corrected mock data keys to match generated measure IDs (hyphens vs. underscores).
+                -   Filtered measures to display only those with mock data.
+                -   "Last Value" column removed.
+                -   "Measure" column header aligned to the left.
+            -   Linter warnings (unused imports, `hasOwnProperty`) addressed.
+    - **C3D Processing & EMG Analysis Components** (previous focus, largely stable):
+        - Successfully fixed C3D file upload functionality by aligning API route prefixes
+        - Fixed Docker configuration for ezc3d library dependencies using a single-stage build approach
+        - Added system dependencies for runtime support of scientific libraries
+        - Added proper location block for `/v1/` paths to proxy to backend
+        - Ensured consistent routing for all API endpoints
+
+### Nginx Configuration Refinement (2025-05-24)
+- Added proper location block for `/v1/` paths to proxy to backend
+- Ensured consistent routing for all API endpoints
+
+### UI Enhancements for Patient Profile & Clinical Assessments (2025-05-26)
+-   **`PatientProfile.tsx`**:
+    -   Tabs modified to "Sessions", "Clinical Assessments", "Notes". "Overview" tab and its content (e.g., `EmgVisualization`, `TreatmentTimeline`) were removed.
+    -   "Clinical Assessments" tab now uses the new `ClinicalAssessments` component instead of `TreatmentConfig`.
+    -   "Edit Assessment" button in the "Clinical Assessments" tab header changed to "Manage Assessments" (subsequently updated to "Add Assessment" and "View Progress" buttons).
+    -   Tab styling ( `TabsList` and `TabsTrigger` in `PatientProfile.tsx`) updated to align with the styling in `frontend/src/pages/dashboard/index.tsx`, including icons (`Calendar`, `FileEdit`, `FilePlus`).
+-   **`ClinicalAssessments.tsx`** (`frontend/src/components/patients/clinical-assessments.tsx`):
+    -   Created as a new component.
+    -   UI evolved from a simple list of assessment categories to a card-based layout, and finally to a table-based layout.
+    -   The table displays columns for "Category" (using a colored `Badge` with a `Tooltip`), "Measure", and "Last Assessed". The "Last Value" column was removed.
+    -   Mock data (`mockPatientAssessments`) was introduced and integrated to populate the table. The displayed data is filtered to only include measures for which mock data exists.
+    -   Keys in `mockPatientAssessments` were corrected to use hyphens (e.g., `muscle-strength_0`) to match the dynamically generated measure IDs, resolving data display issues.
+    -   The "Measure" column header is now left-aligned.
+    -   Linter warnings (unused imports, `hasOwnProperty`) addressed.
+    -   A message "No assessment data available." is shown if the filtered list of measures with mock data is empty.
+
+## Active Decisions & Considerations
+
+### API Path Structure
+- **Date**: 2025-05-26
+- **Focus**: Refining UI for Patient Profile, specifically the Clinical Assessments tab. Ongoing backend integration for EMG data.
+- **Recent Changes**:
+    - **UI Enhancements for `PatientProfile.tsx` and `ClinicalAssessments.tsx`**:
+        -   In `PatientProfile.tsx`:
+            -   Tabs updated to "Sessions", "Clinical Assessments", "Notes". "Overview" tab and its content (e.g., `EmgVisualization`, `TreatmentTimeline`) were removed.
+            -   "Clinical Assessments" tab now uses the new `ClinicalAssessments` component instead of `TreatmentConfig`.
+            -   "Edit Assessment" button in the "Clinical Assessments" tab header changed to "Manage Assessments" (subsequently updated to "Add Assessment" and "View Progress" buttons).
+            -   Tab styling ( `TabsList` and `TabsTrigger` in `PatientProfile.tsx`) updated to align with the styling in `frontend/src/pages/dashboard/index.tsx`, including icons (`Calendar`, `FileEdit`, `FilePlus`).
+        -   In `ClinicalAssessments.tsx`:
+            -   Component created in `frontend/src/components/patients/clinical-assessments.tsx`.
+            -   Initial implementation listed assessment categories.
+            -   Iteratively improved UI:
+                -   Card view with reduced padding and two-column grid for measures.
+                -   Table view implemented with colored badges for categories (with tooltips), "Measure", "Last Value" (later removed), and "Last Assessed" columns.
+                -   Mock data (`mockPatientAssessments`) added to populate the table, with logic to display data or "N/A".
+                -   Corrected mock data keys to match generated measure IDs (hyphens vs. underscores).
+                -   Filtered measures to display only those with mock data.
+                -   "Last Value" column removed.
+                -   "Measure" column header aligned to the left.
+            -   Linter warnings (unused imports, `hasOwnProperty`) addressed.
+    - **C3D Processing & EMG Analysis Components** (previous focus, largely stable):
+        - Successfully fixed C3D file upload functionality by aligning API route prefixes
+        - Fixed Docker configuration for ezc3d library dependencies using a single-stage build approach
+        - Added system dependencies for runtime support of scientific libraries
+        - Added proper location block for `/v1/` paths to proxy to backend
+        - Ensured consistent routing for all API endpoints
+
+### Nginx Configuration Refinement (2025-05-24)
+- Added proper location block for `/v1/` paths to proxy to backend
+- Ensured consistent routing for all API endpoints
+
+### UI Enhancements for Patient Profile & Clinical Assessments (2025-05-26)
+-   **`PatientProfile.tsx`**:
+    -   Tabs modified to "Sessions", "Clinical Assessments", "Notes". "Overview" tab and its content (e.g., `EmgVisualization`, `TreatmentTimeline`) were removed.
+    -   "Clinical Assessments" tab now uses the new `ClinicalAssessments` component instead of `TreatmentConfig`.
+    -   "Edit Assessment" button in the "Clinical Assessments" tab header changed to "Manage Assessments" (subsequently updated to "Add Assessment" and "View Progress" buttons).
+    -   Tab styling ( `TabsList` and `TabsTrigger` in `PatientProfile.tsx`) updated to align with the styling in `frontend/src/pages/dashboard/index.tsx`, including icons (`Calendar`, `FileEdit`, `FilePlus`).
+-   **`ClinicalAssessments.tsx`** (`frontend/src/components/patients/clinical-assessments.tsx`):
+    -   Created as a new component.
+    -   UI evolved from a simple list of assessment categories to a card-based layout, and finally to a table-based layout.
+    -   The table displays columns for "Category" (using a colored `Badge` with a `Tooltip`), "Measure", and "Last Assessed". The "Last Value" column was removed.
+    -   Mock data (`mockPatientAssessments`) was introduced and integrated to populate the table. The displayed data is filtered to only include measures for which mock data exists.
+    -   Keys in `mockPatientAssessments` were corrected to use hyphens (e.g., `muscle-strength_0`) to match the dynamically generated measure IDs, resolving data display issues.
+    -   The "Measure" column header is now left-aligned.
+    -   Linter warnings (unused imports, `hasOwnProperty`) addressed.
+    -   A message "No assessment data available." is shown if the filtered list of measures with mock data is empty.
+
+## Active Decisions & Considerations
+
+### API Path Structure
+- **Date**: 2025-05-26
+- **Focus**: Refining UI for Patient Profile, specifically the Clinical Assessments tab. Ongoing backend integration for EMG data.
+- **Recent Changes**:
+    - **UI Enhancements for `PatientProfile.tsx` and `ClinicalAssessments.tsx`**:
+        -   In `PatientProfile.tsx`:
+            -   Tabs updated to "Sessions", "Clinical Assessments", "Notes". "Overview" tab and its content (e.g., `EmgVisualization`, `TreatmentTimeline`) were removed.
+            -   "Clinical Assessments" tab now uses the new `ClinicalAssessments` component instead of `TreatmentConfig`.
+            -   "Edit Assessment" button in the "Clinical Assessments" tab header changed to "Manage Assessments" (subsequently updated to "Add Assessment" and "View Progress" buttons).
+            -   Tab styling ( `TabsList` and `TabsTrigger` in `PatientProfile.tsx`) updated to align with the styling in `frontend/src/pages/dashboard/index.tsx`, including icons (`Calendar`, `FileEdit`, `FilePlus`).
+        -   In `ClinicalAssessments.tsx`:
+            -   Component created in `frontend/src/components/patients/clinical-assessments.tsx`.
+            -   Initial implementation listed assessment categories.
+            -   Iteratively improved UI:
+                -   Card view with reduced padding and two-column grid for measures.
+                -   Table view implemented with colored badges for categories (with tooltips), "Measure", "Last Value" (later removed), and "Last Assessed" columns.
+                -   Mock data (`mockPatientAssessments`) added to populate the table, with logic to display data or "N/A".
+                -   Corrected mock data keys to match generated measure IDs (hyphens vs. underscores).
+                -   Filtered measures to display only those with mock data.
+                -   "Last Value" column removed.
+                -   "Measure" column header aligned to the left.
+            -   Linter warnings (unused imports, `hasOwnProperty`) addressed.
+    - **C3D Processing & EMG Analysis Components** (previous focus, largely stable):
+        - Successfully fixed C3D file upload functionality by aligning API route prefixes
+        - Fixed Docker configuration for ezc3d library dependencies using a single-stage build approach
+        - Added system dependencies for runtime support of scientific libraries
+        - Added proper location block for `/v1/` paths to proxy to backend
+        - Ensured consistent routing for all API endpoints
+
+### Nginx Configuration Refinement (2025-05-24)
+- Added proper location block for `/v1/` paths to proxy to backend
+- Ensured consistent routing for all API endpoints
+
+### UI Enhancements for Patient Profile & Clinical Assessments (2025-05-26)
+-   **`PatientProfile.tsx`**:
+    -   Tabs modified to "Sessions", "Clinical Assessments", "Notes". "Overview" tab and its content (e.g., `EmgVisualization`, `TreatmentTimeline`) were removed.
+    -   "Clinical Assessments" tab now uses the new `ClinicalAssessments` component instead of `TreatmentConfig`.
+    -   "Edit Assessment" button in the "Clinical Assessments" tab header changed to "Manage Assessments" (subsequently updated to "Add Assessment" and "View Progress" buttons).
+    -   Tab styling ( `TabsList` and `TabsTrigger` in `PatientProfile.tsx`) updated to align with the styling in `frontend/src/pages/dashboard/index.tsx`, including icons (`Calendar`, `FileEdit`, `FilePlus`).
+-   **`ClinicalAssessments.tsx`** (`frontend/src/components/patients/clinical-assessments.tsx`):
+    -   Created as a new component.
+    -   UI evolved from a simple list of assessment categories to a card-based layout, and finally to a table-based layout.
+    -   The table displays columns for "Category" (using a colored `Badge` with a `Tooltip`), "Measure", and "Last Assessed". The "Last Value" column was removed.
+    -   Mock data (`mockPatientAssessments`) was introduced and integrated to populate the table. The displayed data is filtered to only include measures for which mock data exists.
+    -   Keys in `mockPatientAssessments` were corrected to use hyphens (e.g., `muscle-strength_0`) to match the dynamically generated measure IDs, resolving data display issues.
+    -   The "Measure" column header is now left-aligned.
+    -   Linter warnings (unused imports, `hasOwnProperty`) addressed.
+    -   A message "No assessment data available." is shown if the filtered list of measures with mock data is empty.
+
+## Active Decisions & Considerations
+
+### API Path Structure
+- **Date**: 2025-05-26
+- **Focus**: Refining UI for Patient Profile, specifically the Clinical Assessments tab. Ongoing backend integration for EMG data.
+- **Recent Changes**:
+    - **UI Enhancements for `PatientProfile.tsx` and `ClinicalAssessments.tsx`**:
+        -   In `PatientProfile.tsx`:
+            -   Tabs updated to "Sessions", "Clinical Assessments", "Notes". "Overview" tab and its content (e.g., `EmgVisualization`, `TreatmentTimeline`) were removed.
+            -   "Clinical Assessments" tab now uses the new `ClinicalAssessments` component instead of `TreatmentConfig`.
+            -   "Edit Assessment" button in the "Clinical Assessments" tab header changed to "Manage Assessments" (subsequently updated to "Add Assessment" and "View Progress" buttons).
+            -   Tab styling ( `TabsList` and `TabsTrigger` in `PatientProfile.tsx`) updated to align with the styling in `frontend/src/pages/dashboard/index.tsx`, including icons (`Calendar`, `FileEdit`, `FilePlus`).
+        -   In `ClinicalAssessments.tsx`:
+            -   Component created in `frontend/src/components/patients/clinical-assessments.tsx`.
+            -   Initial implementation listed assessment categories.
+            -   Iteratively improved UI:
+                -   Card view with reduced padding and two-column grid for measures.
+                -   Table view implemented with colored badges for categories (with tooltips), "Measure", "Last Value" (later removed), and "Last Assessed" columns.
+                -   Mock data (`mockPatientAssessments`) added to populate the table, with logic to display data or "N/A".
+                -   Corrected mock data keys to match generated measure IDs (hyphens vs. underscores).
+                -   Filtered measures to display only those with mock data.
+                -   "Last Value" column removed.
+                -   "Measure" column header aligned to the left.
+            -   Linter warnings (unused imports, `hasOwnProperty`) addressed.
+    - **C3D Processing & EMG Analysis Components** (previous focus, largely stable):
+        - Successfully fixed C3D file upload functionality by aligning API route prefixes
+        - Fixed Docker configuration for ezc3d library dependencies using a single-stage build approach
+        - Added system dependencies for runtime support of scientific libraries
+        - Added proper location block for `/v1/` paths to proxy to backend
+        - Ensured consistent routing for all API endpoints
+
+### Nginx Configuration Refinement (2025-05-24)
+- Added proper location block for `/v1/` paths to proxy to backend
+- Ensured consistent routing for all API endpoints
+
+### UI Enhancements for Patient Profile & Clinical Assessments (2025-05-26)
+-   **`PatientProfile.tsx`**:
+    -   Tabs modified to "Sessions", "Clinical Assessments", "Notes". "Overview" tab and its content (e.g., `EmgVisualization`, `TreatmentTimeline`) were removed.
+    -   "Clinical Assessments" tab now uses the new `ClinicalAssessments` component instead of `TreatmentConfig`.
+    -   "Edit Assessment" button in the "Clinical Assessments" tab header changed to "Manage Assessments" (subsequently updated to "Add Assessment" and "View Progress" buttons).
+    -   Tab styling ( `TabsList` and `TabsTrigger` in `PatientProfile.tsx`) updated to align with the styling in `frontend/src/pages/dashboard/index.tsx`, including icons (`Calendar`, `FileEdit`, `FilePlus`).
+-   **`ClinicalAssessments.tsx`** (`frontend/src/components/patients/clinical-assessments.tsx`):
+    -   Created as a new component.
+    -   UI evolved from a simple list of assessment categories to a card-based layout, and finally to a table-based layout.
+    -   The table displays columns for "Category" (using a colored `Badge` with a `Tooltip`), "Measure", and "Last Assessed". The "Last Value" column was removed.
+    -   Mock data (`mockPatientAssessments`) was introduced and integrated to populate the table. The displayed data is filtered to only include measures for which mock data exists.
+    -   Keys in `mockPatientAssessments` were corrected to use hyphens (e.g., `muscle-strength_0`) to match the dynamically generated measure IDs, resolving data display issues.
+    -   The "Measure" column header is now left-aligned.
+    -   Linter warnings (unused imports, `hasOwnProperty`) addressed.
+    -   A message "No assessment data available." is shown if the filtered list of measures with mock data is empty.
+
+## Active Decisions & Considerations
+
+### API Path Structure
+- **Date**: 2025-05-26
+- **Focus**: Refining UI for Patient Profile, specifically the Clinical Assessments tab. Ongoing backend integration for EMG data.
+- **Recent Changes**:
+    - **UI Enhancements for `PatientProfile.tsx` and `ClinicalAssessments.tsx`**:
+        -   In `PatientProfile.tsx`:
+            -   Tabs updated to "Sessions", "Clinical Assessments", "Notes". "Overview" tab and its content (e.g., `EmgVisualization`, `TreatmentTimeline`) were removed.
+            -   "Clinical Assessments" tab now uses the new `ClinicalAssessments` component instead of `TreatmentConfig`.
+            -   "Edit Assessment" button in the "Clinical Assessments" tab header changed to "Manage Assessments" (subsequently updated to "Add Assessment" and "View Progress" buttons).
+            -   Tab styling ( `TabsList` and `TabsTrigger` in `PatientProfile.tsx`) updated to align with the styling in `frontend/src/pages/dashboard/index.tsx`, including icons (`Calendar`, `FileEdit`, `FilePlus`).
+        -   In `ClinicalAssessments.tsx`:
+            -   Component created in `frontend/src/components/patients/clinical-assessments.tsx`.
+            -   Initial implementation listed assessment categories.
+            -   Iteratively improved UI:
+                -   Card view with reduced padding and two-column grid for measures.
+                -   Table view implemented with colored badges for categories (with tooltips), "Measure", "Last Value" (later removed), and "Last Assessed" columns.
+                -   Mock data (`mockPatientAssessments`) added to populate the table, with logic to display data or "N/A".
+                -   Corrected mock data keys to match generated measure IDs (hyphens vs. underscores).
+                -   Filtered measures to display only those with mock data.
+                -   "Last Value" column removed.
+                -   "Measure" column header aligned to the left.
+            -   Linter warnings (unused imports, `hasOwnProperty`) addressed.
+    - **C3D Processing & EMG Analysis Components** (previous focus, largely stable):
+        - Successfully fixed C3D file upload functionality by aligning API route prefixes
+        - Fixed Docker configuration for ezc3d library dependencies using a single-stage build approach
+        - Added system dependencies for runtime support of scientific libraries
+        - Added proper location block for `/v1/` paths to proxy to backend
+        - Ensured consistent routing for all API endpoints
+
+### Nginx Configuration Refinement (2025-05-24)
+- Added proper location block for `/v1/` paths to proxy to backend
+- Ensured consistent routing for all API endpoints
+
+### UI Enhancements for Patient Profile & Clinical Assessments (2025-05-26)
+-   **`PatientProfile.tsx`**:
+    -   Tabs modified to "Sessions", "Clinical Assessments", "Notes". "Overview" tab and its content (e.g., `EmgVisualization`, `TreatmentTimeline`) were removed.
+    -   "Clinical Assessments" tab now uses the new `ClinicalAssessments` component instead of `TreatmentConfig`.
+    -   "Edit Assessment" button in the "Clinical Assessments" tab header changed to "Manage Assessments" (subsequently updated to "Add Assessment" and "View Progress" buttons).
+    -   Tab styling ( `TabsList` and `TabsTrigger` in `PatientProfile.tsx`) updated to align with the styling in `frontend/src/pages/dashboard/index.tsx`, including icons (`Calendar`, `FileEdit`, `FilePlus`).
+-   **`ClinicalAssessments.tsx`** (`frontend/src/components/patients/clinical-assessments.tsx`):
+    -   Created as a new component.
+    -   UI evolved from a simple list of assessment categories to a card-based layout, and finally to a table-based layout.
+    -   The table displays columns for "Category" (using a colored `Badge` with a `Tooltip`), "Measure", and "Last Assessed". The "Last Value" column was removed.
+    -   Mock data (`mockPatientAssessments`) was introduced and integrated to populate the table. The displayed data is filtered to only include measures for which mock data exists.
+    -   Keys in `mockPatientAssessments` were corrected to use hyphens (e.g., `muscle-strength_0`) to match the dynamically generated measure IDs, resolving data display issues.
+    -   The "Measure" column header is now left-aligned.
+    -   Linter warnings (unused imports, `hasOwnProperty`) addressed.
+    -   A message "No assessment data available." is shown if the filtered list of measures with mock data is empty.
+
+## Active Decisions & Considerations
+
+### API Path Structure
+- **Date**: 2025-05-26
+- **Focus**: Refining UI for Patient Profile, specifically the Clinical Assessments tab. Ongoing backend integration for EMG data.
+- **Recent Changes**:
+    - **UI Enhancements for `PatientProfile.tsx` and `ClinicalAssessments.tsx`**:
+        -   In `PatientProfile.tsx`:
+            -   Tabs updated to "Sessions", "Clinical Assessments", "Notes". "Overview" tab and its content (e.g., `EmgVisualization`, `TreatmentTimeline`) were removed.
+            -   "Clinical Assessments" tab now uses the new `ClinicalAssessments` component instead of `TreatmentConfig`.
+            -   "Edit Assessment" button in the "Clinical Assessments" tab header changed to "Manage Assessments" (subsequently updated to "Add Assessment" and "View Progress" buttons).
+            -   Tab styling ( `TabsList` and `TabsTrigger` in `PatientProfile.tsx`) updated to align with the styling in `frontend/src/pages/dashboard/index.tsx`, including icons (`Calendar`, `FileEdit`, `FilePlus`).
+        -   In `ClinicalAssessments.tsx`:
+            -   Component created in `frontend/src/components/patients/clinical-assessments.tsx`.
+            -   Initial implementation listed assessment categories.
+            -   Iteratively improved UI:
+                -   Card view with reduced padding and two-column grid for measures.
+                -   Table view implemented with colored badges for categories (with tooltips), "Measure", "Last Value" (later removed), and "Last Assessed" columns.
+                -   Mock data (`mockPatientAssessments`) added to populate the table, with logic to display data or "N/A".
+                -   Corrected mock data keys to match generated measure IDs (hyphens vs. underscores).
+                -   Filtered measures to display only those with mock data.
+                -   "Last Value" column removed.
+                -   "Measure" column header aligned to the left.
+            -   Linter warnings (unused imports, `hasOwnProperty`) addressed.
+    - **C3D Processing & EMG Analysis Components** (previous focus, largely stable):
+        - Successfully fixed C3D file upload functionality by aligning API route prefixes
+        - Fixed Docker configuration for ezc3d library dependencies using a single-stage build approach
+        - Added system dependencies for runtime support of scientific libraries
+        - Added proper location block for `/v1/` paths to proxy to backend
+        - Ensured consistent routing for all API endpoints
+
+### Nginx Configuration Refinement (2025-05-24)
+- Added proper location block for `/v1/` paths to proxy to backend
+- Ensured consistent routing for all API endpoints
+
+### UI Enhancements for Patient Profile & Clinical Assessments (2025-05-26)
+-   **`PatientProfile.tsx`**:
+    -   Tabs modified to "Sessions", "Clinical Assessments", "Notes". "Overview" tab and its content (e.g., `EmgVisualization`, `TreatmentTimeline`) were removed.
+    -   "Clinical Assessments" tab now uses the new `ClinicalAssessments` component instead of `TreatmentConfig`.
+    -   "Edit Assessment" button in the "Clinical Assessments" tab header changed to "Manage Assessments" (subsequently updated to "Add Assessment" and "View Progress" buttons).
+    -   Tab styling ( `TabsList` and `TabsTrigger` in `PatientProfile.tsx`) updated to align with the styling in `frontend/src/pages/dashboard/index.tsx`, including icons (`Calendar`, `FileEdit`, `FilePlus`).
+-   **`ClinicalAssessments.tsx`** (`frontend/src/components/patients/clinical-assessments.tsx`):
+    -   Created as a new component.
+    -   UI evolved from a simple list of assessment categories to a card-based layout, and finally to a table-based layout.
+    -   The table displays columns for "Category" (using a colored `Badge` with a `Tooltip`), "Measure", and "Last Assessed". The "Last Value" column was removed.
+    -   Mock data (`mockPatientAssessments`) was introduced and integrated to populate the table. The displayed data is filtered to only include measures for which mock data exists.
+    -   Keys in `mockPatientAssessments` were corrected to use hyphens (e.g., `muscle-strength_0`) to match the dynamically generated measure IDs, resolving data display issues.
+    -   The "Measure" column header is now left-aligned.
+    -   Linter warnings (unused imports, `hasOwnProperty`) addressed.
+    -   A message "No assessment data available." is shown if the filtered list of measures with mock data is empty.
+
+## Active Decisions & Considerations
+
+### API Path Structure
+- **Date**: 2025-05-26
+- **Focus**: Refining UI for Patient Profile, specifically the Clinical Assessments tab. Ongoing backend integration for EMG data.
+- **Recent Changes**:
+    - **UI Enhancements for `PatientProfile.tsx` and `ClinicalAssessments.tsx`**:
+        -   In `PatientProfile.tsx`:
+            -   Tabs updated to "Sessions", "Clinical Assessments", "Notes". "Overview" tab and its content (e.g., `EmgVisualization`, `TreatmentTimeline`) were removed.
+            -   "Clinical Assessments" tab now uses the new `ClinicalAssessments` component instead of `TreatmentConfig`.
+            -   "Edit Assessment" button in the "Clinical Assessments" tab header changed to "Manage Assessments" (subsequently updated to "Add Assessment" and "View Progress" buttons).
+            -   Tab styling ( `TabsList` and `TabsTrigger` in `PatientProfile.tsx`) updated to align with the styling in `frontend/src/pages/dashboard/index.tsx`, including icons (`Calendar`, `FileEdit`, `FilePlus`).
+        -   In `ClinicalAssessments.tsx`:
+            -   Component created in `frontend/src/components/patients/clinical-assessments.tsx`.
+            -   Initial implementation listed assessment categories.
+            -   Iteratively improved UI:
+                -   Card view with reduced padding and two-column grid for measures.
+                -   Table view implemented with colored badges for categories (with tooltips), "Measure", "Last Value" (later removed), and "Last Assessed" columns.
+                -   Mock data (`mockPatientAssessments`) added to populate the table, with logic to display data or "N/A".
+                -   Corrected mock data keys to match generated measure IDs (hyphens vs. underscores).
+                -   Filtered measures to display only those with mock data.
+                -   "Last Value" column removed.
+                -   "Measure" column header aligned to the left.
+            -   Linter warnings (unused imports, `hasOwnProperty`) addressed.
+    - **C3D Processing & EMG Analysis Components** (previous focus, largely stable):
+        - Successfully fixed C3D file upload functionality by aligning API route prefixes
+        - Fixed Docker configuration for ezc3d library dependencies using a single-stage build approach
+        - Added system dependencies for runtime support of scientific libraries
+        - Added proper location block for `/v1/` paths to proxy to backend
+        - Ensured consistent routing for all API endpoints
+
+### Nginx Configuration Refinement (2025-05-24)
+- Added proper location block for `/v1/` paths to proxy to backend
+- Ensured consistent routing for all API endpoints
+
+### UI Enhancements for Patient Profile & Clinical Assessments (2025-05-26)
+-   **`PatientProfile.tsx`**:
+    -   Tabs modified to "Sessions", "Clinical Assessments", "Notes". "Overview" tab and its content (e.g., `EmgVisualization`, `TreatmentTimeline`) were removed.
+    -   "Clinical Assessments" tab now uses the new `ClinicalAssessments` component instead of `TreatmentConfig`.
+    -   "Edit Assessment" button in the "Clinical Assessments" tab header changed to "Manage Assessments" (subsequently updated to "Add Assessment" and "View Progress" buttons).
+    -   Tab styling ( `TabsList` and `TabsTrigger` in `PatientProfile.tsx`) updated to align with the styling in `frontend/src/pages/dashboard/index.tsx`, including icons (`Calendar`, `FileEdit`, `FilePlus`).
+-   **`ClinicalAssessments.tsx`** (`frontend/src/components/patients/clinical-assessments.tsx`):
+    -   Created as a new component.
+    -   UI evolved from a simple list of assessment categories to a card-based layout, and finally to a table-based layout.
+    -   The table displays columns for "Category" (using a colored `Badge` with a `Tooltip`), "Measure", and "Last Assessed". The "Last Value" column was removed.
+    -   Mock data (`mockPatientAssessments`) was introduced and integrated to populate the table. The displayed data is filtered to only include measures for which mock data exists.
+    -   Keys in `mockPatientAssessments` were corrected to use hyphens (e.g., `muscle-strength_0`) to match the dynamically generated measure IDs, resolving data display issues.
+    -   The "Measure" column header is now left-aligned.
+    -   Linter warnings (unused imports, `hasOwnProperty`) addressed.
+    -   A message "No assessment data available." is shown if the filtered list of measures with mock data is empty.
+
+## Active Decisions & Considerations
+
+### API Path Structure
+- **Date**: 2025-05-26
+- **Focus**: Refining UI for Patient Profile, specifically the Clinical Assessments tab. Ongoing backend integration for EMG data.
+- **Recent Changes**:
+    - **UI Enhancements for `PatientProfile.tsx` and `ClinicalAssessments.tsx`**:
+        -   In `PatientProfile.tsx`:
+            -   Tabs updated to "Sessions", "Clinical Assessments", "Notes". "Overview" tab and its content (e.g., `EmgVisualization`, `TreatmentTimeline`) were removed.
+            -   "Clinical Assessments" tab now uses the new `ClinicalAssessments` component instead of `TreatmentConfig`.
+            -   "Edit Assessment" button in the "Clinical Assessments" tab header changed to "Manage Assessments" (subsequently updated to "Add Assessment" and "View Progress" buttons).
+            -   Tab styling ( `TabsList` and `TabsTrigger` in `PatientProfile.tsx`) updated to align with the styling in `frontend/src/pages/dashboard/index.tsx`, including icons (`Calendar`, `FileEdit`, `FilePlus`).
+        -   In `ClinicalAssessments.tsx`:
+            -   Component created in `frontend/src/components/patients/clinical-assessments.tsx`.
+            -   Initial implementation listed assessment categories.
+            -   Iteratively improved UI:
+                -   Card view with reduced padding and two-column grid for measures.
+                -   Table view implemented with colored badges for categories (with tooltips), "Measure", "Last Value" (later removed), and "Last Assessed" columns.
+                -   Mock data (`mockPatientAssessments`) added to populate the table, with logic to display data or "N/A".
+                -   Corrected mock data keys to match generated measure IDs (hyphens vs. underscores).
+                -   Filtered
