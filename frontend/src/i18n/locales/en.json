@@ -67,7 +67,7 @@
         "difficultyDescription": "Set the game difficulty (1-10).",
         "duration": "Session Duration",
         "durationDescription": "Set the total duration of the game session in minutes.",
-        "restInterval": "Rest Interval",
+        "restInterval": "Avg. Rest Interval",
         "restIntervalDescription": "Set the rest time between active periods in seconds.",
         "maxIntensity": "Maximum Intensity",
         "maxIntensityDescription": "Set the target maximum voluntary contraction (MVC) percentage.",

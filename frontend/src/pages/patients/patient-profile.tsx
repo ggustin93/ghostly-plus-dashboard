@@ -250,17 +250,12 @@ const PatientProfile = () => {
               </div>
               <div className="flex space-x-2">
             
-                <Button variant="outline" size="sm" asChild>
-                  <Link to={`/reports/progress?patientId=${patient.id}`}>
+                <Button variant="outline" size="sm">
                     <BarChart className="mr-2 h-4 w-4" />
-                    View Progress
-                  </Link>
-                </Button>
-                <Button size="sm" variant="default" asChild>
-                  <Link to={`/treatments/configure/${patient.id}`}>
+                    View Progress                </Button>
+                <Button size="sm">
                     <FilePlus className="mr-2 h-4 w-4" />
                     Add Assessment
-                  </Link>
                 </Button>
               </div>
             </CardHeader>

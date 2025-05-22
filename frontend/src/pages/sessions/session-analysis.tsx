@@ -137,9 +137,15 @@ export default function SessionAnalysis() {
   const symmetryScore = selectedGameSession?.metrics?.symmetryScore ? selectedGameSession.metrics.symmetryScore * 100 : 0;
   const engagementScore = selectedGameSession?.statistics?.engagementScore || 0;
 
+  const handleExport = () => {
+    // Placeholder for export functionality
+    console.log(`Exporting data for session ${session?.id} of patient ${patient?.name}`);
+    // Implement actual export logic here (e.g., generate PDF, CSV)
+  };
+
   return (
     <div className="space-y-6">
-      <SessionAnalysisHeader patient={patient} session={session} />
+      <SessionAnalysisHeader patient={patient} session={session} onExport={handleExport} />
 
       <GameSessionNavigator
         gameSessions={session.gameSessions}

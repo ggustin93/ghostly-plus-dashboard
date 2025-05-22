@@ -120,7 +120,7 @@ const measuresWithMockData = allFlattenedMeasures.filter(measure =>
   Object.keys(mockPatientAssessments).includes(measure.id)
 );
 
-const ClinicalAssessments: React.FC<ClinicalAssessmentsProps> = ({ patientId, isEmbedded }) => {
+const ClinicalAssessments: React.FC<ClinicalAssessmentsProps> = ({ patientId: _patientId, isEmbedded }) => {
   return (
     <TooltipProvider>
       <div className="border rounded-lg overflow-hidden">

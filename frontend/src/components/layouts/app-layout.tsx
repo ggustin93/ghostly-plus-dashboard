@@ -6,7 +6,7 @@ import { useAuth } from '@/contexts/auth-context';
 
 const AppLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const { user } = useAuth();
+  useAuth();
   const [mounted, setMounted] = useState(false);
 
   // Ensure hydration issue is avoided

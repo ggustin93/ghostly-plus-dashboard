@@ -4,7 +4,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge';
 import { GameSession } from '@/types/session';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 
 interface GameSessionNavigatorProps {
   gameSessions: GameSession[];

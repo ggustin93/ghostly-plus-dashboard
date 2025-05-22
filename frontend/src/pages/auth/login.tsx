@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { useAuth, MockAppUser } from '@/contexts/auth-context';
+import { useAuth } from '@/contexts/auth-context';
 import { UserCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -39,7 +39,6 @@ const Login = () => {
     session, 
     loading: authLoading, 
     error: authError,
-    isMockAuth,
     authMode
   } = useAuth();
   const navigate = useNavigate();
@@ -75,7 +74,11 @@ const Login = () => {
     if (!authLoading) {
       if (user) {
         if ((authMode === 'supabase' && session) || authMode === 'mock') {
-          const userName = (user as any).email || (user as MockAppUser).name || 'User';
+          interface AuthUserDisplay {
+            email?: string;
+            name?: string; // For MockAppUser
+          }
+          const userName = (user as AuthUserDisplay).email || (user as AuthUserDisplay).name || 'User';
           toast({
             title: 'Login Successful',
             description: `Welcome back, ${userName}${authMode === 'mock' ? ' (Mock User)' : ''}`,

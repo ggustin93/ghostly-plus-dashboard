@@ -94,6 +94,7 @@ const createGameSessions = (patientId: string, date: string, completed: boolean)
 };
 
 // Generate session dates based on patient admission dates and status
+/*
 const generateSessionDates = (patientId: string, admissionDate: string, status: string): string[] => {
   const admission = new Date(admissionDate);
   const today = new Date('2025-05-22'); // Current date from your system
@@ -104,7 +105,7 @@ const generateSessionDates = (patientId: string, admissionDate: string, status: 
   firstSession.setDate(admission.getDate() + 2);
   
   // Generate weekly sessions
-  let currentSession = new Date(firstSession);
+  const currentSession = new Date(firstSession);
   let sessionCount = 0;
   const maxSessions = status === 'active' ? 4 : 2; // Active patients have more sessions
   
@@ -121,6 +122,7 @@ const generateSessionDates = (patientId: string, admissionDate: string, status: 
   
   return dates;
 };
+*/
 
 // Complete session data for all patients
 export const mockSessions: RehabilitationSession[] = [
@@ -383,6 +385,52 @@ export const mockSessions: RehabilitationSession[] = [
     gameSessions: [],
   },
 ];
+
+// Dynamically calculate dates for the next 7 days for demo sessions
+const today = new Date();
+
+const todayPlus1 = new Date(today);
+todayPlus1.setDate(today.getDate() + 1);
+
+const todayPlus3 = new Date(today);
+todayPlus3.setDate(today.getDate() + 3);
+
+const todayPlus5 = new Date(today);
+todayPlus5.setDate(today.getDate() + 5);
+
+const formatDate = (dateObj: Date): string => dateObj.toISOString().split('T')[0];
+
+const nextWeekSessionsDemo: RehabilitationSession[] = [
+  {
+    id: 'P001-S04-NextWeek',
+    patientId: 'P001',
+    date: formatDate(todayPlus1), // Scheduled for tomorrow
+    therapistId: 'T001',
+    status: 'scheduled',
+    gameSessions: [],
+    notes: 'Dynamically scheduled demo session for tomorrow.'
+  },
+  {
+    id: 'P002-S04-NextWeek',
+    patientId: 'P002',
+    date: formatDate(todayPlus3), // Scheduled for 3 days from today
+    therapistId: 'T001',
+    status: 'scheduled',
+    gameSessions: [],
+    notes: 'Dynamically scheduled demo session for 3 days from today.'
+  },
+  {
+    id: 'P005-S04-NextWeek',
+    patientId: 'P005',
+    date: formatDate(todayPlus5), // Scheduled for 5 days from today
+    therapistId: 'T001',
+    status: 'scheduled',
+    gameSessions: [],
+    notes: 'Dynamically scheduled demo session for 5 days from today.'
+  },
+];
+
+mockSessions.push(...nextWeekSessionsDemo);
 
 // Helper functions
 export const getSessionsByPatientId = (patientId: string): RehabilitationSession[] => {

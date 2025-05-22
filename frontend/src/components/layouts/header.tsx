@@ -4,7 +4,6 @@ import {
   Menu, 
   Bell, 
   Settings,
-  Search,
   UserCircle,
   LogOut,
   Globe
@@ -20,11 +19,18 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { ThemeToggle } from '../theme-toggle';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Input } from '@/components/ui/input';
 import { useTranslation } from 'react-i18next';
 
 interface HeaderProps {
   openSidebar: () => void;
+}
+
+interface AppUser {
+  user_metadata?: {
+    name?: string;
+    avatar_url?: string;
+  };
+  email?: string;
 }
 
 const Header = ({ openSidebar }: HeaderProps) => {
@@ -44,7 +50,7 @@ const Header = ({ openSidebar }: HeaderProps) => {
     if (isMockAuth) {
       return (typedUser as MockAppUser).name;
     }
-    return (typedUser as any).user_metadata?.name as string | undefined;
+    return (typedUser as AppUser).user_metadata?.name as string | undefined;
   };
 
   const getUserAvatar = (): string | undefined => {
@@ -52,12 +58,12 @@ const Header = ({ openSidebar }: HeaderProps) => {
     if (isMockAuth) {
       return (typedUser as MockAppUser).avatar;
     }
-    return (typedUser as any).user_metadata?.avatar_url as string | undefined;
+    return (typedUser as AppUser).user_metadata?.avatar_url as string | undefined;
   };
   
   const getUserEmail = (): string | undefined => {
     if (!typedUser) return undefined;
-    return (typedUser as any).email as string | undefined;
+    return (typedUser as AppUser).email as string | undefined;
   };
 
   const getWelcomeMessage = () => {

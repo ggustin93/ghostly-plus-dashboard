@@ -47,11 +47,11 @@ const generateC3DFilesFromSessions = (): Omit<C3DFile, 'patientName' | 'overallS
           const fileName = `${session.patientId}_${session.id.split('-')[1]}_G${gameIndex + 1}_${sessionDate.toISOString().split('T')[0].replace(/-/g, '')}.c3d`;
           
           // Determine status and analysis status with some variation
-          const statusOptions = ['Processed', 'Pending Analysis', 'Processing', 'Error'];
+          const statusOptions: Array<'Processed' | 'Pending Analysis' | 'Processing' | 'Error'> = ['Processed', 'Pending Analysis', 'Processing', 'Error'];
           const weights = [0.6, 0.2, 0.15, 0.05]; // Most files are processed
           const randomValue = Math.random();
           let cumulativeWeight = 0;
-          let selectedStatus: typeof statusOptions[0] = 'Processed';
+          let selectedStatus: 'Processed' | 'Pending Analysis' | 'Processing' | 'Error' = 'Processed';
           
           for (let i = 0; i < statusOptions.length; i++) {
             cumulativeWeight += weights[i];
@@ -73,9 +73,9 @@ const generateC3DFilesFromSessions = (): Omit<C3DFile, 'patientName' | 'overallS
           // Calculate game score based on metrics
           let gameScore = 0;
           if (selectedStatus !== 'Error' && gameSession.metrics) {
-            const baseScore = gameSession.metrics.peakContraction * 10;
-            const symmetryBonus = gameSession.metrics.symmetryScore * 500;
-            const fatigueReduction = (1 - gameSession.metrics.fatigueIndex) * 300;
+            const baseScore = (gameSession.metrics.peakContraction ?? 0) * 10;
+            const symmetryBonus = (gameSession.metrics.symmetryScore ?? 0) * 500;
+            const fatigueReduction = (1 - (gameSession.metrics.fatigueIndex ?? 0)) * 300;
             gameScore = Math.round(baseScore + symmetryBonus + fatigueReduction);
           }
 

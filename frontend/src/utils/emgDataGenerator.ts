@@ -19,18 +19,6 @@ interface PausePeriod {
   end: number;
 }
 
-interface ContractionState {
-  active: boolean;
-  side: 'none' | 'left' | 'right';
-  duration: number;
-  lastSide: 'none' | 'left' | 'right';
-  amplitude: number;
-  remainingDuration: number;
-  isLongContraction: boolean;
-  timeSinceLastContraction: number;
-  contractionCount: number;
-}
-
 /**
  * Generates realistic EMG time series data for rehabilitation gaming sessions
  * Simulates quadriceps muscle activation during maze navigation with BFR protocol
@@ -48,7 +36,7 @@ export const generateEMGTimeSeriesData = (options: EMGGeneratorOptions = {}): EM
   const totalSamples = samplingRate * durationSeconds;
   
   // Generate pause periods (obstacles in game) if enabled
-  let pausePeriods: PausePeriod[] = [];
+  const pausePeriods: PausePeriod[] = [];
   if (includePauses) {
     const numPauses = 2 + Math.floor(Math.random() * 2); // 2-3 pauses
     for (let p = 0; p < numPauses; p++) {
@@ -61,18 +49,6 @@ export const generateEMGTimeSeriesData = (options: EMGGeneratorOptions = {}): EM
     }
   }
   
-  let contractionState: ContractionState = {
-    active: false,
-    side: 'none',
-    duration: 0,
-    lastSide: 'none',
-    amplitude: 0,
-    remainingDuration: 0,
-    isLongContraction: true,
-    timeSinceLastContraction: 0,
-    contractionCount: 0
-  };
-
   // Target contractions (use the value passed in or fall back to random range)
   const finalTargetContractions = targetContractions ?? (10 + Math.floor(Math.random() * 3)); // 10-12
   console.log(`EMG Generator: Target=${targetContractions}, Final=${finalTargetContractions}`);
@@ -82,7 +58,7 @@ export const generateEMGTimeSeriesData = (options: EMGGeneratorOptions = {}): EM
   
   // First, create time slots avoiding pauses
   const availableSlots: Array<{start: number, end: number}> = [];
-  let slotStart = 5000; // Start after 5 seconds
+  const slotStart = 5000; // Start after 5 seconds
   
   for (let i = slotStart; i < totalSamples - 5000; i += 1000) { // Check every second
     const slotEnd = i + 3000; // 3-second slots
@@ -135,7 +111,7 @@ export const generateEMGTimeSeriesData = (options: EMGGeneratorOptions = {}): EM
     let isLongContraction = true;
     let lastSide: 'left' | 'right' = 'left';
     
-    uniqueSlots.slice(0, finalTargetContractions).forEach((slotIndex, contractionIndex) => {
+    uniqueSlots.slice(0, finalTargetContractions).forEach((slotIndex /*, _contractionIndex // Removed unused variable */) => {
       const slot = availableSlots[slotIndex];
       
       // Alternate sides with 75% probability for natural variation
@@ -156,7 +132,6 @@ export const generateEMGTimeSeriesData = (options: EMGGeneratorOptions = {}): EM
       }
       
       // Place contraction randomly within the slot
-      const slotDuration = slot.end - slot.start;
       const maxStartInSlot = Math.max(slot.start, slot.end - duration);
       const randomPositionInSlot = Math.random() * Math.max(100, maxStartInSlot - slot.start);
       const startTime = slot.start + randomPositionInSlot;
@@ -224,9 +199,6 @@ export const generateEMGTimeSeriesData = (options: EMGGeneratorOptions = {}): EM
   console.log('Contraction timings:', contractionTimings.map(ct => `${(ct.start/1000).toFixed(1)}s (${ct.side})`));
   
   for (let i = 0; i < totalSamples; i++) {
-    // Check if we're in a pause period (obstacle)
-    const inPause = pausePeriods.some(pause => i >= pause.start && i <= pause.end);
-    
     // Pre-processed EMG baseline: very low, clean signal when not contracting
     let left = 0.01 + Math.random() * 0.02; // 0.01-0.03: very low baseline
     let right = 0.01 + Math.random() * 0.02; // 0.01-0.03: very low baseline
@@ -236,7 +208,7 @@ export const generateEMGTimeSeriesData = (options: EMGGeneratorOptions = {}): EM
       i >= ct.start && i < ct.start + ct.duration
     );
 
-    if (activeContraction) { // Supprimé "&& !inPause" - les contractions ne sont plus supprimées pendant les pauses
+    if (activeContraction) {
       const progress = (i - activeContraction.start) / activeContraction.duration;
       
       // Create bell-shaped envelope for more realistic contraction
@@ -305,7 +277,7 @@ export type GameType = 'Maze Run' | 'Space Game';
  * Generate EMG data for different game types
  */
 export const generateGameSpecificEMGData = (gameType: GameType | string = 'Maze Run', targetContractions?: number): EMGDataPoint[] => {
-  let options: EMGGeneratorOptions = {
+  const options: EMGGeneratorOptions = {
     durationSeconds: 120,
     downsampleFactor: 100,
   };

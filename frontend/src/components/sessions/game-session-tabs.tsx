@@ -26,6 +26,7 @@ interface GameSessionTabsProps {
   emgTimeSeriesData: EMGDataPoint[];
   mvcPercentage: number;
   symmetryScore: number;
+  engagementScore?: number;
 }
 
 export default function GameSessionTabs({

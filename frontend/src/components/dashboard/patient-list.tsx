@@ -185,15 +185,15 @@ const PatientList = ({ patients, showViewAllButton = true }: PatientListProps) =
                     <TableCell className="text-left pl-5 justify-center">{patient.name}</TableCell>
                     <TableCell className="pl-5 text-left">
                       {patient.studyArm === 'Intervention' ? (
-                        <Badge className="bg-blue-100 text-blue-700 dark:bg-blue-700 dark:text-blue-100 border-blue-300 dark:border-blue-600">
+                        <Badge className="bg-blue-100 text-blue-700 dark:bg-blue-700 dark:text-blue-100 border-blue-300 dark:border-blue-600" variant="static">
                           Intervention
                         </Badge>
                       ) : patient.studyArm === 'Control' ? (
-                        <Badge className="bg-orange-100 text-orange-700 dark:bg-orange-700 dark:text-orange-100 border-orange-300 dark:border-orange-600">
+                        <Badge className="bg-orange-100 text-orange-700 dark:bg-orange-700 dark:text-orange-100 border-orange-300 dark:border-orange-600" variant="static">
                           Control
                         </Badge>
                       ) : patient.studyArm === 'Ghostly' ? (
-                        <Badge className="bg-purple-100 text-purple-700 dark:bg-purple-700 dark:text-purple-100 border-purple-300 dark:border-purple-600">
+                        <Badge className="bg-purple-100 text-purple-700 dark:bg-purple-700 dark:text-purple-100 border-purple-300 dark:border-purple-600" variant="static">
                           Ghostly
                         </Badge>
                       ) : (
