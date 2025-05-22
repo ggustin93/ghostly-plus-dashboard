@@ -145,7 +145,7 @@ export const mockPatients: Patient[] = [
     diagnosis: 'Sarcopenia',
     mobility: 'Needs assistance for transfers',
     cognitiveStatus: 'Alert',
-    lastSession: '2025-06-18',
+    lastSession: '2025-05-18',
     compliance: 'Good',
     progress: 'Steady'
   },
