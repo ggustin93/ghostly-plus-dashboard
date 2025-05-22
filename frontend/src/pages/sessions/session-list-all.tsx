@@ -20,7 +20,7 @@ const SessionsPage = () => {
   );
 
   return (
-    <div className="container mx-auto py-10">
+    <div className="container mx-auto">
       <div className="flex items-center mb-6">
         <h1 className="text-3xl font-bold">All Sessions</h1>
         <div className="ml-auto flex gap-2">

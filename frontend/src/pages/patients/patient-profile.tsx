@@ -5,62 +5,18 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { mockData } from '@/data/mock-data';
-import { Patient } from '@/types/patients';
-import { Session } from '@/types/sessions';
+import { Patient } from '@/types/patient';
+import { SessionListItem } from '@/types/session';
 import { Calendar, FilePlus, BarChart, FileEdit, ArrowLeft } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import SessionsList from '@/components/patients/sessions-list';
 import ClinicalAssessments from '@/components/patients/clinical-assessments';
-
-// Helper function to get initials
-const getInitials = (name: string) => {
-  if (!name) return '';
-  const nameParts = name.split(' ');
-  if (nameParts.length === 1) return nameParts[0][0]?.toUpperCase() || '';
-  return (nameParts[0][0] + (nameParts[nameParts.length - 1][0] || '')).toUpperCase();
-};
-
-// Color palette - using hex codes for direct style application
-const avatarColorPalette = [
-  { backgroundColor: '#ef4444', color: '#ffffff' }, // red-500
-  { backgroundColor: '#f97316', color: '#ffffff' }, // orange-500
-  { backgroundColor: '#f59e0b', color: '#000000' }, // amber-500
-  { backgroundColor: '#eab308', color: '#000000' }, // yellow-500
-  { backgroundColor: '#84cc16', color: '#000000' }, // lime-500
-  { backgroundColor: '#22c55e', color: '#ffffff' }, // green-500
-  { backgroundColor: '#10b981', color: '#ffffff' }, // emerald-500
-  { backgroundColor: '#14b8a6', color: '#ffffff' }, // teal-500
-  { backgroundColor: '#06b6d4', color: '#000000' }, // cyan-500
-  { backgroundColor: '#0ea5e9', color: '#ffffff' }, // sky-500
-  { backgroundColor: '#3b82f6', color: '#ffffff' }, // blue-500
-  { backgroundColor: '#6366f1', color: '#ffffff' }, // indigo-500
-  { backgroundColor: '#8b5cf6', color: '#ffffff' }, // violet-500
-  { backgroundColor: '#a855f7', color: '#ffffff' }, // purple-500
-  { backgroundColor: '#d946ef', color: '#ffffff' }, // fuchsia-500
-  { backgroundColor: '#ec4899', color: '#ffffff' }, // pink-500
-  { backgroundColor: '#f43f5e', color: '#ffffff' }, // rose-500
-];
-
-// Helper function to get a color based on patient ID for random, distinct colors
-const getAvatarColor = (id: string) => {
-  if (!id) { 
-    return avatarColorPalette[0]; // Default color if id is not provided
-  }
-  // Simple hash function
-  let hash = 0;
-  for (let i = 0; i < id.length; i++) {
-    const char = id.charCodeAt(i);
-    hash = ((hash << 5) - hash) + char;
-    hash |= 0; // Convert to 32bit integer
-  }
-  const index = Math.abs(hash) % avatarColorPalette.length;
-  return avatarColorPalette[index];
-};
+import { getInitials, getAvatarColor } from '@/lib/utils';
 
 const PatientProfile = () => {
   const { id } = useParams<{ id: string }>();
   const [patient, setPatient] = useState<Patient | null>(null);
-  const [sessions, setSessions] = useState<Session[]>([]);
+  const [sessions, setSessions] = useState<SessionListItem[]>([]);
   const [loading, setLoading] = useState(true);
   
   useEffect(() => {
@@ -104,7 +60,7 @@ const PatientProfile = () => {
         <Button variant="ghost" size="sm" asChild className="pl-0">
           <Link to="/patients">
             <ArrowLeft className="mr-2 h-4 w-4" />
-            <span className="text-xs text-muted-foreground">Back</span>
+            <span className="text-xs text-muted-foreground">All Patients</span>
           </Link>
         </Button>
       </div>

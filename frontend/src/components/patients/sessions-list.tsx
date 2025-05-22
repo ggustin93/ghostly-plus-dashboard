@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Session } from '@/types/sessions';
+import { SessionListItem } from "@/types/session";
 import { 
   Table, 
   TableBody, 
@@ -22,7 +22,7 @@ import {
 } from "@/components/ui/select";
 
 interface SessionsListProps {
-  sessions: Session[];
+  sessions: SessionListItem[];
 }
 
 // Helper function to get initials
@@ -42,7 +42,7 @@ const formatDateTime = (dateString: string) => {
 };
 
 // Helper function to determine session status based on date
-const getEffectiveStatus = (session: Session) => {
+const getEffectiveStatus = (session: SessionListItem) => {
   // Always respect cancelled status
   if (session.status === 'cancelled') return 'cancelled';
   
@@ -100,8 +100,8 @@ const getAvatarColor = (id: string) => {
   return avatarColorPalette[index];
 };
 
-const SessionsList = ({ sessions }: SessionsListProps) => {
-  const [sortBy, setSortBy] = useState<keyof Session>('date');
+const SessionsList: React.FC<SessionsListProps> = ({ sessions }) => {
+  const [sortBy, setSortBy] = useState<keyof SessionListItem>('date');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   const [statusFilter, setStatusFilter] = useState<string>("all");
 
@@ -155,7 +155,7 @@ const SessionsList = ({ sessions }: SessionsListProps) => {
   });
 
   // Toggle sort
-  const toggleSort = (field: keyof Session) => {
+  const toggleSort = (field: keyof SessionListItem) => {
     if (field === sortBy) {
       setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
     } else {

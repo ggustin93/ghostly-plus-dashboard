@@ -7,7 +7,7 @@ import { Plus } from 'lucide-react';
 
 const PatientsListPage = () => {
   return (
-    <div className="mx-auto py-10">
+    <div className="mx-auto">
       <div className="flex items-center justify-center">
         <div>
           <h2 className="text-3xl font-bold tracking-tight">Patients</h2>

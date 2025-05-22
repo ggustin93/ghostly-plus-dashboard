@@ -106,12 +106,11 @@ const Sidebar = ({ open, setOpen }: SidebarProps) => {
           open ? "translate-x-0" : "-translate-x-full"
         )}
       >
-        <div className="flex h-16 items-center border-b px-4">
+        <div className="flex h-16 items-center border-b px-4  bg-gray-100">
           <Link to="/dashboard" className="flex items-center justify-center w-full py-2">
-            <div className="flex flex-col items-center">
-              <span className="text-3xl font-bold tracking-tighter text-primary font-serif">Ghostly+</span>
-              <div className="h-0.5 w-24 bg-gradient-to-r from-primary/20 via-primary to-primary/20 mt-1"></div>
-              <span className="text-xs text-muted-foreground mt-1 mb-2 font-light tracking-wide">RESEARCH PLATFORM</span>
+            <div className="flex flex-col items-cente">
+              <span className="text-4xl tracking-tighter text-primary font-serif">Ghostly+</span>
+              
             </div>
           </Link>
           <Button

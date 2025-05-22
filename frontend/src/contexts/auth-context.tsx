@@ -146,7 +146,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     if (VITE_USE_MOCK_AUTH || ALLOW_DUAL_AUTH) {
       const matchedUser = MOCK_USERS.find(u => u.email === email && u.password === password);
       if (matchedUser) {
-        const { password, ...userToSet } = matchedUser; // Don't store password in state
+        const userToSet = { ...matchedUser };
+        delete (userToSet as { password?: string }).password; // Remove password property
         setUser(userToSet);
         setSession(null); // No real Supabase session for mock users
         setAuthMode('mock');

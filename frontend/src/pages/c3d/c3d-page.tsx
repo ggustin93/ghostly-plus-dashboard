@@ -5,7 +5,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Button } from '@/components/ui/button';
 import { Input } from "@/components/ui/input"; 
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { mockData, C3DFile } from '@/data/mock-data'; 
+import { mockData } from '@/data/mock-data'; 
+import { C3DFile } from '@/data/c3d-files-data';
 import { UploadCloud, ArrowUpDown, Search, Eye } from 'lucide-react'; 
 
 const formatDate = (dateString: string) => {
@@ -92,9 +93,9 @@ const C3DPage = () => {
   const handleViewFile = (fileId: string) => console.log(`View C3D file details for: ${fileId}`);
 
   return (
-    <div className="container mx-auto py-10">
+    <div className="container mx-auto">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-semibold">C3D File Explorer</h1>
+        <h1 className="text-3xl font-bold mb-6">C3D File Explorer</h1>
         <Button onClick={() => setShowUploadForm(!showUploadForm)}>
           <UploadCloud className="mr-2 h-4 w-4" />
           {showUploadForm ? 'Cancel Manual Upload' : 'Manual Upload'}

@@ -9,11 +9,10 @@ const Login = lazy(() => import('@/pages/auth/login'));
 const Dashboard = lazy(() => import('@/pages/dashboard'));
 const PatientProfile = lazy(() => import('@/pages/patients/patient-profile'));
 const SessionAnalysis = lazy(() => import('@/pages/sessions/session-analysis'));
-const TreatmentConfig = lazy(() => import('@/pages/treatments/treatment-config'));
 const PatientsList = lazy(() => import('@/pages/patients/patients-list'));
 const ProgressReports = lazy(() => import('@/pages/reports/progress-reports'));
 const SessionsPage = lazy(() => import('@/pages/sessions/session-list-all'));
-const C3DUploadPage = lazy(() => import('@/pages/sessions/c3d-upload-page'));
+const C3DUploadPage = lazy(() => import('@/pages/c3d/c3d-upload-page'));
 const C3DPage = lazy(() => import('@/pages/c3d/c3d-page'));
 const NotFound = lazy(() => import('@/pages/not-found'));
 
@@ -92,7 +91,7 @@ const router = createBrowserRouter([
         ),
       },
       {
-        path: 'sessions/:id',
+        path: 'sessions/:sessionId',
         element: (
           <Suspense fallback={<PageLoader />}>
             <SessionAnalysis />
@@ -112,14 +111,6 @@ const router = createBrowserRouter([
         element: (
           <Suspense fallback={<PageLoader />}>
             <C3DUploadPage />
-          </Suspense>
-        ),
-      },
-      {
-        path: 'treatments/configure',
-        element: (
-          <Suspense fallback={<PageLoader />}>
-            <TreatmentConfig />
           </Suspense>
         ),
       },

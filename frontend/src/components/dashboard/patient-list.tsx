@@ -16,7 +16,7 @@ import {
   Search, 
   ArrowUpDown 
 } from 'lucide-react';
-import { Patient } from '@/types/patients';
+import { Patient } from '@/types/patient';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 
 interface PatientListProps {

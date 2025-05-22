@@ -1,14 +1,14 @@
-import { Session } from '@/types/sessions';
+import { SessionListItem } from '@/types/session';
 import { Card } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import { Brain, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 interface TreatmentTimelineProps {
-  sessions: Session[];
+  sessions: SessionListItem[];
 }
 
-const TreatmentTimeline = ({ sessions }: TreatmentTimelineProps) => {
+const TreatmentTimeline: React.FC<TreatmentTimelineProps> = ({ sessions }) => {
   // Sort sessions by date (newest first)
   const sortedSessions = [...sessions].sort((a, b) => 
     new Date(b.date).getTime() - new Date(a.date).getTime()
@@ -18,8 +18,12 @@ const TreatmentTimeline = ({ sessions }: TreatmentTimelineProps) => {
     <div className="space-y-4">
       {sortedSessions.length > 0 ? (
         <div className="relative space-y-4 pl-6 before:absolute before:left-2 before:top-0 before:h-full before:w-0.5 before:bg-border">
-          {sortedSessions.map((session, index) => (
-            <div key={session.id} className="relative">
+          {sortedSessions.map((session, i) => (
+            <div key={session.id} className="relative flex items-start pb-8">
+              {/* Line connecting dots - remove for last item */}
+              {i < sortedSessions.length - 1 && (
+                <div className="absolute left-4 top-5 -ml-px h-full w-0.5 bg-gray-300 dark:bg-gray-700" />
+              )}
               <div className="absolute -left-6 flex h-4 w-4 items-center justify-center rounded-full bg-primary">
                 <div className="h-2 w-2 rounded-full bg-primary-foreground" />
               </div>
