@@ -4,6 +4,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge';
 import { GameSession } from '@/types/session';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import React, { useEffect } from 'react';
 
 interface GameSessionNavigatorProps {
   gameSessions: GameSession[];
@@ -18,10 +19,7 @@ export default function GameSessionNavigator({
   onSelectGameSession,
   onNavigateGameSession,
 }: GameSessionNavigatorProps) {
-  if (gameSessions.length === 0) {
-    return null;
-  }
-
+  
   // Helper function to get current session position
   const getCurrentSessionInfo = () => {
     if (!selectedGameSession) return null;
@@ -37,23 +35,40 @@ export default function GameSessionNavigator({
     };
   };
 
+  const currentInfo = getCurrentSessionInfo();
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (gameSessions.length <= 1) return;
+
+      if (event.key === 'ArrowLeft') {
+        if (currentInfo && !currentInfo.isFirst) {
+          onNavigateGameSession('prev');
+        }
+      } else if (event.key === 'ArrowRight') {
+        if (currentInfo && !currentInfo.isLast) {
+          onNavigateGameSession('next');
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [onNavigateGameSession, gameSessions.length, currentInfo]);
+
+  if (gameSessions.length === 0) {
+    return null;
+  }
+  
   // Format session display text
   const formatSessionText = (gs: GameSession, index: number) => {
-    // Option 1: Use creation order with timestamp
-    if (gs.createdAt) {
-      const date = new Date(gs.createdAt).toLocaleDateString();
-      return `Session ${index + 1} - ${gs.gameType} (${date})`;
-    }
-    
-    // Option 2: Use session ID for uniqueness
-    const shortId = gs.id.slice(-6);
     return `Round ${index + 1} - ${gs.gameType}`;
   };
 
-  const currentInfo = getCurrentSessionInfo();
-
   return (
-    <Card>
+    <Card tabIndex={0} aria-label="Game Session Navigator">
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -72,7 +87,7 @@ export default function GameSessionNavigator({
             variant="ghost"
             size="icon"
             onClick={() => onNavigateGameSession('prev')}
-            disabled={gameSessions.length <= 1 || currentInfo?.isFirst}
+            disabled={gameSessions.length <= 1 || !!currentInfo?.isFirst}
             title={currentInfo?.isFirst ? "Already at first session" : "Previous session"}
           >
             <span className="inline-flex items-center justify-center">
@@ -105,7 +120,7 @@ export default function GameSessionNavigator({
             variant="ghost"
             size="icon"
             onClick={() => onNavigateGameSession('next')}
-            disabled={gameSessions.length <= 1 || currentInfo?.isLast}
+            disabled={gameSessions.length <= 1 || !!currentInfo?.isLast}
             title={currentInfo?.isLast ? "Already at last session" : "Next session"}
           >
             <span className="inline-flex items-center justify-center">

@@ -14,6 +14,8 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Input } from "@/components/ui/input";
 import { EyeIcon, Search, ChevronLeft, ChevronRight } from 'lucide-react';
 import { c3dFiles, C3DFile } from '@/data/c3d-files-data';
+import PageHeader from '@/components/ui/page-header';
+import { Card, CardHeader, CardContent } from '@/components/ui/card';
 
 // Color palette for patient avatars
 const avatarColorPalette = [
@@ -83,9 +85,9 @@ const ViewButton: React.FC<{ file: C3DFile }> = ({ file }) => {
   };
 
   return (
-    <Button variant="ghost" size="sm" onClick={handleClick}>
+    <Button variant="ghost" className="text-blue-600 hover:text-blue-700" size="sm" onClick={handleClick}>
       <EyeIcon className="mr-2 h-4 w-4" />
-      View
+      Analyze
     </Button>
   );
 };
@@ -224,16 +226,19 @@ export default function C3DPage() {
   return (
     <div className="container mx-auto p-6 space-y-6">
       {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold">C3D Files</h1>
-        <p className="text-muted-foreground">
-          Manage and analyze C3D motion capture files from rehabilitation sessions
-        </p>
-      </div>
-
+      <PageHeader
+        title="C3D Files"
+        description="Manage and analyze C3D motion capture files from rehabilitation sessions"
+      />
+      <Card>
+        <CardHeader>
+          
+        </CardHeader>
+        <CardContent>
+          
       {/* Search Bar */}
-      <div className="flex justify-end">
-        <div className="relative w-80">
+      <div className="flex justify-start">
+        <div className="relative w-80 mb-4">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Search files, patients, sessions..."
@@ -378,6 +383,9 @@ export default function C3DPage() {
           <div>Search term: "{searchTerm}"</div>
         </div>
       )}
+    
+        </CardContent>
+      </Card>
     </div>
   );
 }

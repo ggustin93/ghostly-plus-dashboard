@@ -28,7 +28,7 @@ const createGameSessions = (patientId: string, date: string, completed: boolean)
         targetMVC: 75,
         repetitions: 15,
         sets: 1,
-        restIntervals: 0,
+        restIntervals: Math.floor(Math.random() * 10),
         ddaEnabled: true,
         ddaParameters: {
           adaptiveContractionDetection: true,

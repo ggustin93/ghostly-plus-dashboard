@@ -75,7 +75,7 @@ const PatientProfile = () => {
             </AvatarFallback>
           </Avatar>
           <div className="text-center sm:text-left">
-            <h1 className="text-2xl font-bold md:text-3xl">{patient.name}</h1>
+            <h1 className="text-2xl font-bold md:text-3xl mb-1">{patient.name}</h1>
             <div className="flex flex-wrap items-center gap-2">
               {patient.studyArm === 'Intervention' ? (
                 <Badge variant="static" className="bg-blue-100 text-blue-700 dark:bg-blue-700 dark:text-blue-100 border-blue-300 dark:border-blue-600">
@@ -289,7 +289,7 @@ const PatientProfile = () => {
                     <div className="font-medium">Session Progress Note</div>
                     <div className="text-sm text-muted-foreground">June 15, 2025</div>
                   </div>
-                  <p className="text-sm">
+                  <p className="text-sm text-left">
                     Patient showed improved engagement with the game today. EMG readings indicate a 12% increase in right arm muscle activation compared to baseline. Continue with current difficulty setting.
                   </p>
                 </div>
@@ -299,7 +299,7 @@ const PatientProfile = () => {
                     <div className="font-medium">Initial Assessment</div>
                     <div className="text-sm text-muted-foreground">June 10, 2025</div>
                   </div>
-                  <p className="text-sm">
+                  <p className="text-sm text-left">
                     Patient admitted with significant muscle weakness following extended bed rest. Baseline EMG measurements established today. Starting with low difficulty level to build confidence and establish proper movement patterns.
                   </p>
                 </div>

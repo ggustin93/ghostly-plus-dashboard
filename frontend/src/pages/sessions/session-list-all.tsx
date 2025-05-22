@@ -4,13 +4,12 @@ import { mockData } from '@/data/mock-data';
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
-  CardTitle,
 } from '@/components/ui/card';
 import SessionsList from '@/components/patients/sessions-list';
 import { Input } from '@/components/ui/input';
 import { useState } from 'react';
+import PageHeader from '@/components/ui/page-header';
 
 const SessionsPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -20,9 +19,9 @@ const SessionsPage = () => {
   );
 
   return (
-    <div className="container mx-auto">
+    <div className="container mx-auto p-6 space-y-6">
       <div className="flex items-center mb-6">
-        <h1 className="text-3xl font-bold">All Sessions</h1>
+        <PageHeader title="All Sessions" description="Search, view, and manage all patient therapy sessions" />
         <div className="ml-auto flex gap-2">
           <Button>
             <PlusCircle className="mr-2 h-4 w-4" /> New Session
@@ -30,14 +29,8 @@ const SessionsPage = () => {
         </div>
       </div>
 
-      <Card className="mt-6">
+      <Card>
         <CardHeader>
-          <div className="text-center w-full">
-            <CardTitle>Session Overview</CardTitle>
-            <CardDescription>
-              Search, view, and manage all patient therapy sessions
-            </CardDescription>
-          </div>
         </CardHeader>
         <CardContent>
           <div className="flex items-center justify-between mb-4">

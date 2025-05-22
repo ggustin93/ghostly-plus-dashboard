@@ -324,7 +324,7 @@ export default function GameSessionTabs({
                   <dd>{selectedGameSession.parameters.targetMVC}%</dd>
                   <dt className="text-muted-foreground">Expected Repetitions:</dt>
                   <dd>{selectedGameSession.parameters.repetitions}</dd>
-                  <dt className="text-muted-foreground">Rest Interval:</dt>
+                  <dt className="text-muted-foreground">Avg. Rest Interval:</dt>
                   <dd>{selectedGameSession.parameters.restIntervals} sec</dd>
                 </dl>
               </div>
