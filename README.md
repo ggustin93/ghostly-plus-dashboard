@@ -15,11 +15,11 @@ The Web Dashboard will:
 - Feature advanced EMG data visualization and game performance analysis tools.
 - Enable session management and the generation of clinical and research reports.
 - Adhere to strict security and GDPR compliance standards for handling sensitive medical data.
-- Be built with a modern tech stack: Vue.js 3 (frontend), FastAPI (backend), and self-hosted Supabase (database, auth, storage).
+- Be built with a modern tech stack: React (frontend), FastAPI (backend), and self-hosted Supabase (database, auth, storage), featuring a polished UI built with Shadcn UI components and styled with Tailwind CSS.
 
 ## 3. High-Level Project Phases
 
-1.  **Infrastructure Setup**: Project config, Docker/Nginx, Supabase, Auth system, DB schema, C3D parser.
+1.  **Infrastructure Setup**: Project config, Docker/Nginx, Supabase, Auth system, DB schema, C3D parser. *(Largely completed)*
 2.  **Core Functionality**: Patient & Cohort management, OpenFeasyo integration, Backend API.
 3.  **Visualization & Analysis**: EMG data viz, game performance components, session management, report generation.
 4.  **Security & Compliance**: Data encryption, pseudonymization, GDPR features.
@@ -72,10 +72,9 @@ Refer to `memory-bank/techContext.md` (section 6.1) and `docs/environments/` for
     - The frontend (Vite dev server) is running internally on port 5173, proxied by Nginx.
     - The backend (FastAPI) is running internally on port 8000, proxied by Nginx under `/api`.
 5.  **Supabase Studio** should be accessible via the Kong gateway, typically at `http://localhost:8000` (or the port defined by `KONG_HTTP_PORT` in your `.env`). Use the `DASHBOARD_USERNAME` and `DASHBOARD_PASSWORD` from your `.env` to log in.
-6.  Supabase API endpoints (Auth, REST, Storage, Realtime) are also available via Kong on the same port (e.g., `http://localhost:8000/auth/v1`, `http://localhost:8000/rest/v1`).
+6.  Supabase API endpoints (Auth, REST, Storage) for application interaction are primarily accessed through the Nginx proxy (e.g., `http://localhost/auth/v1`, `http://localhost/rest/v1`). Direct access via Kong (e.g., `http://localhost:8000/auth/v1`) is also possible.
 
 ### Running Manually (Optional)
-
 **Backend:**
 ```bash
 cd backend
