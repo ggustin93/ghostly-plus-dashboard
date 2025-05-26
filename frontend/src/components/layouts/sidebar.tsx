@@ -95,6 +95,7 @@ const Sidebar = ({ open, setOpen }: SidebarProps) => {
       {open && (
         <div
           className="fixed inset-0 z-40 bg-background/80 backdrop-blur-sm lg:hidden"
+          onClick={() => setOpen(false)}
         />
       )}
       
@@ -105,17 +106,16 @@ const Sidebar = ({ open, setOpen }: SidebarProps) => {
           open ? "translate-x-0" : "-translate-x-full"
         )}
       >
-        <div className="flex h-16 items-center border-b px-4  bg-gray-100">
-          <Link to="/dashboard" className="flex items-center justify-center w-full py-2">
+        <div className="flex h-16 items-center justify-between border-b px-4 bg-gray-100">
+          <Link to="/dashboard" className="flex items-center py-2">
             <div className="flex flex-col items-center">
               <span className="text-4xl tracking-tighter text-primary hover:text-primary font-serif">Ghostly+</span>
-              
             </div>
           </Link>
           <Button
             variant="ghost"
             size="icon"
-            className="absolute right-2 top-3 lg:hidden"
+            className="lg:hidden"
             asChild
             onClick={() => setOpen(false)}
           >
