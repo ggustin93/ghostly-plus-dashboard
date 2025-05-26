@@ -153,17 +153,26 @@ const Login = () => {
         <div className="mt-6">
           <p className="mb-2 text-center text-sm text-muted-foreground">Quick login with mock users:</p>
           <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
-            {DEMO_USERS_CREDENTIALS.map((demoUser) => (
-              <Button
-                key={demoUser.email}
-                variant="outline"
-                className="w-full"
-                onClick={() => handleLogin({ email: demoUser.email, password: demoUser.password })}
-                disabled={isLoading || authLoading}
-              >
-                {demoUser.role}
-              </Button>
-            ))}
+            {DEMO_USERS_CREDENTIALS.map((demoUser) => {
+              const isDisabled = demoUser.role === 'Researcher' || demoUser.role === 'Admin';
+              return (
+                <Button
+                  key={demoUser.email}
+                  variant="outline"
+                  className="w-full"
+                  onClick={() => {
+                    if (isDisabled) {
+                      alert(`Mock login for ${demoUser.role} is temporarily disabled.`);
+                    } else {
+                      handleLogin({ email: demoUser.email, password: demoUser.password });
+                    }
+                  }}
+                  disabled={isLoading || authLoading || isDisabled}
+                >
+                  {demoUser.role}
+                </Button>
+              );
+            })}
           </div>
         </div>
       </div>
