@@ -555,7 +555,7 @@ We are also **refining the UI for the Patient Profile page, particularly the Cli
 ## Recent Changes
 
 ### API Endpoint Restructuring (2025-05-24)
-- Renamed router prefix from `/api/v1/ghostly` to `/api/v1/c3d` for clearer domain separation
+  - Renamed router prefix from `/api/v1/ghostly` to `/api/v1/c3d` for clearer domain separation
 - Added system dependencies for runtime support of scientific libraries
 
 ### Nginx Configuration Refinement (2025-05-24)

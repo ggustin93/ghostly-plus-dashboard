@@ -36,7 +36,7 @@ interface AppUser {
 const Header = ({ openSidebar }: HeaderProps) => {
   const { user, signOut, isMockAuth } = useAuth();
   const navigate = useNavigate();
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
 
   const handleLogout = async () => {
     await signOut();
