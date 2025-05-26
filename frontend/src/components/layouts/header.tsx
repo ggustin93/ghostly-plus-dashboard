@@ -93,23 +93,27 @@ const Header = ({ openSidebar }: HeaderProps) => {
   ];
 
   return (
-    <header className="sticky top-0 z-10 flex h-16 w-full items-center border-b bg-background px-4 shadow-sm md:px-6">
-      <Button
-        variant="ghost"
-        size="icon"
-        className="mr-2 md:hidden"
-        onClick={openSidebar}
-      >
-        <Menu className="h-5 w-5" />
-        <span className="sr-only">Toggle menu</span>
-      </Button>
-      
-      {/* Personalized Welcome Message */}
-      <div className="hidden md:block">
-        <span className="text-lg font-medium text-foreground tracking-tight">{getWelcomeMessage()}</span>
+    <header className="sticky top-0 z-10 flex h-16 w-full items-center justify-between border-b bg-background px-4 shadow-sm md:px-6">
+      <div className="flex items-center">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="mr-2 lg:hidden"
+          asChild
+          onClick={openSidebar}
+        >
+          <span className="inline-flex items-center justify-center h-full w-full">
+            <Menu className="h-5 w-5" />
+            <span className="sr-only">Toggle menu</span>
+          </span>
+        </Button>
+        
+        <div className="hidden lg:block">
+          <span className="text-lg font-medium text-foreground tracking-tight">{getWelcomeMessage()}</span>
+        </div>
       </div>
 
-      <div className="ml-auto flex items-center gap-4">
+      <div className="flex items-center gap-4">
         <Button variant="ghost" size="icon" asChild>
           <span className="inline-flex items-center justify-center">
             <Bell className="h-5 w-5" />
@@ -128,7 +132,10 @@ const Header = ({ openSidebar }: HeaderProps) => {
             {languages.map((lang) => (
               <DropdownMenuItem
                 key={lang.code}
-                onClick={() => i18n.changeLanguage(lang.code)}
+                onClick={() => {
+                  // i18n.changeLanguage(lang.code); // Original functionality commented out
+                  alert("Language switching is temporarily disabled.");
+                }}
               >
                 {lang.name}
               </DropdownMenuItem>

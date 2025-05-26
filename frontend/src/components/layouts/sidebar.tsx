@@ -94,33 +94,35 @@ const Sidebar = ({ open, setOpen }: SidebarProps) => {
       {/* Mobile overlay */}
       {open && (
         <div
-          className="fixed inset-0 z-40 bg-background/80 backdrop-blur-sm md:hidden"
-          onClick={() => setOpen(false)}
+          className="fixed inset-0 z-40 bg-background/80 backdrop-blur-sm lg:hidden"
         />
       )}
       
       {/* Sidebar */}
       <div
         className={cn(
-          "fixed inset-y-0 left-0 z-50 w-64 transform border-r bg-card shadow-lg transition-transform duration-300 ease-in-out md:static md:z-0 md:transform-none",
+          "fixed inset-y-0 left-0 z-50 w-64 transform border-r bg-card shadow-lg transition-transform duration-300 ease-in-out lg:static lg:z-0 lg:transform-none",
           open ? "translate-x-0" : "-translate-x-full"
         )}
       >
         <div className="flex h-16 items-center border-b px-4  bg-gray-100">
           <Link to="/dashboard" className="flex items-center justify-center w-full py-2">
-            <div className="flex flex-col items-cente">
-              <span className="text-4xl tracking-tighter text-primary font-serif">Ghostly+</span>
+            <div className="flex flex-col items-center">
+              <span className="text-4xl tracking-tighter text-primary hover:text-primary font-serif">Ghostly+</span>
               
             </div>
           </Link>
           <Button
             variant="ghost"
             size="icon"
-            className="absolute right-2 top-3 md:hidden"
+            className="absolute right-2 top-3 lg:hidden"
+            asChild
             onClick={() => setOpen(false)}
           >
-            <X className="h-5 w-5" />
-            <span className="sr-only">Close sidebar</span>
+            <span className="inline-flex items-center justify-center h-full w-full">
+              <X className="h-5 w-5" />
+              <span className="sr-only">Close sidebar</span>
+            </span>
           </Button>
         </div>
         
