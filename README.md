@@ -1,4 +1,10 @@
-# GHOSTLY+ Web Dashboard
+# GHOSTLY+ Web Dashboard 
+
+![Work in Progress](https://img.shields.io/badge/Status-Work%20in%20Progress-yellow?style=for-the-badge)
+![Development Phase](https://img.shields.io/badge/Phase-Infrastructure%20Setup-blue?style=for-the-badge)
+![License](https://img.shields.io/badge/License-Academic%20Research-blue?style=for-the-badge)
+
+> ⚠️ **Work in Progress**: This project is currently under active development. Features and documentation may be incomplete or subject to change.
 
 ## 1. Project Purpose & Scope
 
