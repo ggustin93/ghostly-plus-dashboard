@@ -45,7 +45,8 @@ source_documents: [docs/prd.md](mdc:docs/prd.md) (Section 4), [docs/security.md]
 
 ### 1.3. Database & BaaS (Data Infrastructure - WP4)
 
-- **Platform:** Supabase (Self-Hosted on VUB Private VM)
+- **Platform:** Supabase (Self-Hosted on VUB Private VM for **Production**)
+    - **Development Strategy:** During development and testing, the frontend can be configured to point to a **Supabase Cloud instance** via environment variables in `frontend/.env`. This allows for rapid prototyping and testing before targeting the production VUB instance.
 - **Core Database:** PostgreSQL (v15+). The schema is detailed in `docs/00_PROJECT_DEFINITION/database_schema_simplified_research.md`, defining tables such as `User`, `Patient`, `HospitalSite`, `Therapist`, `RehabilitationSession`, `GameSession`, `MVCCalibration`, `GameLevel`, `EMGMetricDefinition`, `EMGCalculatedMetric`, `GamePlayStatistic`, `ClinicalAssessment`, and `ClinicalOutcomeMeasure`.
 - **Authentication:** Supabase Auth (GoTrue) - Manages users stored in the `User` table.
 - **Storage:** Supabase Storage - For C3D files (linked from `GameSession` table), reports, etc.
@@ -138,6 +139,7 @@ source_documents: [docs/prd.md](mdc:docs/prd.md) (Section 4), [docs/security.md]
 - **npm:** Used for all frontend dependency management, running scripts (`npm run dev`, `npm run build`, `npm run lint`).
 - **Poetry:** Used for all backend dependency management and running scripts (`poetry install`, `poetry run ...`).
 - **Supabase CLI:** Used for managing migrations, generating types, interacting with the local/remote Supabase instance (`supabase login`, `supabase link`, `supabase migration`, `supabase functions new/deploy`, `supabase gen types typescript`). **Note:** `supabase start` avoided due to M1 issues; manual compose used instead.
+    - **Frontend Supabase Client Configuration:** The Supabase client in `frontend/src/lib/supabase/client.ts` is dynamically configured using the `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` environment variables, typically set in a `frontend/.env` file. This allows switching between Supabase Cloud (for development) and the self-hosted VUB instance (for production) by changing these variables.
 - **Task Master:** Used via MCP server tools or `task-master` CLI for managing project tasks defined in `tasks/tasks.json`.
 - **Git:** Standard Git workflow (feature branches, commits, PRs).
 - **Shadcn UI CLI:** (`npx shadcn@latest add ...`) used to add UI components to the `frontend-2` project.
@@ -147,9 +149,9 @@ source_documents: [docs/prd.md](mdc:docs/prd.md) (Section 4), [docs/security.md]
 - **Authentication:** JWT-based via Supabase Auth. Tokens issued by Supabase are validated by backend services (FastAPI, Edge Functions).
 - **Authorization:** Primarily handled by RLS policies in Supabase PostgreSQL. Role-based logic can be implemented in backend services or Edge Functions where needed.
 - **CORS:** Configured in Supabase Kong (via `supabase_cors_config.sh` or Studio) and potentially in FastAPI if needed. Nginx proxy configuration also handles routing.
-- **Secrets Management:** API keys, JWT secrets, service keys stored in `.env` files (root for Docker Compose/Supabase, `frontend` for React build-time vars, `backend` for FastAPI). **SERVICE_ROLE_KEY and other sensitive keys MUST NOT be exposed client-side.** Edge Functions provide a secure environment for using `service_role`.
+- **Secrets Management:** API keys, JWT secrets, service keys stored in `.env` files (root for Docker Compose/Supabase, `frontend/.env` for Supabase client URL/key and frontend build-time vars, `backend` for FastAPI). **SERVICE_ROLE_KEY and other sensitive keys MUST NOT be exposed client-side.** Edge Functions provide a secure environment for using `service_role`.
 - **Environment Variables:**
-    - `frontend`: Uses `VITE_` prefix for browser-accessible vars (e.g., `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`).
+    - `frontend`: Uses `VITE_` prefix for browser-accessible vars (e.g., `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`, `VITE_USE_MOCK_AUTH`). The Supabase URL and Anon Key determine if a Cloud or self-hosted instance is targeted.
     - `backend`: Loaded via `python-dotenv`.
     - `supabase_config`: Loaded via root `.env` file by Docker Compose.
 

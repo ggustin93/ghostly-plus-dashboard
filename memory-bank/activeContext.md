@@ -17,6 +17,10 @@ source_documents: [docs/00_PROJECT_DEFINITION/ressources/2024_ghostly_proposal.m
 
 ## Recent Changes & Decisions:
 
+-   **Supabase Client Configuration & Dev/Prod Strategy (Current Session):**
+    -   The Supabase client initialization in `frontend/src/lib/supabase/client.ts` has been updated to use `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` environment variables. This allows for dynamic configuration of the Supabase instance targeted by the frontend.
+    -   This change facilitates the agreed-upon strategy: using a **Supabase Cloud instance for development and testing** (configured via `frontend/.env`) for ease of setup and iteration, while the **self-hosted Supabase instance on the VUB machine remains the target for production** to ensure data sovereignty and control, aligning with GDPR requirements for sensitive medical data.
+    -   The `frontend/.env` file becomes the control point for switching the Supabase backend during development (e.g., between a personal Cloud dev instance, a shared team Cloud dev instance, or a local/VUB dev instance).
 -   **UI Refinements & Vercel Deployment (Current Session):**
     -   Successfully deployed the application to Vercel.
     -   Fixed `TS6133: 'i18n' is declared but its value is never read` error in `frontend/src/components/layouts/header.tsx` by removing unused `i18n` variable, enabling Vercel build.
