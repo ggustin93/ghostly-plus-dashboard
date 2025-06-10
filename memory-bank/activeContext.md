@@ -17,6 +17,42 @@ source_documents: [docs/00_PROJECT_DEFINITION/ressources/2024_ghostly_proposal.m
 -   **Backend sEMG Metric Calculation:** Advancing the backend logic for calculating and storing key sEMG-derived metrics (WP2.3) into the `EMGCalculatedMetric` table, as these are crucial for both Therapist and Researcher views.
 -   **User Story Prioritization:** Reviewing and assigning priorities (e.g., Must-have, Should-have for MVP) to the user stories (T1-T5, R1-R3, A1-A4) within `UX_UI_specifications.md` to guide phased implementation.
 
+## Open Questions for Prototype V2
+
+The following points were recently raised to seek clarification from the project team and ensure V2 development is aligned with trial requirements.
+
+### 1. Patient Authentication & Autonomy
+- **Login Workflow:** What is the exact login procedure for patients? (Therapist-led vs. patient-direct authentication).
+- **Usability:** For shared tablets, what is the preferred login mechanism for elderly patients (e.g., QR codes, PID cards)?
+
+### 2. Patient Data & Identification
+- **Pseudonymization:** Who handles pseudo-ID generation and management? (Backend vs. external system).
+- **Therapist View:** What level of patient identification is needed in the dashboard? How do therapists map pseudo-IDs to their patients?
+- **Patient Profile:** What specific clinical data should be displayed on the patient profile page, adhering to data minimization?
+
+### 3. Session Scheduling
+- **Patient Autonomy:** Are sessions entirely patient-led, or do therapists pre-schedule them?
+- **Calendar Function:** Should the dashboard calendar be a historical log rather than a future scheduling tool?
+- **Therapist Intervention:** Can therapists set session parameters (e.g., game level) from the dashboard or game?
+- **Feasibility:** Is it realistic to expect patients to autonomously manage login, MVC calibration, and BFR application?
+
+### 4. Adherence & Compliance Metrics
+- **Intervention Protocol:** What is the protocol for therapists acting on real-time adherence/compliance data to avoid trial bias?
+- **Metric Definitions:** What are the specific formulas for calculating **adherence** (e.g., completed vs. prescribed sessions) and **compliance** (e.g., %MVC target met, number of contractions)? Is the game score a sufficient proxy for compliance?
+
+### 5. Users Management
+- **Onboarding:** Is the assumption correct that an admin will create all user accounts (no self-registration)?
+- **Patient Data Entry:** How are patients added to the dashboard? Will therapists manually enter pseudonymized patient data, or should the system sync with another source like REDCap?
+
+### 6. Dashboard Scope
+- **Patient Cohort:** Should the dashboard display data only for the BFR intervention group or for the control group as well?
+
+### 7. BFR Data (Risk Mitigation)
+- **Manual Entry:** Should a manual entry method for BFR parameters be implemented as a fallback?
+
+### 8. Clinical Assessments Data
+- **REDCap Integration:** Confirmation that the clinical assessment data entry feature should be removed from the dashboard in favor of REDCap as the primary tool.
+
 ## Recent Changes & Decisions:
 
 -   **Supabase Client Configuration & Dev/Prod Strategy (Current Session):**
@@ -53,6 +89,10 @@ source_documents: [docs/00_PROJECT_DEFINITION/ressources/2024_ghostly_proposal.m
         -   `ResponsiveBlocker.tsx` updated to block screens `< 640px` (mobile only), allowing tablets (>=640px) to use the retractable menu.
         -   Corrected sidebar branding ("Ghostly+") display and hover color retention in `sidebar.tsx`.
         -   Sidebar overlay click-to-close functionality removed; only 'X' button closes the sidebar now. Overlay visibility aligned to `lg:hidden`.
+    -   **RBAC Strategy Finalized (Current Session):**
+        -   Finalized and documented the decision to use `raw_user_meta_data` for storing user roles ('Therapist', 'Admin', etc.).
+        -   This is the standard Supabase pattern, chosen for its performance benefits (role data included in the JWT) and simpler RLS policies.
+        -   The full rationale has been added to `memory-bank/systemPatterns.md` under section `10.1.1`.
 -   **Vercel Deployment & Path Aliasing (Frontend):**
     -   Encountered persistent `TS2307: Cannot find module '@/lib/utils'` (and similar for other `@/lib/*` imports) errors during Vercel builds, despite the `frontend` directory being set as the Vercel project root and `tsconfig.app.json` containing correct `baseUrl: "."` and `paths: { "@/*": ["./src/*"] }`.
     -   Attempted to fix by removing explicit `resolve.alias` from `frontend/vite.config.ts` to let Vite infer from `tsconfig.json` – this did not resolve the Vercel build error.

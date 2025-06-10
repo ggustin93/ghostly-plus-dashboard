@@ -469,6 +469,22 @@ app/
 - **Role-Based Access Control**: Different UI views and API access based on user role
 - **Row-Level Security**: Database access control at the row level
 
+### 10.1.1. RBAC Implementation Strategy: `raw_user_meta_data`
+
+A key architectural decision is how to store user roles (e.g., 'Therapist', 'Admin'). For the GHOSTLY+ project, we are using the `raw_user_meta_data` JSONB column in the `auth.users` table.
+
+**Why this approach is chosen (The Supabase Pattern):**
+
+1.  **Direct JWT Integration**: Supabase automatically includes `raw_user_meta_data` in the user's JWT upon login. This allows any part of the application (frontend, backend API) to instantly know the user's role without making an extra database query, which is a significant performance benefit.
+2.  **Simpler RLS Policies**: Our security policies are more concise as they can directly access the role from the user's session (`(SELECT raw_user_meta_data->>'role' FROM auth.users WHERE id = auth.uid())`) without needing an additional `JOIN` to a roles table.
+3.  **Sufficient for Current Needs**: For a limited and fixed set of roles, this approach is clean, efficient, and avoids the overhead of managing extra tables.
+
+**Alternative Considered (Dedicated `Roles` Table):**
+
+We considered creating a dedicated `Roles` table and a `UserRoles` join table. While this is a standard pattern in many traditional architectures and provides stricter data integrity (preventing role name typos), it was deemed overly complex for the current requirements of this project. It would add complexity to every RLS policy and require an extra database call after login to determine a user's role, as the role information would not be part of the JWT by default.
+
+**Verdict**: The use of `raw_user_meta_data` is the cleaner, more performant, and more idiomatic approach within the Supabase ecosystem for this project's specific needs.
+
 ### 10.2. API Security
 
 - **Input Validation**: Using Pydantic schemas for request validation
