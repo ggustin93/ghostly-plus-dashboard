@@ -1,13 +1,13 @@
 ---
 description: Outlines the system architecture, key technical decisions, design patterns, component relationships, and critical implementation paths for the GHOSTLY+ Dashboard.
-source_documents: [docs/prd.md](mdc:docs/prd.md) (Section 4), [docs/security.md](mdc:docs/security.md)
+source_documents: [docs/prd.md](mdc:docs/prd.md) (Section 4), [docs/security.md](mdc:docs/security.md), [docs/00_PROJECT_DEFINITION/ressources/data_management_plan.md](mdc:docs/00_PROJECT_DEFINITION/ressources/data_management_plan.md)
 ---
 
 # GHOSTLY+ Dashboard: System Patterns
 
 ## 1. System Architecture Overview
 
-The GHOSTLY+ system is composed of existing client-side components and a new server-side extension (Web Dashboard and supporting services). The architecture is designed around Work Packages (WP) as defined in [docs/prd.md](mdc:docs/prd.md) (Section 4) **and further detailed for WP2 in [WP2_proposal_detailed.md](mdc:docs/00_PROJECT_DEFINITION/ressources/WP2_proposal_detailed.md)**, now with a clear data structure outlined in `docs/00_PROJECT_DEFINITION/database_schema_simplified_research.md` and user interactions defined in `docs/00_PROJECT_DEFINITION/UX_UI_specifications.md`.
+The GHOSTLY+ system is composed of existing client-side components and a new server-side extension (Web Dashboard and supporting services). The architecture is designed around Work Packages (WP) as defined in [docs/prd.md](mdc:docs/prd.md) (Section 4) **and further detailed for WP2 in [WP2_proposal_detailed.md](mdc:docs/00_PROJECT_DEFINITION/ressources/WP2_proposal_detailed.md)**, now with a clear data structure outlined in `docs/00_PROJECT_DEFINITION/database_schema_simplified_research.md`, user interactions defined in `docs/00_PROJECT_DEFINITION/UX_UI_specifications.md`, and data governance defined by `docs/00_PROJECT_DEFINITION/ressources/data_management_plan.md`.
 
 -   **WP1: Existing System Integration**: Interfacing with OpenFeasyo game (MonoGame/C# on Android) and Delsys Trigno EMG sensors. Key modification: game will authenticate via Supabase Auth and upload C3D files directly to the backend API. A single **Rehabilitation Session** (overall therapy appointment) can result in one or more C3D files, each representing a distinct **Game Session** (a single instance of playing the game). **WP2.2 outlines analysis and potential integration of alternative sEMG sensors.**
 -   **WP2: Web Dashboard (Frontend)**: React with React Router, Tailwind CSS, shadcn/ui, Context API/Zustand. Provides role-based interfaces for **Therapists, Researchers, and Administrators** in a single consolidated codebase, as detailed in `docs/00_PROJECT_DEFINITION/UX_UI_specifications.md`. *(Migrated from Next.js to standard React with Vite for simplicity and performance, and consolidated into a single directory)*
@@ -17,8 +17,19 @@ The GHOSTLY+ system is composed of existing client-side components and a new ser
     -   Manages authentication through Supabase client, which is configured via environment variables (`VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`) to target appropriate Supabase instances (e.g., Supabase Cloud for development, self-hosted for production).
     -   **Will display detailed sEMG-derived metrics (activation, fatigue, force/mass estimations), game engagement/adherence reports (WP2.3, WP2.5), DDA-related data (WP2.4, WP2.5), and comprehensive clinical assessment data.**
 -   **WP3: Service Layer (Backend API)**: FastAPI (Python), Pydantic, SQLAlchemy. Handles business logic, secure data processing, C3D handling (parsing, storing C3D file path), **calculation and processing of sEMG-derived metrics (activation, fatigue, force/mass estimations as per WP2.3)**, game statistic aggregation, DDA parameter logging, JWT verification. Interacts with the database structured as per `docs/00_PROJECT_DEFINITION/database_schema_simplified_research.md`.
--   **WP4: Data Infrastructure**: Self-hosted Supabase on VUB Private VM (PostgreSQL for structured data based on `docs/00_PROJECT_DEFINITION/database_schema_simplified_research.md`, Supabase Storage for files like C3D and reports). This self-hosted instance is the **primary target for production deployment**. Features RLS and encryption. **Database will store raw EMG data references (C3D paths), processed sEMG metrics (e.g., `EMGCalculatedMetric` table), game statistics (e.g., `GamePlayStatistic` table), DDA parameters (e.g., in `GameSession` table), clinical assessments (e.g., `ClinicalAssessment`, `ClinicalOutcomeMeasure` tables), patient/user/session management data, and other data as specified in WP2 and the UI/UX specifications.**
--   **WP5: Security and Compliance**: Focus on pseudonymization (SHA-256), encryption (Fernet), GDPR, role-based access control (RBAC), Row-Level Security (RLS), audit logs, OWASP Top 10 protections. Uses Supabase Auth for authentication (JWTs) with optional 2FA/MFA.
+-   **WP4: Data Infrastructure**: Self-hosted Supabase on VUB Private VM (PostgreSQL for structured data based on `docs/00_PROJECT_DEFINITION/database_schema_simplified_research.md`, Supabase Storage for files like C3D and reports). This self-hosted instance is the **primary target for production deployment** for the GHOSTLY+ Dashboard's operational data. Features RLS and encryption.
+    -   **Broader Data Ecosystem (as per `data_management_plan.md`):** The `data_management_plan.md` outlines a comprehensive data management strategy. While Supabase serves the immediate operational needs of the dashboard and game, other systems are designated for specific roles:
+        -   **REDCap:** Used for collecting and managing certain research data, potentially serving as the eCRF and for long-term storage of clinical trial master data/archive.
+        -   **Pixiu:** VUB's secure data management system for organizing, processing, and long-term archiving of research data (especially pseudonymized and anonymized datasets).
+        -   **VUB SharePoint:** Used for storing research documents, protocols, administrative files, and study-related materials.
+        -   The GHOSTLY+ Dashboard and backend services must facilitate data export or integration pathways to support these systems as required by the DMP.
+    -   **Database will store raw EMG data references (C3D paths), processed sEMG metrics (e.g., `EMGCalculatedMetric` table), game statistics (e.g., `GamePlayStatistic` table), DDA parameters (e.g., in `GameSession` table), clinical assessments (e.g., `ClinicalAssessment`, `ClinicalOutcomeMeasure` tables), patient/user/session management data, and other data as specified in WP2 and the UI/UX specifications.**
+-   **WP5: Security and Compliance**: Focus on pseudonymization (SHA-256 as per `data_management_plan.md`), encryption (Fernet), GDPR, role-based access control (RBAC), Row-Level Security (RLS), audit logs, OWASP Top 10 protections. Uses Supabase Auth for authentication (JWTs) with optional 2FA/MFA. **Crucially, all practices must align with the `data_management_plan.md`, including:**
+    -   Adherence to ethical approvals from FAGG and hospital ethics committees (UZ Brussel, UZ Leuven, UZ Antwerpen).
+    -   Management of informed consent.
+    -   Compliance with VUB privacy registers.
+    -   Respecting terms of the collaboration agreement regarding data ownership, use, and sharing.
+    -   Implementing data retention and sharing policies as specified in the DMP.
 -   **WP6: Deployment and Operations**: Docker & Docker Compose for containerization, Nginx for reverse proxy in production. Deployment on VUB private VM.
 
 Refer to the architecture diagram in [docs/prd.md](mdc:docs/prd.md) (Section 4.8) and security diagrams in [docs/security.md](mdc:docs/security.md).
@@ -63,18 +74,20 @@ flowchart TD
                 Analytics["📈 Analytics Services<br>(Python/FastAPI)"]:::backend
             end
             
-            subgraph SupabaseCloud["☁️ SUPABASE PLATFORM (Self-Hosted)"]
+            subgraph SupabaseCloud["☁️ SUPABASE PLATFORM (Self-Hosted) - Operational DB"]
                 Database["💾 PostgreSQL<br>(Schema: database_schema_simplified_research.md)<br>Patient Data, Clinical Assessments, Rehab/Game Sessions, EMG Metrics, Game Stats, User Roles, etc."]:::database
                 FileStore["📁 Supabase Storage<br>(Reports/C3D)"]:::database
                 Auth["🔑 Supabase Auth<br>(JWT)"]:::supabase
             end
             
-            subgraph GDPRCompliance["🔒 GDPR COMPLIANCE"]
+            subgraph GDPRCompliance["🔒 GDPR COMPLIANCE (aligns with data_management_plan.md)"]
                 direction TB
                 Pseudonymization["👤 Pseudonymization<br>of Patient Data (SHA-256)"]:::security
                 DataEncryption["🔐 App-Level Encryption<br>(Fernet)"]:::security
+                EthicalApprovals["📜 Ethical Approvals & Consent<br>(FAGG, Hospitals, GDPR)"]:::security
                 AccessControl["📝 Patient Access<br>& Deletion Rights (RLS)"]:::security
                 AuditLogs["📋 Audit Logs<br>& Traceability"]:::security
+                DMPAdherence["📄 DMP Adherence<br>(Data Storage, Retention, Sharing)"]:::security
             end
         end
     end
@@ -112,17 +125,28 @@ flowchart TD
     FastAPIServices --> GDPRCompliance
     Database --> GDPRCompliance
     API --> GDPRCompliance
+
+    %% External Data Systems (as per DMP)
+    subgraph ExternalSystems["🗄️ EXTERNAL DATA SYSTEMS (DMP)"]
+        direction TB
+        REDCap["🔴 REDCap<br>(eCRF, Clinical Trial Archive)"]:::database
+        Pixiu["📦 Pixiu<br>(Long-term Archive, Processed Data)"]:::database
+        SharePoint["📄 SharePoint<br>(Docs, Protocols)"]:::database
+    end
+
+    FastAPIServices --> |"Data Export/Sync"| REDCap
+    FastAPIServices --> |"Data Archiving"| Pixiu
 ```
 
 ## 2. Key Technical Decisions & Design Patterns
 
 -   **Unified Authentication**: Both the OpenFeasyo game and the Web Dashboard will use the same self-hosted Supabase Auth instance for user authentication (therapists, researchers). Clients authenticate *directly* with Supabase Auth, which then issues JWTs. The FastAPI backend's role is to subsequently *verify* these JWTs for API request authorization, not to handle the initial credential exchange. (Source: [docs/prd.md](mdc:docs/prd.md) 4.1.2, [docs/security.md](mdc:docs/security.md) Unified Authentication System)
 -   **Direct Authenticated Game Upload**: The OpenFeasyo game will be modified to upload C3D files directly to a secure FastAPI backend endpoint, authenticated with a JWT (obtained from Supabase Auth). A manual dashboard upload serves as a fallback. (Source: [docs/prd.md](mdc:docs/prd.md) 4.1.2, 4.7.1)
--   **Self-Hosted Supabase**: All Supabase services (Auth, Database, Storage) will be self-hosted on the VUB private VM for data sovereignty and control. (Source: [docs/security.md](mdc:docs/security.md) Executive Summary, Local Supabase Deployment Notes)
--   **Security by Layers**: Multi-layered security approach (authentication, authorization, encryption at rest and in transit, pseudonymization, RLS). (Source: [docs/security.md](mdc:docs/security.md))
--   **Row-Level Security (RLS)**: Supabase (PostgreSQL) RLS will be extensively used to ensure users can only access data they are authorized to see. (Source: [docs/prd.md](mdc:docs/prd.md) 4.4.1, [docs/security.md](mdc:docs/security.md) Section 2)
--   **Application-Level Encryption**: Sensitive medical data will be encrypted by the FastAPI backend using Fernet before storage in Supabase and decrypted upon retrieval for authorized users. (Source: [docs/prd.md](mdc:docs/prd.md) 4.5.1, [docs/security.md](mdc:docs/security.md) Section 3)
--   **Pseudonymization**: Patient identifiers will be pseudonymized (e.g., using SHA-256) to enhance privacy. (Source: [docs/prd.md](mdc:docs/prd.md) 4.5.1, [docs/security.md](mdc:docs/security.md) Section 4)
+-   **Self-Hosted Supabase (Operational Database)**: All Supabase services (Auth, Database, Storage) will be self-hosted on the VUB private VM for data sovereignty and control for the dashboard's *operational data*. This is part of a broader data ecosystem described in `data_management_plan.md` that includes REDCap, Pixiu, and SharePoint for specific data management roles (e.g., long-term archiving, master clinical trial data). (Source: [docs/security.md](mdc:docs/security.md) Executive Summary, Local Supabase Deployment Notes, `data_management_plan.md`)
+-   **Security by Layers**: Multi-layered security approach (authentication, authorization, encryption at rest and in transit, pseudonymization, RLS), all guided by the stringent requirements of the `data_management_plan.md`. (Source: [docs/security.md](mdc:docs/security.md), `data_management_plan.md`)
+-   **Row-Level Security (RLS)**: Supabase (PostgreSQL) RLS will be extensively used to ensure users can only access data they are authorized to see within the operational Supabase database. (Source: [docs/prd.md](mdc:docs/prd.md) 4.4.1, [docs/security.md](mdc:docs/security.md) Section 2)
+-   **Application-Level Encryption**: Sensitive medical data will be encrypted by the FastAPI backend using Fernet before storage in Supabase and decrypted upon retrieval for authorized users, as per `data_management_plan.md` guidelines. (Source: [docs/prd.md](mdc:docs/prd.md) 4.5.1, [docs/security.md](mdc:docs/security.md) Section 3)
+-   **Pseudonymization**: Patient identifiers will be pseudonymized (e.g., using SHA-256 as specified in `data_management_plan.md`) to enhance privacy. (Source: [docs/prd.md](mdc:docs/prd.md) 4.5.1, [docs/security.md](mdc:docs/security.md) Section 4, `data_management_plan.md`)
 -   **API-Driven Architecture**: The **React frontend** interacts with the FastAPI backend primarily through REST APIs. Next.js server-side logic (Server Components, Route Handlers) may interact directly with Supabase for initial loads/RLS-protected data or handle specific backend tasks, complementing the separate FastAPI service. *(Frontend switched to React for its integrated full-stack capabilities and ecosystem benefits)*.
 -   **Containerization**: Docker will be used for packaging the frontend (`frontend-2`) and backend applications, orchestrated with Docker Compose for development and simplifying deployment.
     -   For local development, Supabase services are also containerized using a dedicated `supabase_config/docker-compose.yml`. Currently, core services like `studio`, `kong`, `auth`, `rest`, `storage`, `db`, `meta`, and `supavisor` are active, while others (`realtime`, `functions`, etc.) are commented out to streamline the local environment.
@@ -177,9 +201,9 @@ The application follows a **versioned API structure** with clear domain separati
 
 ## 3. Component Relationships
 
--   **GHOSTLY+ Game (OpenFeasyo Adaptation)**: Collects EMG data for each **Game Session** -> Authenticates *directly* with Supabase Auth -> Uploads C3D file(s) (one per Game Session, potentially batched per **Rehabilitation Session**) to FastAPI Backend (sending JWT). Game stores/sends data related to game levels, DDA parameters used, and basic performance (WP2.1, WP2.3, WP2.4). C3D file path stored in `GameSession` table.
--   **Web Dashboard (React)**: User Interface (React components specific to Therapist, Researcher, Admin roles) -> Authenticates *directly* with Supabase Auth -> Manages auth state -> Communicates with FastAPI Backend (sending JWT) to manage **Rehabilitation Sessions**, their associated **Game Session** data (C3D file paths, **processed sEMG metrics from `EMGCalculatedMetric`**, **game stats from `GamePlayStatistic`**, DDA data logged in `GameSession`), **clinical assessments from `ClinicalAssessment` & `ClinicalOutcomeMeasure`**, and user/patient data from relevant tables. Fetches and displays this structured data according to persona needs.
--   **FastAPI Backend**: Receives requests from Game & Dashboard -> **Verifies JWTs** (issued by Supabase Auth) -> Processes business logic (e.g., associating multiple C3D files/Game Sessions with a single Rehabilitation Session, **calculating sEMG metrics per WP2.3 and storing them in `EMGCalculatedMetric`**, aggregating game stats for `GamePlayStatistic`, logging DDA parameters to `GameSession`) -> Interacts **directly with Supabase DB (PostgreSQL)** via ORM/driver according to the schema in `docs/00_PROJECT_DEFINITION/database_schema_simplified_research.md` for complex logic/analytics -> Handles encryption/decryption & pseudonymization -> May use `supabase-py` optionally for simple tasks.
+-   **GHOSTLY+ Game (OpenFeasyo Adaptation)**: Collects EMG data for each **Game Session** -> Authenticates *directly* with Supabase Auth -> Uploads C3D file(s) (one per Game Session, potentially batched per **Rehabilitation Session**) to FastAPI Backend (sending JWT). Game stores/sends data related to game levels, DDA parameters used, and basic performance (WP2.1, WP2.3, WP2.4). C3D file path stored in `GameSession` table (operational Supabase DB).
+-   **Web Dashboard (React)**: User Interface (React components specific to Therapist, Researcher, Admin roles) -> Authenticates *directly* with Supabase Auth -> Manages auth state -> Communicates with FastAPI Backend (sending JWT) to manage **Rehabilitation Sessions**, their associated **Game Session** data (C3D file paths, **processed sEMG metrics from `EMGCalculatedMetric`**, **game stats from `GamePlayStatistic`**, DDA data logged in `GameSession`), **clinical assessments from `ClinicalAssessment` & `ClinicalOutcomeMeasure`**, and user/patient data from relevant tables in the operational Supabase DB. Fetches and displays this structured data according to persona needs. Must also support workflows for data export to systems like REDCap or for data preparation for archiving in Pixiu, as per `data_management_plan.md`.
+-   **FastAPI Backend**: Receives requests from Game & Dashboard -> **Verifies JWTs** (issued by Supabase Auth) -> Processes business logic (e.g., associating multiple C3D files/Game Sessions with a single Rehabilitation Session, **calculating sEMG metrics per WP2.3 and storing them in `EMGCalculatedMetric`**, aggregating game stats for `GamePlayStatistic`, logging DDA parameters to `GameSession`) -> Interacts **directly with Supabase DB (PostgreSQL)** via ORM/driver according to the schema in `docs/00_PROJECT_DEFINITION/database_schema_simplified_research.md` for complex logic/analytics -> Handles encryption/decryption & pseudonymization. **Must also implement functionalities for data export/formatting compatible with REDCap and Pixiu as required by `data_management_plan.md`.** -> May use `supabase-py` optionally for simple tasks.
 -   **Supabase Auth**: Issues JWTs upon successful authentication. User roles stored in `User` table are used by backend/RLS.
 -   **Supabase Database (PostgreSQL)**: Stores application data according to `docs/00_PROJECT_DEFINITION/database_schema_simplified_research.md`, including a clear structure for `User`, `Patient`, `HospitalSite`, `Therapist`, `RehabilitationSession`, `GameSession`, `MVCCalibration`, `GameLevel`, `EMGMetricDefinition`, `EMGCalculatedMetric`, `GamePlayStatistic`, `ClinicalAssessment`, `ClinicalOutcomeMeasure`. Enforces RLS based on JWT claims and user roles for direct access from React/clients where appropriate.
 -   **Supabase Storage**: Stores files (C3D from each **Game Session**, reports); access controlled by RLS policies.
@@ -192,8 +216,8 @@ See diagrams in [docs/prd.md](mdc:docs/prd.md) (Sections 4.8, 4.9) and [docs/sec
 -   **Authentication Flow**: Ensuring seamless and secure JWT-based authentication for both the C# game client and the React web client against the central Supabase Auth service, leveraging libraries like `@supabase/ssr`.
 -   **C3D Data Pipeline**: The flow of C3D files from game generation, authenticated upload to API, processing (parsing, pseudonymization, encryption), storage in Supabase Storage, and retrieval/visualization in the dashboard.
 -   **EMG Data Visualization and Metrics Reporting**: Efficiently fetching, decrypting, processing, and rendering potentially large EMG datasets in the React frontend (using React components) with interactive charts. **This includes the calculation (backend) and display (frontend) of specific sEMG-derived metrics (fatigue, strength, mass trends as per WP2.3) and game engagement/adherence reports.**
--   **RLS Policy Implementation**: Correctly defining and implementing PostgreSQL RLS policies in Supabase to ensure strict data segregation and access control.
--   **Security Measures**: Proper implementation of encryption/decryption services, pseudonymization, and other security controls outlined in [docs/security.md](mdc:docs/security.md).
+-   **RLS Policy Implementation**: Correctly defining and implementing PostgreSQL RLS policies in Supabase to ensure strict data segregation and access control, complementing the overall data governance model in `data_management_plan.md`.
+-   **Security Measures**: Proper implementation of encryption/decryption services, pseudonymization, and other security controls outlined in [docs/security.md](mdc:docs/security.md) and mandated by `data_management_plan.md` (including consent management and ethical compliance).
 -   **Hybrid Backend Strategy**: Defining clear boundaries between logic handled by Next.js server-side features, Supabase Edge Functions, and the potential separate FastAPI analytics service. *Refer to Section 5 below for detailed guidance.*
 -   **Dynamic Difficulty Adjustment (DDA) Data Flow and Dashboard Interaction**: If the dashboard is to display or influence DDA parameters (WP2.4, WP2.5), ensuring this data is correctly logged, stored, and presented is critical.
 

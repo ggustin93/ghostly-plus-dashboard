@@ -100,4 +100,28 @@ docker compose -f supabase_config/docker-compose.yml logs -f
 - **Module resolution errors**: May require npm cache clear or `--legacy-peer-deps` flag
 - **CORS issues**: Use `supabase_config_cors_config.sh` to update Kong configuration
 
+## Testing Production Deployment Locally with Coolify
+
+If you want to test the production deployment process locally before deploying to the VUB VM, you can install Coolify on your local machine:
+
+```bash
+# Install Coolify locally (requires Docker)
+curl -fsSL https://cdn.coollabs.io/coolify/install.sh | bash
+```
+
+After installation:
+
+1. Access Coolify at `http://localhost:8000` and create your admin account
+2. Add your local machine as a server in Coolify
+3. Create a project for GHOSTLY+ testing
+4. Upload or connect to your repository containing the Docker Compose files
+5. Configure the environment variables:
+   - Use the same structure as your production environment
+   - Adjust network settings for local development (use `host.docker.internal` instead of container names for services running outside Coolify)
+6. Deploy and test the application
+
+This local Coolify setup provides a safe environment to validate your deployment process before applying it to the production VUB VM.
+
+> **Note for M1/M2 Mac users**: You may encounter architecture compatibility issues with some Coolify services on Apple Silicon. Use the `platform: linux/amd64` setting in your Docker Compose files where needed.
+
 This guide represents our current understanding and may evolve as we learn more. Issues and improvements are welcome. 

@@ -1,6 +1,6 @@
 ---
 description: Details the technologies, development setup, technical constraints, dependencies, and tool usage patterns for the GHOSTLY+ Dashboard, within the broader GHOSTLY+ project context.
-source_documents: [docs/prd.md](mdc:docs/prd.md) (Section 4), [docs/security.md](mdc:docs/security.md), [docs/00_PROJECT_DEFINITION/ressources/2024_ghostly_proposal.md](mdc:docs/00_PROJECT_DEFINITION/ressources/2024_ghostly_proposal.md)
+source_documents: [docs/prd.md](mdc:docs/prd.md) (Section 4), [docs/security.md](mdc:docs/security.md), [docs/00_PROJECT_DEFINITION/ressources/2024_ghostly_proposal.md](mdc:docs/00_PROJECT_DEFINITION/ressources/2024_ghostly_proposal.md), [docs/00_PROJECT_DEFINITION/ressources/data_management_plan.md](mdc:docs/00_PROJECT_DEFINITION/ressources/data_management_plan.md)
 ---
 
 # GHOSTLY+ Dashboard: Technical Context
@@ -45,14 +45,20 @@ source_documents: [docs/prd.md](mdc:docs/prd.md) (Section 4), [docs/security.md]
 
 ### 1.3. Database & BaaS (Data Infrastructure - WP4)
 
-- **Platform:** Supabase (Self-Hosted on VUB Private VM for **Production**)
+- **Platform:** Supabase (Self-Hosted on VUB Private VM for **Production - Operational Data**)
     - **Development Strategy:** During development and testing, the frontend can be configured to point to a **Supabase Cloud instance** via environment variables in `frontend/.env`. This allows for rapid prototyping and testing before targeting the production VUB instance.
-- **Core Database:** PostgreSQL (v15+). The schema is detailed in `docs/00_PROJECT_DEFINITION/database_schema_simplified_research.md`, defining tables such as `User`, `Patient`, `HospitalSite`, `Therapist`, `RehabilitationSession`, `GameSession`, `MVCCalibration`, `GameLevel`, `EMGMetricDefinition`, `EMGCalculatedMetric`, `GamePlayStatistic`, `ClinicalAssessment`, and `ClinicalOutcomeMeasure`.
+- **Core Operational Database:** PostgreSQL (v15+). The schema is detailed in `docs/00_PROJECT_DEFINITION/database_schema_simplified_research.md`, defining tables such as `User`, `Patient`, `HospitalSite`, `Therapist`, `RehabilitationSession`, `GameSession`, `MVCCalibration`, `GameLevel`, `EMGMetricDefinition`, `EMGCalculatedMetric`, `GamePlayStatistic`, `ClinicalAssessment`, and `ClinicalOutcomeMeasure`.
 - **Authentication:** Supabase Auth (GoTrue) - Manages users stored in the `User` table.
-- **Storage:** Supabase Storage - For C3D files (linked from `GameSession` table), reports, etc.
+- **Storage (Operational Files):** Supabase Storage - For C3D files (linked from `GameSession` table), reports, etc., directly related to dashboard operations.
 - **API Gateway:** Supabase Kong
 - **Realtime:** Supabase Realtime (Currently disabled in local dev)
 - **Edge Functions:** Supabase Edge Functions (Deno Runtime) - *Used for specific privileged operations or transformations.*
+
+- **Broader Data Management Infrastructure (as per `data_management_plan.md`):**
+    -   **REDCap:** Designated for collecting and managing specific research data, potentially as the primary eCRF system, and for long-term storage of clinical trial master data/archive. The dashboard may need to export data in a REDCap-compatible format.
+    -   **Pixiu:** VUB's institutional secure data management system for organizing, processing, and long-term archiving of research data, particularly pseudonymized and anonymized datasets.
+    -   **VUB SharePoint:** Used for storing research documents (e.g., study protocols, SOPs, consent forms templates), administrative files, and other study-related materials.
+    -   **Encrypted External HDDs:** For manual, offline backups of new data every 2-3 weeks as an additional security layer.
 
 ### 1.4. Containerization & Orchestration (Deployment - WP6)
 
@@ -68,11 +74,15 @@ source_documents: [docs/prd.md](mdc:docs/prd.md) (Section 4), [docs/security.md]
 - **EMG Sensors:** Delsys Trigno Avanti (primary for RCT), with WP2 task (**WP2.2 of [WP2_proposal_detailed.md](mdc:docs/00_PROJECT_DEFINITION/ressources/WP2_proposal_detailed.md)**) to explore/integrate other (low-cost) wireless sEMG sensors.
 - **BFR Cuffs:** Smart Cuffs system (Smart Tools, USA) or similar, for applying Blood Flow Restriction during exercises.
 
-### 1.6. Clinical Measurement & External Tools (WP4, WP5)
+### 1.6. Clinical Measurement & External Tools (WP4, WP5 - as per `data_management_plan.md`)
 
 - **Muscle Strength Measurement:** Handheld dynamometer (e.g., MicroFet).
-- **Muscle Mass Assessment:** Bedside ultrasound (for M. Rectus Femoris cross-sectional area).
-- **Data Storage (Clinical Trial Master Data/Archive):** REDCap (mentioned in proposal for GDPR-proof storage, separate from Supabase operational DB for dashboard).
+- **Muscle Mass Assessment:** Bedside ultrasound (for M. Rectus Femoris cross-sectional area – images in .dcm, .jpg, .pdf).
+- **Functional Outcomes:** Tools/methods for 30-second Sit-to-Stand test, Functional Ambulation Category (FAC).
+- **Cognitive Assessment:** Mini-Mental State Examination (MMSE).
+- **Data Entry & Management (Clinical Trial Master):** REDCap (cloud-based eCRF system).
+- **Physiological Data Formats:** sEMG signals in .c3d, .csv, .txt.
+- **Qualitative Data Formats:** Interviews/transcripts in .docx, .txt, .pdf, .mp3.
 - **Statistical Analysis:** SPSS or similar statistical software (for analysis of exported data from dashboard/REDCap).
 
 ## 2. Development Setup
@@ -88,9 +98,14 @@ source_documents: [docs/prd.md](mdc:docs/prd.md) (Section 4), [docs/security.md]
 
 ## 3. Technical Constraints
 
-- **Self-Hosted Supabase:** The entire Supabase instance runs on a private VUB VM, not Supabase Cloud. This impacts deployment, maintenance, and potentially available Supabase features/extensions.
-- **GDPR Compliance:** Strict adherence required due to handling sensitive medical data. Pseudonymization (e.g., SHA-256 as per `systemPatterns.md`) and encryption (e.g., Fernet) are key requirements. The proposal highlights storing data in REDCap as a GDPR-proof measure, and CME approval is needed.
-- **Existing Game Client Adaptation:** The dashboard must integrate with the GHOSTLY+ game, which is an adaptation of the existing C#/MonoGame Android application (OpenFeasyo). This involves changes to the game for authentication and data upload.
+- **Self-Hosted Supabase (Operational Focus):** The Supabase instance primarily serves the dashboard's operational needs. Data archival, master clinical data management, and document storage rely on Pixiu, REDCap, and SharePoint respectively, as per `data_management_plan.md`.
+- **GDPR Compliance & Ethical Mandates (as per `data_management_plan.md`):** Strict adherence required due to handling sensitive medical data (personal, medical, physiological). This includes:
+    -   Implementing pseudonymization (e.g., SHA-256) and encryption (e.g., Fernet).
+    -   Managing data according to ethical approvals from FAGG, UZ Brussel, UZ Leuven, UZ Antwerpen.
+    -   Ensuring informed consent procedures are respected.
+    -   Aligning with VUB privacy registers and the collaboration agreement's stipulations on data ownership, use, and sharing.
+    -   Adhering to specified data retention (min 10 years, 25 for trial data, 30 for medical research data) and data sharing policies (FAIR principles, use of Zenodo/OSF for anonymized data, PURE for pseudonymized, specific licenses like CC BY-NC).
+- **Existing Game Client Adaptation:** The dashboard must integrate with the GHOSTLY+ game, which is an adaptation of the existing C#/MonoGame Android application (OpenFeasyo). This involves changes to the game for authentication and data upload to the operational backend.
 
 ## 4. Key Dependencies & Libraries
 
@@ -147,9 +162,10 @@ source_documents: [docs/prd.md](mdc:docs/prd.md) (Section 4), [docs/security.md]
 ## 6. API & Security Configuration
 
 - **Authentication:** JWT-based via Supabase Auth. Tokens issued by Supabase are validated by backend services (FastAPI, Edge Functions).
-- **Authorization:** Primarily handled by RLS policies in Supabase PostgreSQL. Role-based logic can be implemented in backend services or Edge Functions where needed.
+- **Authorization:** Primarily handled by RLS policies in Supabase PostgreSQL for the operational data. Role-based logic can be implemented in backend services or Edge Functions where needed.
 - **CORS:** Configured in Supabase Kong (via `supabase_cors_config.sh` or Studio) and potentially in FastAPI if needed. Nginx proxy configuration also handles routing.
 - **Secrets Management:** API keys, JWT secrets, service keys stored in `.env` files (root for Docker Compose/Supabase, `frontend/.env` for Supabase client URL/key and frontend build-time vars, `backend` for FastAPI). **SERVICE_ROLE_KEY and other sensitive keys MUST NOT be exposed client-side.** Edge Functions provide a secure environment for using `service_role`.
+- **Overall Security Alignment:** All security configurations and practices must align with the comprehensive requirements of the `data_management_plan.md`, including specific measures for data storage on approved institutional platforms (Pixiu, REDCap, SharePoint) and physical security for documents/backups.
 - **Environment Variables:**
     - `frontend`: Uses `VITE_` prefix for browser-accessible vars (e.g., `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`, `VITE_USE_MOCK_AUTH`). The Supabase URL and Anon Key determine if a Cloud or self-hosted instance is targeted.
     - `backend`: Loaded via `python-dotenv`.

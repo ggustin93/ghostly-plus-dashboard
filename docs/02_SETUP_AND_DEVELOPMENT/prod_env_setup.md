@@ -2,6 +2,87 @@
 
 > **Note:** This document outlines the planned deployment process for the GHOSTLY+ application on the VUB VM. As the project is in its early stages, some details or specific commands may evolve. Always refer to the latest version and cross-reference with the project's Memory Bank (`memory-bank/`) for the most current information and context.
 
+## Deployment Options
+
+As of June 2025, we now support two deployment methods for the GHOSTLY+ application on the VUB VM:
+
+1. **Coolify (Recommended)**: A GUI-based Docker management platform that simplifies deployment and maintenance
+2. **Manual Deployment**: Traditional SSH-based setup with direct Docker and Nginx configuration
+
+### Option 1: Coolify Deployment (Recommended)
+
+Coolify offers a web-based interface for deploying and managing Docker applications, which is particularly beneficial for the GHOSTLY+ project's multi-center clinical trial where multiple team members may need to manage the application.
+
+#### 1. Coolify Installation
+
+On your Ubuntu 22.04 or 24.04 VUB VM, run the installation script:
+
+```bash
+curl -fsSL https://cdn.coollabs.io/coolify/install.sh | sudo bash
+```
+
+This script will:
+- Install Docker and other required dependencies
+- Set up Coolify directories under `/data/coolify/`
+- Configure SSH keys for server management
+- Install and start Coolify services
+
+#### 2. Initial Coolify Setup
+
+1. After installation, access Coolify at `http://<VM_STATIC_IP>:8000`
+2. Create your admin account immediately for security
+3. Configure your server in Coolify (typically already done during installation)
+
+#### 3. Application Deployment
+
+1. **Create a Project**:
+   - In the Coolify dashboard, create a new project for "GHOSTLY+"
+
+2. **Add Services**:
+   - Choose "Docker Compose" as the deployment type
+   - Connect to your GitHub repository or upload your `docker-compose.yml` file
+   - Configure environment variables matching those described in section 2.2 and 3.2 of the manual deployment
+
+3. **Configure Domains & SSL**:
+   - Add your domains (`dashboard.yourproject.vub.be`, `api.yourproject.vub.be`, `supabase.yourproject.vub.be`)
+   - Enable Let's Encrypt SSL certificate generation
+
+4. **Deploy Your Application**:
+   - Click the "Deploy" button to start the deployment process
+   - Monitor the deployment logs directly in the Coolify interface
+
+#### 4. Supabase Configuration
+
+1. **Deploy Supabase Services**:
+   - Create a separate service in Coolify using your `supabase_config/docker-compose.yml`
+   - Configure environment variables as detailed in section 3.2 of the manual deployment
+   - Ensure proper networking between your application and Supabase services
+
+2. **Database Migration**:
+   - Follow the same migration approach described in section 4.1 of the manual deployment
+   - You can run these commands from your local environment or use Coolify's terminal feature
+
+#### 5. Backup Configuration
+
+1. In Coolify's dashboard, navigate to your Supabase database service
+2. Configure automated backups with your preferred schedule and retention policy
+3. Set up a backup destination (local or remote storage)
+
+#### 6. Monitoring & Maintenance
+
+Coolify provides built-in features for:
+- Resource monitoring (CPU, memory, disk usage)
+- Container logs viewing and searching
+- Service restarting and updating
+- Environment variable management
+- One-click SSL certificate renewal
+
+For more details on using Coolify, refer to the [official Coolify documentation](https://coolify.io/docs).
+
+### Option 2: Manual Deployment (Alternative)
+
+The following sections detail the traditional, SSH-based manual deployment process, which remains as a reference and alternative option.
+
 This guide provides a step-by-step tutorial for deploying the complete GHOSTLY+ application (frontend, backend, and self-hosted Supabase) on a VUB Virtual Machine using Docker and Nginx. This setup is intended for a production-like environment.
 
 **Key Technologies:** Docker, Docker Compose, Nginx, Supabase (Self-Hosted).

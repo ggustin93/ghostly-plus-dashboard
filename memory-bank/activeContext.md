@@ -1,7 +1,9 @@
 ---
 description: Tracks the current work focus, recent changes, next steps, active decisions, and key learnings for the GHOSTLY+ Dashboard project, contextualized by the FWO proposal.
-source_documents: [docs/00_PROJECT_DEFINITION/ressources/2024_ghostly_proposal.md](mdc:docs/00_PROJECT_DEFINITION/ressources/2024_ghostly_proposal.md)
+source_documents: [docs/00_PROJECT_DEFINITION/ressources/2024_ghostly_proposal.md](mdc:docs/00_PROJECT_DEFINITION/ressources/2024_ghostly_proposal.md), [docs/00_PROJECT_DEFINITION/ressources/data_management_plan.md](mdc:docs/00_PROJECT_DEFINITION/ressources/data_management_plan.md)
 ---
+
+**IMPORTANT NOTE ON CLINICAL REQUIREMENTS & DATA MANAGEMENT:** The **[Data Management Plan (DMP) (data_management_plan.md)](mdc:docs/00_PROJECT_DEFINITION/ressources/data_management_plan.md)** is now the **primary source of truth** for all clinical trial parameters, data types to be collected, ethical considerations, data storage (including the roles of Pixiu, REDCap, and SharePoint alongside Supabase), security measures, retention policies, and data sharing agreements. All development and decision-making concerning these aspects must align with the DMP. This document supersedes previous information where discrepancies related to clinical and data management aspects may exist.
 
 # GHOSTLY+ Dashboard: Active Context
 
@@ -21,6 +23,19 @@ source_documents: [docs/00_PROJECT_DEFINITION/ressources/2024_ghostly_proposal.m
     -   The Supabase client initialization in `frontend/src/lib/supabase/client.ts` has been updated to use `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` environment variables. This allows for dynamic configuration of the Supabase instance targeted by the frontend.
     -   This change facilitates the agreed-upon strategy: using a **Supabase Cloud instance for development and testing** (configured via `frontend/.env`) for ease of setup and iteration, while the **self-hosted Supabase instance on the VUB machine remains the target for production** to ensure data sovereignty and control, aligning with GDPR requirements for sensitive medical data.
     -   The `frontend/.env` file becomes the control point for switching the Supabase backend during development (e.g., between a personal Cloud dev instance, a shared team Cloud dev instance, or a local/VUB dev instance).
+
+-   **Production Deployment Strategy with Coolify (2025-06-01):**
+    -   After evaluation, we've decided to implement Coolify for production deployment on the VUB Ubuntu server, replacing the manual deployment process previously outlined in `docs/02_SETUP_AND_DEVELOPMENT/prod_env_setup.md`.
+    -   Coolify provides a web-based GUI for Docker container management, eliminating the need for direct SSH access for routine deployment and maintenance tasks.
+    -   This approach is especially beneficial for the GHOSTLY+ multi-center clinical trial, as it:
+        -   Simplifies deployment and management across hospital sites
+        -   Provides centralized environment variable management
+        -   Offers built-in monitoring and logging features
+        -   Streamlines backup procedures for database and storage volumes
+        -   Facilitates SSL certificate management through Let's Encrypt integration
+    -   The deployment documentation is being updated to reflect this change, while maintaining compatibility with our existing Docker Compose configuration.
+    -   This choice aligns with our GDPR compliance requirements while reducing the operational complexity for research team members who need to manage the production environment.
+
 -   **UI Refinements & Vercel Deployment (Current Session):**
     -   Successfully deployed the application to Vercel.
     -   Fixed `TS6133: 'i18n' is declared but its value is never read` error in `frontend/src/components/layouts/header.tsx` by removing unused `i18n` variable, enabling Vercel build.
@@ -72,7 +87,7 @@ source_documents: [docs/00_PROJECT_DEFINITION/ressources/2024_ghostly_proposal.m
         -   Implemented mock data (`mockPatientAssessments`) to populate the table.
         -   Measures displayed are now filtered to only show those with available mock data.
         -   Styling adjustments for alignment and readability.
-    -   Unused imports and linter warnings addressed in both files.
+        -   Unused imports and linter warnings addressed in both files.
 
 ## Next Steps & Immediate Priorities:
 
@@ -81,17 +96,22 @@ source_documents: [docs/00_PROJECT_DEFINITION/ressources/2024_ghostly_proposal.m
     -   Investigate Vercel build logs in detail for clues about path resolution or `tsconfig` usage.
     -   If `vite-tsconfig-paths` with explicit project path doesn't work, consider reverting `vite.config.ts` to use a very explicit `resolve.alias` structure like `alias: { '@/lib/': path.resolve(__dirname, 'src/lib/') }` for each major subdirectory under `src/` as a more forceful workaround, ensuring `path` is imported.
     -   Consider creating a minimal reproducible example to isolate the issue with Vercel/Vite/tsconfig paths.
-2.  **Research Team Validation of UX Specifications:** Crucially, the updated `docs/00_PROJECT_DEFINITION/UX_UI_specifications.md` needs to be reviewed and validated by the GHOSTLY+ research team to confirm assumptions and clarify requirements before extensive implementation.
-3.  **Prioritize User Stories (MoSCoW):** Fill in the "Priority / Notes" column for all user stories (T1-T5, R1-R3, A1-A4) in `UX_UI_specifications.md` using MoSCoW or a similar framework, in collaboration with the research team if possible.
-4.  **Backend Development for Core Therapist Features:**
-    -   Develop FastAPI endpoints to support T1-T3 functionalities, ensuring data is created/retrieved according to `database_schema_simplified_research.md` (e.g., creating/updating `Patient`, `RehabilitationSession`, `GameSession`, `ClinicalAssessment`, `ClinicalOutcomeMeasure` records).
-    -   Implement logic for calculating and storing core sEMG metrics (e.g., RMS, MAV) into `EMGCalculatedMetric` based on C3D file processing or direct data streams.
+2.  **Align Development with Data Management Plan (DMP):**
+    -   Thoroughly review all planned dashboard features related to data collection, storage, processing, visualization, and export against the specifications in `docs/00_PROJECT_DEFINITION/ressources/data_management_plan.md`.
+    -   Ensure UI forms capture all necessary clinical variables (primary/secondary outcomes, medical history, etc.) as detailed in the DMP.
+    -   Confirm that data storage solutions (Supabase operational DB, Pixiu for archiving, REDCap for clinical trial master data/archive) are correctly integrated or planned for, respecting the data flow outlined or implied in the DMP.
+    -   Verify that all security, pseudonymization, consent management, and ethical requirements from the DMP are addressed in the design and implementation.
+3.  **Research Team Validation of UX Specifications:** Crucially, the updated `docs/00_PROJECT_DEFINITION/UX_UI_specifications.md` needs to be reviewed and validated by the GHOSTLY+ research team to confirm assumptions and clarify requirements before extensive implementation, ensuring it aligns with the DMP.
+4.  **Prioritize User Stories (MoSCoW):** Fill in the "Priority / Notes" column for all user stories (T1-T5, R1-R3, A1-A4) in `UX_UI_specifications.md` using MoSCoW or a similar framework, in collaboration with the research team if possible.
+5.  **Backend Development for Core Therapist Features:**
+    -   Develop FastAPI endpoints to support T1-T3 functionalities, ensuring data is created/retrieved according to `database_schema_simplified_research.md` and aligns with data types defined in the DMP (e.g., creating/updating `Patient`, `RehabilitationSession`, `GameSession`, `ClinicalAssessment`, `ClinicalOutcomeMeasure` records).
+    -   Implement logic for calculating and storing core sEMG metrics (e.g., RMS, MAV) into `EMGCalculatedMetric` based on C3D file processing or direct data streams, as per DMP outcomes.
     -   Implement logic for processing and storing game statistics into `GamePlayStatistic`.
-5.  **Frontend Development for Core Therapist Features:**
+6.  **Frontend Development for Core Therapist Features:**
     -   Build React components for Therapist views (T1: Dashboard/Patient List, T2: Patient Profile/Clinical Data Entry, T3: Session Management/Monitoring).
     -   Integrate these components with the new backend APIs.
-    -   Focus on clear visualization of clinical data, sEMG metrics, and game stats.
-6.  **Refine Data Flow for Game Data:** Solidify how detailed game log data (beyond C3D, if necessary for WP2.3/WP2.4 metrics) will be transmitted from the game to the backend and stored (e.g., potentially new tables or extended fields in `GamePlayStatistic` or `GameSession`).
+    -   Focus on clear visualization of clinical data (all outcomes from DMP), sEMG metrics, and game stats.
+7.  **Refine Data Flow for Game Data:** Solidify how detailed game log data (beyond C3D, if necessary for WP2.3/WP2.4 metrics) will be transmitted from the game to the backend and stored (e.g., potentially new tables or extended fields in `GamePlayStatistic` or `GameSession`), ensuring it supports DMP defined outcomes.
 
 ## Key Patterns & Preferences Emerging:
 
@@ -105,6 +125,7 @@ source_documents: [docs/00_PROJECT_DEFINITION/ressources/2024_ghostly_proposal.m
 -   The detailed UX specification process has highlighted the complexity and interconnectedness of data required for the GHOSTLY+ dashboard. Having a clear, validated set of requirements is paramount before deep coding.
 -   Formalizing the database schema early, even in a simplified form, provides significant clarity for both backend and frontend development.
 -   Regularly updating the Memory Bank is crucial for maintaining a shared understanding of the project's evolving state, especially with detailed documents like the UX specifications.
+-   The **Data Management Plan (`data_management_plan.md`)** provides critical, overarching guidance on all clinical aspects, data governance, ethical compliance, and data security. Strict adherence to the DMP is essential for the project's success and regulatory compliance.
 -   **Ongoing UI/UX Refinements:** Small enhancements, such as adding keyboard navigation to components like the `GameSessionNavigator`, contribute to overall accessibility and usability goals, reflecting an iterative approach to improving the user experience.
 
 *(Ensure to replace [Current Date] with the actual date of this update.)*
