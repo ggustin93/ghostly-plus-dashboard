@@ -16,12 +16,19 @@ import {
   ArrowUpDown,
   ArrowUp,
   ArrowDown,
-  Minus
+  Minus,
+  InfoIcon
 } from 'lucide-react';
 import { Patient } from '@/types/patient';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { formatDate } from '@/lib/utils';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface PatientListProps {
   patients: Patient[];
@@ -114,150 +121,209 @@ const PatientList = ({ patients, showViewAllButton = true }: PatientListProps) =
   };
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <div className="relative w-full max-w-sm">
-          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input
-            type="search"
-            placeholder="Search patients..."
-            className="pl-8"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
+    <TooltipProvider>
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <div className="relative w-full max-w-sm">
+            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+            <Input
+              type="search"
+              placeholder="Search patients..."
+              className="pl-8"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          </div>
+          {showViewAllButton && (
+            <Link to="/patients">
+              <Button variant="ghost" size="sm">
+                View All
+              </Button>
+            </Link>
+          )}
         </div>
-        {showViewAllButton && (
-          <Link to="/patients">
-            <Button variant="ghost" size="sm">
-              View All
-            </Button>
-          </Link>
-        )}
-      </div>
 
-      <div className="rounded-md border">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="w-[50px]">
-                <div className="pl-2.5">Avatar</div>
-              </TableHead>
-              <TableHead className="cursor-pointer" onClick={() => toggleSort('id' as keyof Patient)}>
-                <div className="flex items-center gap-1 pl-2.5">
-                  Patient ID
-                  <ArrowUpDown className="h-3 w-3" />
-                </div>
-              </TableHead>
-              <TableHead className="cursor-pointer" onClick={() => toggleSort('name')}>
-                <div className="flex items-center gap-1 pl-2.5">
-                  Name
-                  <ArrowUpDown className="h-3 w-3" />
-                </div>
-              </TableHead>
-              <TableHead className="cursor-pointer" onClick={() => toggleSort('lastSession')}>
-                <div className="flex items-center gap-1 pl-2.5">
-                  Last Session
-                  <ArrowUpDown className="h-3 w-3" />
-                </div>
-              </TableHead>
-              <TableHead className="cursor-pointer" onClick={() => toggleSort('adherence')}>
-                <div className="flex items-center gap-1 pl-2.5">
-                  Adherence
-                  <ArrowUpDown className="h-3 w-3" />
-                </div>
-              </TableHead>
-              <TableHead className="cursor-pointer" onClick={() => toggleSort('progress')}>
-                <div className="flex items-center gap-1 pl-2.5">
-                  Progress
-                  <ArrowUpDown className="h-3 w-3" />
-                </div>
-              </TableHead>
-              <TableHead className="text-right">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {sortedPatients.length > 0 ? (
-              sortedPatients.map(patient => {
-                const avatarStyle = getAvatarColor(patient.id);
-                return (
-                  <TableRow key={patient.id}>
-                    <TableCell className="pl-5">
-                      <Avatar className="h-8 w-8">
-                        <AvatarFallback 
-                          style={avatarStyle}
-                          className="flex items-center justify-center h-full w-full rounded-full text-xs font-semibold"
-                        >
-                          {getInitials(patient.name)}
-                        </AvatarFallback>
-                      </Avatar>
-                    </TableCell>
-                    <TableCell className="text-left pl-5 justify-center">{patient.id}</TableCell>
-                    <TableCell className="text-left pl-5 justify-center">{patient.name}</TableCell>
-                    <TableCell className="pl-5 text-left">
-                      {patient.lastSession ? formatDate(patient.lastSession) : 'N/A'}
-                    </TableCell>
-                    <TableCell>
-                      {patient.adherence !== undefined ? (
-                        <Badge 
-                          variant="outline"
-                          className={
-                            patient.adherence > 85 ? 'bg-green-100 text-green-700' :
-                            patient.adherence > 60 ? 'bg-yellow-100 text-yellow-700' :
-                            'bg-red-100 text-red-700'
-                          }
-                        >
-                          {patient.adherence}%
-                        </Badge>
-                      ) : (
-                        'N/A'
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      {patient.progress ? (
-                        <div className="flex items-center gap-2">
-                          {patient.progress === 'improving' && <ArrowUp className="h-4 w-4 text-green-500" />}
-                          {patient.progress === 'steady' && <Minus className="h-4 w-4 text-gray-500" />}
-                          {patient.progress === 'declining' && <ArrowDown className="h-4 w-4 text-red-500" />}
-                          <Badge 
-                            variant="secondary"
-                            className={
-                              patient.progress === 'improving' ? 'bg-green-100 text-green-700' :
-                              patient.progress === 'declining' ? 'bg-red-100 text-red-700' : ''
-                            }
-                          >
-                            {patient.progress}
-                          </Badge>
-                        </div>
-                      ) : (
-                        'N/A'
-                      )}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <Button 
-                        variant="ghost" 
-                        size="sm"
-                        asChild
-                      >
-                        <Link to={`/patients/${patient.id}`}>
-                          <EyeIcon className="mr-2 h-4 w-4" />
-                          View
-                        </Link>
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                );
-              })
-            ) : (
+        <div className="rounded-md border">
+          <Table>
+            <TableHeader>
               <TableRow>
-                <TableCell colSpan={7} className="h-16 text-center">
-                  No patients found.
-                </TableCell>
+                <TableHead className="w-[50px]">
+                  <div className="pl-2.5">Avatar</div>
+                </TableHead>
+                <TableHead className="cursor-pointer" onClick={() => toggleSort('id' as keyof Patient)}>
+                  <div className="flex items-center gap-1 pl-2.5">
+                    Patient ID
+                    <ArrowUpDown className="h-3 w-3" />
+                  </div>
+                </TableHead>
+                <TableHead className="cursor-pointer" onClick={() => toggleSort('name')}>
+                  <div className="flex items-center gap-1 pl-2.5">
+                    Name
+                    <ArrowUpDown className="h-3 w-3" />
+                  </div>
+                </TableHead>
+                <TableHead className="cursor-pointer" onClick={() => toggleSort('lastSession')}>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div className="flex items-center gap-1 pl-2.5">
+                        Last Session
+                        <ArrowUpDown className="h-3 w-3" />
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Date of most recent completed rehabilitation session</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TableHead>
+                <TableHead className="cursor-pointer" onClick={() => toggleSort('adherence')}>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div className="flex items-center gap-1 pl-2.5">
+                        Adherence
+                        <ArrowUpDown className="h-3 w-3" />
+                        <InfoIcon className="h-3 w-3 ml-1 text-muted-foreground" />
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Adherence to GHOSTLY+ protocol (5 sessions/week, 10 total over 2 weeks)</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TableHead>
+                <TableHead className="cursor-pointer" onClick={() => toggleSort('progress')}>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div className="flex items-center gap-1 pl-2.5">
+                        Progress
+                        <ArrowUpDown className="h-3 w-3" />
+                        <InfoIcon className="h-3 w-3 ml-1 text-muted-foreground" />
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Clinical progress based on game performance metrics, isometric contractions at 75% MVC, and 50% BFR</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TableHead>
+                <TableHead className="text-right">Actions</TableHead>
               </TableRow>
-            )}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {sortedPatients.length > 0 ? (
+                sortedPatients.map(patient => {
+                  const avatarStyle = getAvatarColor(patient.id);
+                  return (
+                    <TableRow key={patient.id}>
+                      <TableCell className="pl-5">
+                        <Avatar className="h-8 w-8">
+                          <AvatarFallback 
+                            style={avatarStyle}
+                            className="flex items-center justify-center h-full w-full rounded-full text-xs font-semibold"
+                          >
+                            {getInitials(patient.name)}
+                          </AvatarFallback>
+                        </Avatar>
+                      </TableCell>
+                      <TableCell className="text-left pl-5 justify-center">{patient.id}</TableCell>
+                      <TableCell className="text-left pl-5 justify-center">{patient.name}</TableCell>
+                      <TableCell className="pl-5 text-left">
+                        {patient.lastSession ? (
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <span>{formatDate(patient.lastSession)}</span>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>Patient-led session with performance data recorded</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        ) : (
+                          'N/A'
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        {patient.adherence !== undefined ? (
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Badge 
+                                variant="outline"
+                                className={
+                                  patient.adherence > 85 ? 'bg-green-100 text-green-700' :
+                                  patient.adherence > 60 ? 'bg-yellow-100 text-yellow-700' :
+                                  'bg-red-100 text-red-700'
+                                }
+                              >
+                                {patient.adherence}%
+                              </Badge>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>{`${patient.adherence}% completion of prescribed protocol (${Math.round(patient.adherence/10)} of 10 sessions completed)`}</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        ) : (
+                          'N/A'
+                        )}
+                      </TableCell>
+                      {/* Progress column - Shows patient progress based on game performance scores, not adherence */}
+                      <TableCell>
+                        {patient.progress ? (
+                          <div className="flex items-center gap-2">
+                            {patient.progress === 'Improving' && <ArrowUp className="h-4 w-4 text-green-500" />}
+                            {patient.progress === 'Steady' && <Minus className="h-4 w-4 text-gray-500" />}
+                            {patient.progress === 'Declining' && <ArrowDown className="h-4 w-4 text-red-500" />}
+                            {patient.progress === 'Mixed' && <ArrowUpDown className="h-4 w-4 text-blue-500" />}
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Badge 
+                                  variant="secondary"
+                                  className={
+                                    patient.progress === 'Improving' ? 'bg-green-100 text-green-700' :
+                                    patient.progress === 'Declining' ? 'bg-red-100 text-red-700' :
+                                    patient.progress === 'Steady' ? 'bg-gray-100 text-gray-700' :
+                                    patient.progress === 'Mixed' ? 'bg-blue-100 text-blue-700' : ''
+                                  }
+                                >
+                                  {patient.progress}
+                                </Badge>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>
+                                  {patient.progress === 'Improving' ? 'Patient showing consistent improvement in performance metrics and strength gains' :
+                                  patient.progress === 'Declining' ? 'Patient showing decreased performance in rehabilitation exercises' :
+                                  patient.progress === 'Steady' ? 'Patient maintaining consistent performance levels' :
+                                  'Patient showing variable performance across sessions'}
+                                </p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </div>
+                        ) : (
+                          'N/A'
+                        )}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <Button 
+                          variant="ghost" 
+                          size="sm"
+                          asChild
+                        >
+                          <Link to={`/patients/${patient.id}`}>
+                            <EyeIcon className="mr-2 h-4 w-4" />
+                            View
+                          </Link>
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={7} className="h-16 text-center">
+                    No patients found.
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </div>
       </div>
-    </div>
+    </TooltipProvider>
   );
 };
 

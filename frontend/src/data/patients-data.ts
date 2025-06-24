@@ -32,12 +32,50 @@ const generateChartData = (startDate: string, numPoints: number, startValue: num
   return data;
 }
 
-const getProgressStatus = (trend: 'up' | 'down' | 'flat' | 'mixed'): 'Improving' | 'Declining' | 'Steady' | 'Mixed' => {
-  switch (trend) {
-    case 'up': return 'Improving';
-    case 'down': return 'Declining';
-    case 'flat': return 'Steady';
-    default: return 'Mixed';
+// Calculate progress based on game performance history
+const calculateProgressFromGamePerformance = (gamePerformanceHistory?: { date: string; value: number }[]): 'Improving' | 'Declining' | 'Steady' | 'Mixed' => {
+  // Need at least 2 data points to determine a trend
+  if (!gamePerformanceHistory || gamePerformanceHistory.length < 2) {
+    return 'Steady';
+  }
+
+  // Sort by date (oldest to newest)
+  const sortedData = [...gamePerformanceHistory].sort((a, b) => 
+    new Date(a.date).getTime() - new Date(b.date).getTime()
+  );
+
+  // Calculate the overall trend
+  let improvements = 0;
+  let declines = 0;
+  let steadyCount = 0;
+  
+  // Compare each adjacent pair of data points
+  for (let i = 1; i < sortedData.length; i++) {
+    const diff = sortedData[i].value - sortedData[i-1].value;
+    
+    if (diff > 2) { // Significant improvement
+      improvements++;
+    } else if (diff < -2) { // Significant decline
+      declines++;
+    } else { // Relatively steady
+      steadyCount++;
+    }
+  }
+
+  // Determine the overall trend
+  const total = improvements + declines + steadyCount;
+  const improvementRatio = improvements / total;
+  const declineRatio = declines / total;
+  const steadyRatio = steadyCount / total;
+
+  if (improvementRatio > 0.6) {
+    return 'Improving';
+  } else if (declineRatio > 0.6) {
+    return 'Declining';
+  } else if (steadyRatio > 0.6) {
+    return 'Steady';
+  } else {
+    return 'Mixed';
   }
 };
 
@@ -57,11 +95,13 @@ export const mockPatients: Patient[] = [
     cognitiveStatus: 'Alert and oriented',
     therapistId: 'T001',
     adherence: 92,
-    progress: getProgressStatus('up'),
-    adherenceHistory: generateChartData('2025-05-16', 7, 70, 'up', 5),
     gamePerformanceHistory: generateChartData('2025-05-16', 7, 60, 'up', 8),
     fatigueHistory: generateChartData('2025-05-16', 7, 40, 'down', 8),
     rpeHistory: generateChartData('2025-05-16', 7, 7, 'down', 2),
+    adherenceHistory: generateChartData('2025-05-16', 7, 70, 'up', 5),
+    get progress() {
+      return calculateProgressFromGamePerformance(this.gamePerformanceHistory);
+    },
   },
   // P002: Robert Chen
   {
@@ -78,11 +118,13 @@ export const mockPatients: Patient[] = [
     cognitiveStatus: 'Mild cognitive impairment',
     therapistId: 'T001',
     adherence: 75,
-    progress: getProgressStatus('mixed'),
-    adherenceHistory: generateChartData('2025-05-21', 6, 65, 'flat', 4),
     gamePerformanceHistory: generateChartData('2025-05-21', 6, 50, 'mixed', 10),
     fatigueHistory: generateChartData('2025-05-21', 6, 50, 'mixed', 10),
     rpeHistory: generateChartData('2025-05-21', 6, 8, 'flat', 2),
+    adherenceHistory: generateChartData('2025-05-21', 6, 65, 'flat', 4),
+    get progress() {
+      return calculateProgressFromGamePerformance(this.gamePerformanceHistory);
+    },
   },
   // P003: Mildred Jackson
   {
@@ -99,11 +141,13 @@ export const mockPatients: Patient[] = [
     cognitiveStatus: 'Alert and oriented',
     therapistId: 'T001',
     adherence: 95,
-    progress: getProgressStatus('up'),
-    adherenceHistory: generateChartData('2025-05-29', 5, 80, 'up', 6),
     gamePerformanceHistory: generateChartData('2025-05-29', 5, 70, 'up', 7),
     fatigueHistory: generateChartData('2025-05-29', 5, 30, 'down', 5),
     rpeHistory: generateChartData('2025-05-29', 5, 5, 'down', 1),
+    adherenceHistory: generateChartData('2025-05-29', 5, 80, 'up', 6),
+    get progress() {
+      return calculateProgressFromGamePerformance(this.gamePerformanceHistory);
+    },
   },
   // P004: Thomas Rivera
   {
@@ -121,11 +165,13 @@ export const mockPatients: Patient[] = [
     cognitiveStatus: 'Periodic confusion',
     therapistId: 'T001',
     adherence: 35,
-    progress: getProgressStatus('down'),
-    adherenceHistory: generateChartData('2025-04-11', 8, 50, 'down', 7),
     gamePerformanceHistory: generateChartData('2025-04-11', 8, 40, 'down', 9),
     fatigueHistory: generateChartData('2025-04-11', 8, 60, 'up', 9),
     rpeHistory: generateChartData('2025-04-11', 8, 8, 'up', 1),
+    adherenceHistory: generateChartData('2025-04-11', 8, 50, 'down', 7),
+    get progress() {
+      return calculateProgressFromGamePerformance(this.gamePerformanceHistory);
+    },
   },
   // P005: Sarah Wilson
   {
@@ -140,11 +186,13 @@ export const mockPatients: Patient[] = [
     mobility: 'Ambulates with cane',
     therapistId: 'T001',
     adherence: 85,
-    progress: getProgressStatus('mixed'),
-    adherenceHistory: generateChartData('2025-06-06', 4, 75, 'up', 5),
     gamePerformanceHistory: generateChartData('2025-06-06', 4, 65, 'mixed', 12),
     fatigueHistory: generateChartData('2025-06-06', 4, 25, 'mixed', 10),
     rpeHistory: generateChartData('2025-06-06', 4, 4, 'up', 2),
+    adherenceHistory: generateChartData('2025-06-06', 4, 75, 'up', 5),
+    get progress() {
+      return calculateProgressFromGamePerformance(this.gamePerformanceHistory);
+    },
   },
   // P006: George Miller
   {
@@ -161,11 +209,13 @@ export const mockPatients: Patient[] = [
     lastSession: '2025-05-18',
     therapistId: 'T002',
     adherence: 88,
-    progress: getProgressStatus('up'),
-    adherenceHistory: generateChartData('2025-06-02', 7, 70, 'up', 4),
     gamePerformanceHistory: generateChartData('2025-06-02', 7, 60, 'up', 6),
     fatigueHistory: generateChartData('2025-06-02', 7, 45, 'down', 7),
     rpeHistory: generateChartData('2025-06-02', 7, 6, 'down', 2),
+    adherenceHistory: generateChartData('2025-06-02', 7, 70, 'up', 4),
+    get progress() {
+      return calculateProgressFromGamePerformance(this.gamePerformanceHistory);
+    },
   },
   // P007: Brenda Lee
   {
@@ -182,11 +232,13 @@ export const mockPatients: Patient[] = [
     lastSession: '2025-06-19',
     therapistId: 'T003',
     adherence: 65,
-    progress: getProgressStatus('mixed'),
-    adherenceHistory: generateChartData('2025-06-04', 6, 60, 'mixed', 8),
     gamePerformanceHistory: generateChartData('2025-06-04', 6, 55, 'mixed', 15),
     fatigueHistory: generateChartData('2025-06-04', 6, 55, 'up', 8),
     rpeHistory: generateChartData('2025-06-04', 6, 7, 'flat', 3),
+    adherenceHistory: generateChartData('2025-06-04', 6, 60, 'mixed', 8),
+    get progress() {
+      return calculateProgressFromGamePerformance(this.gamePerformanceHistory);
+    },
   },
   // P008: Arthur Lewis
   {
@@ -203,11 +255,13 @@ export const mockPatients: Patient[] = [
     lastSession: '2025-05-25',
     therapistId: 'T002',
     adherence: 25,
-    progress: getProgressStatus('down'),
-    adherenceHistory: generateChartData('2025-05-11', 3, 40, 'down', 10),
     gamePerformanceHistory: generateChartData('2025-05-11', 3, 30, 'down', 12),
     fatigueHistory: generateChartData('2025-05-11', 3, 70, 'up', 10),
     rpeHistory: generateChartData('2025-05-11', 3, 9, 'up', 1),
+    adherenceHistory: generateChartData('2025-05-11', 3, 40, 'down', 10),
+    get progress() {
+      return calculateProgressFromGamePerformance(this.gamePerformanceHistory);
+    },
   },
   // P009: Nancy Young
   {
@@ -224,11 +278,13 @@ export const mockPatients: Patient[] = [
     lastSession: '2025-06-20',
     therapistId: 'T003',
     adherence: 94,
-    progress: getProgressStatus('up'),
-    adherenceHistory: generateChartData('2025-06-11', 5, 85, 'up', 3),
     gamePerformanceHistory: generateChartData('2025-06-11', 5, 75, 'up', 5),
     fatigueHistory: generateChartData('2025-06-11', 5, 20, 'down', 5),
     rpeHistory: generateChartData('2025-06-11', 5, 3, 'down', 1),
+    adherenceHistory: generateChartData('2025-06-11', 5, 85, 'up', 3),
+    get progress() {
+      return calculateProgressFromGamePerformance(this.gamePerformanceHistory);
+    },
   },
   // P010: Kenneth Walker
   {
@@ -245,11 +301,13 @@ export const mockPatients: Patient[] = [
     lastSession: '2025-06-19',
     therapistId: 'T002',
     adherence: 68,
-    progress: getProgressStatus('mixed'),
-    adherenceHistory: generateChartData('2025-06-13', 4, 60, 'mixed', 10),
     gamePerformanceHistory: generateChartData('2025-06-13', 4, 50, 'mixed', 15),
     fatigueHistory: generateChartData('2025-06-13', 4, 65, 'up', 7),
     rpeHistory: generateChartData('2025-06-13', 4, 7, 'mixed', 2),
+    adherenceHistory: generateChartData('2025-06-13', 4, 60, 'mixed', 10),
+    get progress() {
+      return calculateProgressFromGamePerformance(this.gamePerformanceHistory);
+    },
   },
   // P011: Patricia Hall
   {
@@ -266,10 +324,12 @@ export const mockPatients: Patient[] = [
     lastSession: '2025-06-21',
     therapistId: 'T003',
     adherence: 85,
-    progress: getProgressStatus('up'),
-    adherenceHistory: generateChartData('2025-06-16', 3, 70, 'up', 6),
     gamePerformanceHistory: generateChartData('2025-06-16', 3, 65, 'up', 7),
     fatigueHistory: generateChartData('2025-06-16', 3, 50, 'down', 9),
     rpeHistory: generateChartData('2025-06-16', 3, 6, 'down', 2),
+    adherenceHistory: generateChartData('2025-06-16', 3, 70, 'up', 6),
+    get progress() {
+      return calculateProgressFromGamePerformance(this.gamePerformanceHistory);
+    },
   }
 ];
