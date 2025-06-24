@@ -37,7 +37,7 @@ export const mockPatients: Patient[] = [
     age: 82, // From mock-data
     gender: 'Male', // From mock-data
     dateOfBirth: '1947-11-23', // From patients-data (Maria Garcia)
-    studyArm: 'Control', // From mock-data (Robert Chen) vs Intervention (Maria Garcia) - taking Robert's
+    studyArm: 'Intervention', // Updated from Control to Intervention
     admissionDate: '2025-05-20', // From mock-data (Robert)
     room: '310', // From mock-data
     status: 'active', // Consistent
@@ -94,7 +94,7 @@ export const mockPatients: Patient[] = [
     age: 80, // From mock-data
     gender: 'Male', // From mock-data
     dateOfBirth: '1960-03-12', // From patients-data (Emily Wilson)
-    studyArm: 'Control', // Consistent
+    studyArm: 'Intervention', // Updated from Control to Intervention
     admissionDate: '2025-04-10', // From mock-data (Thomas)
     room: '308', // From mock-data
     status: 'inactive', // From mock-data Thomas (vs active for Emily) - using Thomas's status
@@ -140,7 +140,7 @@ export const mockPatients: Patient[] = [
     gender: 'Male',
     room: '401',
     status: 'active',
-    studyArm: 'Control',
+    studyArm: 'Intervention', // Updated from Control to Intervention
     admissionDate: '2025-06-01',
     diagnosis: 'Sarcopenia',
     mobility: 'Needs assistance for transfers',
@@ -172,7 +172,7 @@ export const mockPatients: Patient[] = [
     gender: 'Male',
     room: '405',
     status: 'inactive', // This was 'inactive' in mock-data
-    studyArm: 'Control',
+    studyArm: 'Intervention', // Updated from Control to Intervention
     admissionDate: '2025-05-10',
     diagnosis: 'COPD Exacerbation',
     mobility: 'Bed rest',
@@ -204,7 +204,7 @@ export const mockPatients: Patient[] = [
     gender: 'Male',
     room: '410',
     status: 'active',
-    studyArm: 'Control',
+    studyArm: 'Intervention', // Updated from Control to Intervention
     admissionDate: '2025-06-12',
     diagnosis: 'Pneumonia recovery',
     mobility: 'Ambulates short distances with help',

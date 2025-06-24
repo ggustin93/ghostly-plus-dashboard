@@ -166,7 +166,64 @@ The web dashboard must support:
 
 ## 8. User Perspectives (within the GHOSTLY+ RCT context, informed by `data_management_plan.md`)
 
-- **Therapists**: Need to monitor individual patient progress with GHOSTLY+, ensure adherence to the specified intervention protocol (75% MVC, 50% AOP, 3x12 reps, ≥5 sessions/week), manage BFR and game settings, input diverse clinical assessment data (dynamometer, ultrasound, FAC, STS, MMSE), and document session details across multiple hospital sites.
-- **Researchers**: Need to analyze treatment effects on primary and secondary outcomes, compare intervention vs. control, manage data from three sites, track implementation outcomes (acceptability, adoption, etc.), and export comprehensive, pseudonymized datasets for statistical analysis as per the `data_management_plan.md`.
-- **Study Coordinators/PIs (e.g., Eva Swinnen, Mahyar Firouzi as per DMP)**: Need to oversee trial progress across all sites, manage randomization, monitor recruitment, ensure data quality and integrity, and ensure adherence to the DMP.
-- **Data Managers (e.g., Carlos Cevallos Barragan as per DMP)**: Need tools for data cleaning, quality checks, ensuring compliance with data documentation (READMEs, codebooks), and preparing datasets for analysis as per the `data_management_plan.md`. 
+- **Therapists**: To monitor patient progress, adherence, and compliance, and to manage their patient list.
+- **Researchers**: To access pseudonymized or anonymized data for analysis and to evaluate the effectiveness of the intervention.
+- **Patients**: To perform their rehabilitation exercises in a motivating and engaging way, with a high degree of autonomy.
+
+### Key User Scenarios & Workflows
+
+**1. Patient Onboarding and Setup**
+
+- **Previous Assumption:** Therapist handles all setup.
+- **Revised Workflow (as of 2024-06-25):**
+    1.  Patient is registered in an external system, which generates a pseudo-ID.
+    2.  An administrator imports the `pseudo-ID -> patient info` map into the GHOSTLY+ system.
+    3.  The therapist logs into the dashboard and assigns the new patient to their caseload.
+    4.  The therapist conducts an initial training session with the patient, showing them how to use the tablet, log in (with PID and a simple password), apply the BFR cuff, and perform the MVC calibration. The app will contain guides for reinforcement.
+
+**2. Daily Patient Game Session (Autonomous)**
+
+- **Previous Assumption:** Therapist initiates and supervises each session.
+- **Revised Workflow (as of 2024-06-25):**
+    1.  The patient, at a time of their choosing, turns on the tablet.
+    2.  They open the GHOSTLY+ game application.
+    3.  They log in using their credentials.
+    4.  The app guides them through the pre-session setup: MVC calibration and BFR cuff application.
+    5.  The patient plays the game, performing the prescribed exercises.
+    6.  Session data is automatically sent to the backend.
+    7.  The patient logs out.
+
+**3. Therapist Monitoring**
+
+- **Workflow:**
+    1.  The therapist logs into the web dashboard.
+    2.  They can view a list of their assigned patients (from both intervention and control groups).
+    3.  For a specific patient, they can view:
+        -   A historical log of completed sessions (e.g., via the calendar view showing the last 7 days).
+        -   Detailed metrics for each session, including adherence and compliance scores.
+        -   Progress over time.
+    4.  The therapist can manage their patients (e.g., reset a password).
+    5.  The dashboard does **not** include features for scheduling future sessions or entering clinical assessment data.
+
+**4. Researcher Data Analysis**
+
+- **Workflow:**
+    1.  The researcher accesses the web dashboard.
+    2.  They can view and analyze pseudonymized sEMG signals, derived metrics, game statistics, and clinical outcomes.
+    3.  They can compare outcomes between intervention and control groups.
+    4.  They can export data for statistical analysis.
+
+## 9. Study Coordinators/PIs (e.g., Eva Swinnen, Mahyar Firouzi as per DMP)
+
+- **Workflow:**
+    1.  The study coordinator oversees trial progress across all sites.
+    2.  They manage randomization and monitor recruitment.
+    3.  They ensure data quality and integrity.
+    4.  They ensure adherence to the DMP.
+
+## 10. Data Managers (e.g., Carlos Cevallos Barragan as per DMP)
+
+- **Workflow:**
+    1.  The data manager performs data cleaning and quality checks.
+    2.  They ensure compliance with data documentation (READMEs, codebooks).
+    3.  They prepare datasets for analysis. 

@@ -8,7 +8,5 @@ export default defineConfig({
     react(),
     tsconfigPaths({ projects: ['./tsconfig.app.json'] })
   ],
-  optimizeDeps: {
-    exclude: ['lucide-react'],
-  },
+  // Removed lucide-react exclusion to prevent content blocker issues
 });

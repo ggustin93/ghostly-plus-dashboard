@@ -10,7 +10,6 @@ import {
   TableHeader, 
   TableRow 
 } from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
 import { 
   EyeIcon, 
   Search, 
@@ -150,12 +149,6 @@ const PatientList = ({ patients, showViewAllButton = true }: PatientListProps) =
                   <ArrowUpDown className="h-3 w-3" />
                 </div>
               </TableHead>
-              <TableHead className="cursor-pointer" onClick={() => toggleSort('studyArm' as keyof Patient)}>
-                <div className="flex items-center gap-1 pl-2.5">
-                  Study Arm
-                  <ArrowUpDown className="h-3 w-3" />
-                </div>
-              </TableHead>
               <TableHead className="cursor-pointer" onClick={() => toggleSort('lastSession')}>
                 <div className="flex items-center gap-1 pl-2.5">
                   Last Session
@@ -184,25 +177,6 @@ const PatientList = ({ patients, showViewAllButton = true }: PatientListProps) =
                     <TableCell className="text-left pl-5 justify-center">{patient.id}</TableCell>
                     <TableCell className="text-left pl-5 justify-center">{patient.name}</TableCell>
                     <TableCell className="pl-5 text-left">
-                      {patient.studyArm === 'Intervention' ? (
-                        <Badge className="bg-blue-100 text-blue-700 dark:bg-blue-700 dark:text-blue-100 border-blue-300 dark:border-blue-600" variant="static">
-                          Intervention
-                        </Badge>
-                      ) : patient.studyArm === 'Control' ? (
-                        <Badge className="bg-orange-100 text-orange-700 dark:bg-orange-700 dark:text-orange-100 border-orange-300 dark:border-orange-600" variant="static">
-                          Control
-                        </Badge>
-                      ) : patient.studyArm === 'Ghostly' ? (
-                        <Badge className="bg-purple-100 text-purple-700 dark:bg-purple-700 dark:text-purple-100 border-purple-300 dark:border-purple-600" variant="static">
-                          Ghostly
-                        </Badge>
-                      ) : (
-                        <Badge variant={"outline"}>
-                          {patient.studyArm || 'N/A'}
-                        </Badge>
-                      )}
-                    </TableCell>
-                    <TableCell className="pl-5 text-left">
                       {patient.lastSession ? new Date(patient.lastSession).toLocaleDateString() : 'N/A'}
                     </TableCell>
                     <TableCell className="text-right">
@@ -222,7 +196,7 @@ const PatientList = ({ patients, showViewAllButton = true }: PatientListProps) =
               })
             ) : (
               <TableRow>
-                <TableCell colSpan={6} className="h-16 text-center">
+                <TableCell colSpan={5} className="h-16 text-center">
                   No patients found.
                 </TableCell>
               </TableRow>

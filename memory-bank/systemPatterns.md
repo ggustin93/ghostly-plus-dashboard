@@ -485,19 +485,90 @@ We considered creating a dedicated `Roles` table and a `UserRoles` join table. W
 
 **Verdict**: The use of `raw_user_meta_data` is the cleaner, more performant, and more idiomatic approach within the Supabase ecosystem for this project's specific needs.
 
-### 10.2. API Security
+##### 10.1.1.2. Management of Roles
 
-- **Input Validation**: Using Pydantic schemas for request validation
-- **CORS Configuration**: Restricting cross-origin requests
-- **Rate Limiting**: Preventing abuse through request rate limiting (future implementation)
+-   **Manual (Development/Initial Setup):** During development, roles can be set manually via the Supabase Studio SQL Editor by updating the `raw_user_meta_data` field for a specific user ID. This is suitable for developers but not for end-users.
+-   **Programmatic (Production):** For production, user roles must be managed via a dedicated, secure administrative interface. An administrator with the 'admin' role should be able to change another user's role via a UI. This action must trigger a call to a secure backend endpoint (e.g., a FastAPI route or a Supabase Edge Function) that uses the `service_role` key to perform the update. Direct client-side updates of other users' metadata are not and should not be possible.
 
-### 10.3. Data Security
+#### 10.1.2. Data Access Policies
 
-- **Data Encryption**: Sensitive data encrypted at rest
-- **Pseudonymization**: Patient identifiers pseudonymized
-- **Access Logging**: Logging access to sensitive data
+-   **Row-Level Security (RLS):** RLS is enabled on all tables containing sensitive or user-specific data. Policies are written to restrict access based on the user's ID (`auth.uid()`) and their role (`auth.jwt() ->> 'role'`).
 
-## 11. Data Flow Architecture
+### 10.2. C3D File Storage and Naming Convention
+
+A hybrid approach of subfolders and a clear naming convention is used to ensure security, organization, and scalability for C3D files stored in the `ghostly-c3d-files` bucket.
+
+#### 10.2.1. Folder Structure (Security & Organization)
+
+The folder structure is critical as it is directly tied to the Row-Level Security policies. The policies work by checking the top-level folder name against the `pseudo_id` of patients assigned to the therapist.
+
+The definitive folder structure is a two-level hierarchy:
+
+```
+/<patient_pseudo_id>/<rehab_session_timestamp>_<rehab_session_id>/
+```
+
+-   **`<patient_pseudo_id>`**: The human-readable ID of the patient (e.g., `P001`). This is the primary security boundary.
+-   **`<rehab_session_timestamp>_<rehab_session_id>`**: The folder for a specific rehabilitation session.
+    -   It is prefixed with a timestamp (e.g., `20250611T143000`) to make it human-readable and chronologically sortable.
+    -   It includes the UUID of the rehabilitation session to guarantee uniqueness.
+
+**Example Path:** `/P001/20250611T143000_c7a5f8e1-b3d4-4c2a-a8f7-9e6d5b4c3a2b/`
+
+#### 10.2.2. File Naming (Traceability & Portability)
+
+Within the session folder, filenames should be both unique and self-describing. This is a deliberate choice to include redundant information in the filename to provide portable context, which is critical in a research environment where files may be exported or analyzed offline.
+
+While the folder path remains the absolute source of truth for security policies, the filename provides human-readable context.
+
+-   **Definitive Filename Convention:** `<patient_pseudo_id>_<timestamp>_<game_session_id>.c3d`
+    -   **`<patient_pseudo_id>`**: `P001`, `P002`, etc.
+    -   **`<timestamp>`**: An ISO 8601-like timestamp, e.g., `20250611T143000`. This ensures chronological sorting.
+    -   **`<game_session_id>`**: The UUID of the game session, ensuring the filename is unique.
+
+**Example Full Path:** `/P001/20250611T143000_c7a5f8e1-b3d4-4c2a-a8f7-9e6d5b4c3a2b/P001_20250611T143000_a1b2c3d4-e5f6-a7b8-c9d0-e1f2a3b4c5d6.c3d`
+
+This combined structure provides:
+-   **Ironclad Security:** Enforced at the patient level by RLS.
+-   **Logical Organization:** Groups files by patient and then by rehab session.
+-   **Data Integrity:** A direct link from the stored file back to the `GameSession` record in the database.
+-   **High Performance:** Efficient lookups using path prefixes.
+
+## 11. Backend Implementation Strategy: When to Use What
+
+For interacting with the database and implementing backend logic, multiple options are available, each suited to different scenarios:
+
+1.  **React Frontend + Supabase Client (`@supabase/js`):**
+    *   **When:** Simple data fetching/mutation directly tied to the UI, where operations respect user permissions defined by **Row Level Security (RLS)**.
+    *   **Examples:**
+    *   Displaying user-specific data (e.g., their profile, their assigned patients).
+    *   Basic CRUD operations on tables where RLS is configured properly.
+    *   *How:** Use Supabase client libraries (`@supabase/js`) in React components. Authentication is handled automatically via JWTs managed by the Supabase client. **NEVER use the `service_role` key here.**
+
+2.  **FastAPI Backend:**
+    *   **When:** Complex backend logic, data transformation, or operations that can't be handled by simple database queries or RLS.
+    *   **Examples:**  
+    *   Aggregating data from multiple sources.
+    *   Implementing business logic that requires multiple database operations.
+    *   Operations requiring service role level access.
+    *   **How:** Create FastAPI endpoints in the backend service, call them from React components. Authenticate via headers forwarded from the client.
+
+3.  **Supabase Edge Functions:**
+    *   **When:** Isolated operations requiring elevated privileges or when you need serverless execution.
+    *   **Examples:**
+    *   Admin operations requiring the `service_role` key.
+    *   Data transformation requiring access to sensitive fields before returning sanitized data.
+    *   **How:** Deploy serverless functions through Supabase that can use the `service_role` key safely. Call these from the React frontend when needed.
+
+4.  **Separate FastAPI Analytics Service (Future):**
+    *   **When:** Advanced Python-based analytics and machine learning that require specialized libraries or significant computational resources.
+    *   **Examples:**
+    *   Processing C3D files for movement analysis.
+    *   Running machine learning models.
+    *   Complex statistical analysis of patient data.
+    *   **How:** Deploy as a separate service that can be scaled independently, with its own authentication and resource allocation.
+
+## 12. Data Flow Architecture
 
 The GHOSTLY+ system follows a clear data flow pattern for capturing, storing, and analyzing quadriceps muscle data:
 
@@ -508,9 +579,9 @@ The GHOSTLY+ system follows a clear data flow pattern for capturing, storing, an
 5. **Data Analysis**: Web Dashboard visualizes data with appropriate access controls
 6. **Data Export**: Exports to SPSS-compatible formats for statistical analysis
 
-## 12. Visualization Patterns
+## 13. Visualization Patterns
 
-### 12.1. EMG Visualization
+### 13.1. EMG Visualization
 
 ```
 ┌─────────────────────────────────┐
@@ -532,7 +603,7 @@ The GHOSTLY+ system follows a clear data flow pattern for capturing, storing, an
 - Training protocol markers (sets, repetitions)
 - Comparison between left and right leg
 
-### 12.2. Muscle Heatmap Visualization
+### 13.2. Muscle Heatmap Visualization
 
 ```
 ┌─────────────────────────────────┐
@@ -542,7 +613,7 @@ The GHOSTLY+ system follows a clear data flow pattern for capturing, storing, an
 │    ╚═════════╝                  │
 │    ╔═════════╗                  │
 │    ║██████░░░║  ◄── Vastus      │
-│    ║███░░░░░░║      Lateralis   │
+│    ║███░░░░░║      Lateralis   │
 │    ╚═════════╝                  │
 │    ╔═════════╗                  │
 │    ║████░░░░░║  ◄── Vastus      │
@@ -561,7 +632,7 @@ The GHOSTLY+ system follows a clear data flow pattern for capturing, storing, an
 - Side-by-side comparison of left and right leg
 - Time-series visualization (baseline, 2-week, 6-week)
 
-### 12.3. Progress Tracking Visualization
+### 13.3. Progress Tracking Visualization
 
 ```
 ┌─────────────────────────────────┐
@@ -584,7 +655,7 @@ The GHOSTLY+ system follows a clear data flow pattern for capturing, storing, an
 - Baseline, 2-week, and 6-week measurements
 - Population-specific assessment visualizations
 
-### 12.4. Group Comparison Visualization
+### 13.4. Group Comparison Visualization
 
 ```
 ┌─────────────────────────────────┐
@@ -607,7 +678,7 @@ The GHOSTLY+ system follows a clear data flow pattern for capturing, storing, an
 - Error bars and significance indicators
 - Interactive filtering by timepoint
 
-## 13. Data Access Patterns
+## 14. Data Access Patterns
 
 Different user roles have different access patterns:
 
@@ -629,7 +700,7 @@ Different user roles have different access patterns:
    - Access audit logs
    - Monitor system health
 
-## 14. Integration Patterns
+## 15. Integration Patterns
 
 The system integrates with several external components:
 
@@ -640,7 +711,7 @@ The system integrates with several external components:
 5. **Ultrasound**: Viamo sv7 device captures muscle measurements
 6. **MicroFET**: Dynamometer for strength measurements
 
-## 15. Reporting Patterns
+## 16. Reporting Patterns
 
 Standard reports follow consistent patterns:
 
@@ -650,4 +721,46 @@ Standard reports follow consistent patterns:
 4. **Treatment Group Report**: Comparison between treatment arms
 5. **Export Report**: Formatted data for SPSS analysis
 6. **USE Questionnaire Report**: User experience analysis
+
+### Authentication and Authorization
+
+- **Initial Design**: Assumed therapist-led sessions.
+- **Current Design (as of 2024-06-25)**:
+    - **Patient Authentication (Game App):** The system must support two modes.
+        - **Normal Mode (Post-Trial):** Standard `email + password` model. This is the primary, long-term design.
+        - **Trial Mode:** Simplified login using a `PID + shared password` for ease of use.
+    - **Therapist/Researcher Authentication (Dashboard):**
+        - Standard `email + password` with RBAC. A self-signup workflow will be supported alongside admin creation.
+        - Role-based access control (RBAC) will be used to differentiate permissions (e.g., Admin, Therapist, Researcher).
+        - Password Management:** Therapists will have the ability to reset passwords for their assigned patients.
+
+### Data Flow
+
+The data flow must also be considered in two contexts:
+
+1.  **Patient Onboarding (Normal Mode)**:
+    - A therapist with appropriate permissions logs into the dashboard.
+    - They directly add a new patient by filling out a form with their details (e.g., Name, Email).
+    - The system creates a new patient record and credentials.
+
+2.  **Patient Onboarding (Trial Mode)**:
+    - An external system handles patient registration and pseudonymization.
+    - An administrator imports a mapping file (CSV) containing `Pseudo-ID -> Patient Details` into the dashboard. This populates a "pool" of available trial participants.
+    - A therapist logs into the dashboard, views this pool, and formally assigns their specific patients to their manageable cohort. The system links the pseudo-ID to the internal patient record.
+
+3.  **Game Session Data**:
+    - The patient logs into the game app (using either trial or normal credentials).
+    - The game app sends raw EMG data and game events to the backend API.
+    - The backend processes this data to calculate session metrics (adherence, compliance, etc.).
+    - Session data is stored in the database, linked to the patient's ID.
+
+3.  **Dashboard Data Display**:
+    - The therapist logs into the dashboard.
+    - The dashboard fetches data for the therapist's assigned patients **(intervention group only)**.
+    - For usability, the dashboard will always display the real patient identifiers (e.g., name) by referencing the internally stored mapping.
+
+### Backup and Recovery Strategy
+
+-   **Primary Backup**: A daily automated backup of the PostgreSQL database will be performed using `pg_dump`. These backups will be stored on the primary application VM.
+-   **Secondary (Redundant) Backup**: A strategy for off-site backups will be implemented to ensure disaster recovery. This will likely involve securely transferring the daily dumps to a cloud storage solution (e.g., Supabase storage, DigitalOcean Spaces).
 

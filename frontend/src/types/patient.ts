@@ -27,7 +27,6 @@ export interface Patient {
   // Clinical/Study Info
   room?: string; // From patients.ts
   status: 'active' | 'inactive' | 'discharged'; // From patients.ts (used in mock data & UI)
-  studyArm?: 'Intervention' | 'Control' | 'Ghostly' | string; // From patients.ts (used in mock data & UI)
   admissionDate?: string; // Made optional; consistent with patients.ts and UI handling
   diagnosis?: string; // From patients.ts
   medicalHistory?: string; // From patient.ts (made optional as not in mock)

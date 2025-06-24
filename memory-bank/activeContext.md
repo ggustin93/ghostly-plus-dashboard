@@ -128,30 +128,38 @@ The following points were recently raised to seek clarification from the project
         -   Measures displayed are now filtered to only show those with available mock data.
         -   Styling adjustments for alignment and readability.
         -   Unused imports and linter warnings addressed in both files.
+-   **Admin UI for User Management (Current Session):**
+    -   Based on the difficulty of manually editing user roles via Supabase Studio's UI or SQL, it has been decided that creating a dedicated user management interface for the Administrator persona is a necessary and high-priority feature.
+    -   This aligns with the Administrator's core responsibility of "managing user accounts" (`UX_UI_specifications.md`, A1).
+    -   The interface will allow admins to view all users and change their roles ('therapist', 'researcher', 'admin') through a simple UI, eliminating the need for technical intervention.
+    -   This feature will require a new protected frontend route (e.g., `/admin/users`) and a secure backend function that uses the Supabase Admin/Service Role to perform the updates, as client-side users cannot modify other users' metadata.
 
 ## Next Steps & Immediate Priorities:
 
-1.  **Resolve Vercel Path Aliasing Issue:**
+1.  **Implement Admin User Management Interface:**
+    -   **Backend:** Create a new FastAPI endpoint (e.g., `/admin/users/{user_id}/role`) that is protected and can only be accessed by authenticated users with the 'admin' role. This endpoint will use the Supabase Admin client to update the `raw_user_meta_data` of the target user. Another endpoint will be needed to list all users for the admin view.
+    -   **Frontend:** Create a new page/component at `/admin/users` that fetches and displays a list of all users. Provide UI controls (e.g., a dropdown) for an admin to change a user's role and trigger a call to the new backend endpoint. Ensure this route is protected by RBAC.
+2.  **Resolve Vercel Path Aliasing Issue:**
     -   Verify Vercel Project Settings: Ensure "Root Directory" is correctly set to `frontend`.
     -   Investigate Vercel build logs in detail for clues about path resolution or `tsconfig` usage.
     -   If `vite-tsconfig-paths` with explicit project path doesn't work, consider reverting `vite.config.ts` to use a very explicit `resolve.alias` structure like `alias: { '@/lib/': path.resolve(__dirname, 'src/lib/') }` for each major subdirectory under `src/` as a more forceful workaround, ensuring `path` is imported.
     -   Consider creating a minimal reproducible example to isolate the issue with Vercel/Vite/tsconfig paths.
-2.  **Align Development with Data Management Plan (DMP):**
+3.  **Align Development with Data Management Plan (DMP):**
     -   Thoroughly review all planned dashboard features related to data collection, storage, processing, visualization, and export against the specifications in `docs/00_PROJECT_DEFINITION/ressources/data_management_plan.md`.
     -   Ensure UI forms capture all necessary clinical variables (primary/secondary outcomes, medical history, etc.) as detailed in the DMP.
     -   Confirm that data storage solutions (Supabase operational DB, Pixiu for archiving, REDCap for clinical trial master data/archive) are correctly integrated or planned for, respecting the data flow outlined or implied in the DMP.
     -   Verify that all security, pseudonymization, consent management, and ethical requirements from the DMP are addressed in the design and implementation.
-3.  **Research Team Validation of UX Specifications:** Crucially, the updated `docs/00_PROJECT_DEFINITION/UX_UI_specifications.md` needs to be reviewed and validated by the GHOSTLY+ research team to confirm assumptions and clarify requirements before extensive implementation, ensuring it aligns with the DMP.
-4.  **Prioritize User Stories (MoSCoW):** Fill in the "Priority / Notes" column for all user stories (T1-T5, R1-R3, A1-A4) in `UX_UI_specifications.md` using MoSCoW or a similar framework, in collaboration with the research team if possible.
-5.  **Backend Development for Core Therapist Features:**
+4.  **Research Team Validation of UX Specifications:** Crucially, the updated `docs/00_PROJECT_DEFINITION/UX_UI_specifications.md` needs to be reviewed and validated by the GHOSTLY+ research team to confirm assumptions and clarify requirements before extensive implementation, ensuring it aligns with the DMP.
+5.  **Prioritize User Stories (MoSCoW):** Fill in the "Priority / Notes" column for all user stories (T1-T5, R1-R3, A1-A4) in `UX_UI_specifications.md` using MoSCoW or a similar framework, in collaboration with the research team if possible.
+6.  **Backend Development for Core Therapist Features:**
     -   Develop FastAPI endpoints to support T1-T3 functionalities, ensuring data is created/retrieved according to `database_schema_simplified_research.md` and aligns with data types defined in the DMP (e.g., creating/updating `Patient`, `RehabilitationSession`, `GameSession`, `ClinicalAssessment`, `ClinicalOutcomeMeasure` records).
     -   Implement logic for calculating and storing core sEMG metrics (e.g., RMS, MAV) into `EMGCalculatedMetric` based on C3D file processing or direct data streams, as per DMP outcomes.
     -   Implement logic for processing and storing game statistics into `GamePlayStatistic`.
-6.  **Frontend Development for Core Therapist Features:**
+7.  **Frontend Development for Core Therapist Features:**
     -   Build React components for Therapist views (T1: Dashboard/Patient List, T2: Patient Profile/Clinical Data Entry, T3: Session Management/Monitoring).
     -   Integrate these components with the new backend APIs.
     -   Focus on clear visualization of clinical data (all outcomes from DMP), sEMG metrics, and game stats.
-7.  **Refine Data Flow for Game Data:** Solidify how detailed game log data (beyond C3D, if necessary for WP2.3/WP2.4 metrics) will be transmitted from the game to the backend and stored (e.g., potentially new tables or extended fields in `GamePlayStatistic` or `GameSession`), ensuring it supports DMP defined outcomes.
+8.  **Refine Data Flow for Game Data:** Solidify how detailed game log data (beyond C3D, if necessary for WP2.3/WP2.4 metrics) will be transmitted from the game to the backend and stored (e.g., potentially new tables or extended fields in `GamePlayStatistic` or `GameSession`), ensuring it supports DMP defined outcomes.
 
 ## Key Patterns & Preferences Emerging:
 
@@ -387,7 +395,7 @@ The following points were recently raised to seek clarification from the project
 -   **Authentication architecture**: 
     - Three approaches attempted:
       1. Direct connection to Supabase services (bypassing Nginx)
-      2. Nginx proxy with explicit header management (removing Authorization header)
+      2. Nginx proxy with properly configured header management (removing Authorization header)
       3. Custom fetch implementation that bypasses Supabase client's internal header management
     - Custom fetch approach gives complete control over headers and appears to be the most reliable solution
 -   **C3D file processing and EMG analysis**:
@@ -538,9 +546,80 @@ We are currently working on **fixing API endpoint routing and file upload functi
    - Document required payload formats and response structures
    - Add example requests and responses
 
+5. **Implement Admin User Management Interface:**
+    -   **Backend:** Create a new FastAPI endpoint (e.g., `/admin/users/{user_id}/role`) that is protected and can only be accessed by authenticated users with the 'admin' role. This endpoint will use the Supabase Admin client to update the `raw_user_meta_data` of the target user. Another endpoint will be needed to list all users for the admin view.
+    -   **Frontend:** Create a new page/component at `/admin/users` that fetches and displays a list of all users. Provide UI controls (e.g., a dropdown) for an admin to change a user's role and trigger a call to the new backend endpoint. Ensure this route is protected by RBAC.
+
 ## Learnings & Project Insights
 
 - **API Path Consistency**: The importance of consistent API path structures between frontend, nginx configuration, and backend routes
 - **Docker Multi-Stage Builds**: For complex scientific Python libraries, multi-stage builds can separate compilation environments from runtime
 - **Dependency Management**: Scientific Python libraries often require careful management of system dependencies beyond what Poetry installs
 - **Nginx Configuration**: Subtle differences in location blocks (e.g., `/api` vs `/api/`) can have significant impacts on request routing 
+
+- Patients are expected to be autonomous in using the GHOSTLY+ system.
+- Therapists will assist with initial setup and training but not with every session.
+
+### Next Steps & Key Decisions (as of 2024-06-25)
+
+This section summarizes the most recent decisions that will guide the next development cycle.
+
+**1. Authentication & User Management:**
+
+-   **Patient Login (Trial):** Implement a simple login for patients using their `PID` and a generic password (e.g., `ghostly2025`).
+-   **Patient Login (Post-Trial):** Plan for a standard `email + password` authentication system.
+-   **Therapist Patient Management:** Therapists must be able to manage their patients, including updating passwords if necessary.
+-   **Therapist/Researcher Accounts:** Support both admin-led creation of accounts and a self-registration flow.
+-   **Patient Onboarding:** Therapists are responsible for adding their own patients into the system.
+
+**2. Data Handling & Display:**
+
+-   **Pseudonymization:** This will be handled by an external system. The dashboard needs a feature for an admin to import the mapping table (e.g., CSV).
+-   **Therapist View:** Therapists **will see identifiable patient data** (e.g., full names) in the dashboard to ensure practical usability during the trial.
+-   **Patient Profile:** The "Clinical Assessments" feature will be **removed**. Data entry for this will be handled exclusively in REDCap.
+-   **Dashboard Scope:** The dashboard must display data for **only the intervention group**. It will not handle patients from the control group.
+
+**3. Session & Scheduling:**
+
+-   **Session Autonomy:** Sessions are **fully patient-led**. Therapists do not pre-schedule them.
+-   **Calendar View:** The calendar on the dashboard will function as a **historical log of recent sessions (e.g., last 7 days)**, not a tool for future scheduling.
+-   **In-App Guidance:** The game must include a guide to help patients with login, MVC calibration, and BFR cuff application.
+
+**4. Metrics & Compliance:**
+
+-   **Adherence/Compliance Algorithm:** The definition for a "good contraction" needs to be finalized. This will involve capturing more detailed data during gameplay (e.g., contraction duration, time to reach target MVC, RPE). The current game score is insufficient.
+-   **Therapist Intervention Protocol:** This is TBD. For now, metrics are for monitoring purposes.
+
+**5. Technical & Infrastructure:**
+
+-   **BFR Data Fallback:** Implement a feature for therapists to **manually enter BFR parameters** in case the direct sensor integration is not possible.
+-   **Backup Strategy:**
+    -   Primary: Daily `pg_dump` on the primary VM.
+    -   Secondary: Plan for a redundant backup solution (e.g., on a separate cloud provider like Supabase/DigitalOcean).
+-   **Dashboard Licensing:** This is a future decision point (MIT, Apache 2.0, or GPLv3 are considerations).
+
+**4. Core Design Philosophy: Product-First, Trial-Compatible**
+
+-   The `Dashboard + Game` is a single product.
+-   Features should be designed for long-term, real-world clinical use first.
+-   The system must then be adaptable to work within the specific constraints of the trial (e.g., pseudonymization, simplified login). This might mean having a "Trial Mode" vs. a "Normal Mode" for certain features.
+
+**5. Session & Scheduling:**
+
+-   **Therapist Intervention Protocol:** This is TBD. For now, metrics are for monitoring purposes.
+
+**6. Technical & Infrastructure:**
+
+-   **BFR Data Fallback:** Implement a feature for therapists to **manually enter BFR parameters** in case the direct sensor integration is not possible.
+-   **Backup Strategy:**
+    -   Primary: Daily `pg_dump` on the primary VM.
+    -   Secondary: Plan for a redundant backup solution (e.g., on a separate cloud provider like Supabase/DigitalOcean).
+-   **Dashboard Licensing:** This is a future decision point (MIT, Apache 2.0, or GPLv3 are considerations).
+
+### Open Questions & Action Items:
+
+-   **[HIGH]** Define the precise algorithm for calculating "compliance" and what constitutes a "good contraction." (Meeting with Margreet pending).
+-   **[MEDIUM]** Design the UI/UX for the admin feature to import the pseudonymization mapping file.
+-   **[MEDIUM]** Design the UI/UX for the therapist's patient management interface.
+-   **[LOW]** Finalize the choice of license for the dashboard software.
+-   **[LOW]** Refine the technical plan for secondary backups. 
