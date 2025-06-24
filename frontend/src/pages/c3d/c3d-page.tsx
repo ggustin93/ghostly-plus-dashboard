@@ -16,6 +16,7 @@ import { EyeIcon, Search, ChevronLeft, ChevronRight } from 'lucide-react';
 import { c3dFiles, C3DFile } from '@/data/c3d-files-data';
 import PageHeader from '@/components/ui/page-header';
 import { Card, CardHeader, CardContent } from '@/components/ui/card';
+import { formatDate } from '@/lib/utils';
 
 // Color palette for patient avatars
 const avatarColorPalette = [
@@ -57,15 +58,6 @@ const getAvatarColor = (id: string) => {
   }
   const index = Math.abs(hash) % avatarColorPalette.length;
   return avatarColorPalette[index];
-};
-
-// Helper function to format date
-const formatDate = (dateString: string) => {
-  try {
-    return new Date(dateString).toLocaleDateString();
-  } catch {
-    return 'Invalid Date';
-  }
 };
 
 // View Button Component

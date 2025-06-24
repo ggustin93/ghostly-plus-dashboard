@@ -11,7 +11,6 @@ import {
   Home,
   BarChart,
   X,
-  FileText,
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -44,11 +43,11 @@ const Sidebar = ({ open, setOpen }: SidebarProps) => {
         href: '/sessions',
         icon: <ListChecks className="h-5 w-5" />,
       },
-      {
-        name: 'C3D Files',
-        href: '/c3d',
-        icon: <FileText className="h-5 w-5" />,
-      },
+      // {
+      //   name: 'C3D Files',
+      //   href: '/c3d',
+      //   icon: <FileText className="h-5 w-5" />,
+      // },
       {
         name: 'Reports',
         href: '/reports/progress',

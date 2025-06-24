@@ -133,6 +133,19 @@ The following points were recently raised to seek clarification from the project
     -   This aligns with the Administrator's core responsibility of "managing user accounts" (`UX_UI_specifications.md`, A1).
     -   The interface will allow admins to view all users and change their roles ('therapist', 'researcher', 'admin') through a simple UI, eliminating the need for technical intervention.
     -   This feature will require a new protected frontend route (e.g., `/admin/users`) and a secure backend function that uses the Supabase Admin/Service Role to perform the updates, as client-side users cannot modify other users' metadata.
+-   **Patient Profile & Progress Tracking Refinement (Current Session):**
+    -   **Metrics Definition:** Clarified and documented the definitions for core patient metrics:
+        -   **Adherence:** Ratio of completed vs. prescribed sessions.
+        -   **Game Performance Score:** Replaced the ambiguous "Compliance" metric. This score reflects in-session performance and effort.
+        -   **Perceived Exertion (RPE):** Added as a key subjective metric.
+        -   **Fatigue:** Remains an objective sEMG-derived metric.
+    -   **Data Model Update:**
+        -   The `Patient` type in `frontend/src/types/patient.ts` was updated. `complianceHistory` was renamed to `gamePerformanceHistory`, and new fields for `rpeHistory` and `progress` status were added.
+        -   The mock patient data in `frontend/src/data/patients-data.ts` was enhanced to include static values for `adherence` and `progress` to populate the main patient list view.
+    -   **UI Overhaul for Charts:**
+        -   The `ProgressTrackingCharts` component was completely redesigned for a more professional and informative presentation.
+        -   A reusable `ChartCard` component was created with standardized styling, icons, descriptions, and support for reference lines.
+        -   The UI now displays four charts: "Game Performance Score," "Adherence History," "Fatigue History," and "Perceived Exertion (RPE)."
 
 ## Next Steps & Immediate Priorities:
 

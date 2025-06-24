@@ -27,19 +27,19 @@ export interface Patient {
   // Clinical/Study Info
   room?: string; // From patients.ts
   status: 'active' | 'inactive' | 'discharged'; // From patients.ts (used in mock data & UI)
-  admissionDate?: string; // Made optional; consistent with patients.ts and UI handling
-  diagnosis?: string; // From patients.ts
-  medicalHistory?: string; // From patient.ts (made optional as not in mock)
+  admissionDate: string; // Made optional; consistent with patients.ts and UI handling
+  dischargeDate?: string; // Made optional; consistent with patients.ts and UI handling
+  diagnosis: string; // From patients.ts
+  mobility?: string; // From patients.ts
   mmseScore?: number; // From patient.ts (made optional as not in mock)
 
   // Functional Status
-  mobility?: string; // From patients.ts
   cognitiveStatus?: string; // From patients.ts
 
   // Activity/Engagement
   lastSession?: string; // From patients.ts (used in mock data)
-  compliance?: string; // From patients.ts
-  progress?: string; // From patients.ts
+  nextSession?: string; // Made optional; consistent with patients.ts and UI handling
+  therapistId: string; // Made optional; consistent with patients.ts and UI handling
 
   // App-specific / Detailed clinical data (from patient.ts, made optional as not in current mock data)
   assignedTherapist?: string;
@@ -47,4 +47,12 @@ export interface Patient {
   notes?: PatientNote[];
   alerts?: string[];
   avatar?: string; // From patients.ts
+  adherence?: number; // Example: 95
+  progress?: 'Improving' | 'Declining' | 'Steady' | 'Mixed';
+
+  // Add history arrays for the new charts
+  adherenceHistory?: { date: string; value: number }[];
+  gamePerformanceHistory?: { date: string; value: number }[];
+  fatigueHistory?: { date: string; value: number }[];
+  rpeHistory?: { date: string; value: number }[];
 }

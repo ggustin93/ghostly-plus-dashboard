@@ -66,16 +66,6 @@ const Header = ({ openSidebar }: HeaderProps) => {
     return (typedUser as AppUser).email as string | undefined;
   };
 
-  const getWelcomeMessage = () => {
-    const displayName = getUserDisplayName();
-    if (!displayName) return t('welcome.back');
-    
-    if (displayName.toLowerCase().startsWith('dr.') || displayName.toLowerCase().startsWith('doctor')) {
-      return `${t('welcome.back')}, ${displayName}`;
-    }
-    return `${t('welcome.back')}, Dr. ${displayName.split(' ')[0]}`;
-  };
-
   const getUserInitials = () => {
     const displayName = getUserDisplayName();
     if (!displayName) return 'U';
@@ -108,9 +98,6 @@ const Header = ({ openSidebar }: HeaderProps) => {
           </span>
         </Button>
         
-        <div className="hidden lg:block">
-          <span className="text-lg font-medium text-foreground tracking-tight">{getWelcomeMessage()}</span>
-        </div>
       </div>
 
       <div className="flex items-center gap-4">

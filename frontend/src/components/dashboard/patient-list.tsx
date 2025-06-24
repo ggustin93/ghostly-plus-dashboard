@@ -13,10 +13,15 @@ import {
 import { 
   EyeIcon, 
   Search, 
-  ArrowUpDown 
+  ArrowUpDown,
+  ArrowUp,
+  ArrowDown,
+  Minus
 } from 'lucide-react';
 import { Patient } from '@/types/patient';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
+import { formatDate } from '@/lib/utils';
 
 interface PatientListProps {
   patients: Patient[];
@@ -155,6 +160,18 @@ const PatientList = ({ patients, showViewAllButton = true }: PatientListProps) =
                   <ArrowUpDown className="h-3 w-3" />
                 </div>
               </TableHead>
+              <TableHead className="cursor-pointer" onClick={() => toggleSort('adherence')}>
+                <div className="flex items-center gap-1 pl-2.5">
+                  Adherence
+                  <ArrowUpDown className="h-3 w-3" />
+                </div>
+              </TableHead>
+              <TableHead className="cursor-pointer" onClick={() => toggleSort('progress')}>
+                <div className="flex items-center gap-1 pl-2.5">
+                  Progress
+                  <ArrowUpDown className="h-3 w-3" />
+                </div>
+              </TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -177,7 +194,43 @@ const PatientList = ({ patients, showViewAllButton = true }: PatientListProps) =
                     <TableCell className="text-left pl-5 justify-center">{patient.id}</TableCell>
                     <TableCell className="text-left pl-5 justify-center">{patient.name}</TableCell>
                     <TableCell className="pl-5 text-left">
-                      {patient.lastSession ? new Date(patient.lastSession).toLocaleDateString() : 'N/A'}
+                      {patient.lastSession ? formatDate(patient.lastSession) : 'N/A'}
+                    </TableCell>
+                    <TableCell>
+                      {patient.adherence !== undefined ? (
+                        <Badge 
+                          variant="outline"
+                          className={
+                            patient.adherence > 85 ? 'bg-green-100 text-green-700' :
+                            patient.adherence > 60 ? 'bg-yellow-100 text-yellow-700' :
+                            'bg-red-100 text-red-700'
+                          }
+                        >
+                          {patient.adherence}%
+                        </Badge>
+                      ) : (
+                        'N/A'
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      {patient.progress ? (
+                        <div className="flex items-center gap-2">
+                          {patient.progress === 'improving' && <ArrowUp className="h-4 w-4 text-green-500" />}
+                          {patient.progress === 'steady' && <Minus className="h-4 w-4 text-gray-500" />}
+                          {patient.progress === 'declining' && <ArrowDown className="h-4 w-4 text-red-500" />}
+                          <Badge 
+                            variant="secondary"
+                            className={
+                              patient.progress === 'improving' ? 'bg-green-100 text-green-700' :
+                              patient.progress === 'declining' ? 'bg-red-100 text-red-700' : ''
+                            }
+                          >
+                            {patient.progress}
+                          </Badge>
+                        </div>
+                      ) : (
+                        'N/A'
+                      )}
                     </TableCell>
                     <TableCell className="text-right">
                       <Button 
@@ -196,7 +249,7 @@ const PatientList = ({ patients, showViewAllButton = true }: PatientListProps) =
               })
             ) : (
               <TableRow>
-                <TableCell colSpan={5} className="h-16 text-center">
+                <TableCell colSpan={7} className="h-16 text-center">
                   No patients found.
                 </TableCell>
               </TableRow>

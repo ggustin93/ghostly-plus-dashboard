@@ -70,7 +70,6 @@ export interface BFRParameters {
     patientId: string;
     date: string;
     therapistId: string;
-    status: 'scheduled' | 'completed' | 'cancelled' | 'in-progress';
     type?: string; // Type of rehabilitation session, e.g., 'Strength Training (BFR)', 'Endurance Training'
     gameSessions: GameSession[];
     notes?: string;
@@ -83,6 +82,7 @@ export interface BFRParameters {
       adherence?: number; // Overall adherence to the prescribed session
       // Add other summary metrics as needed
     };
+    duration: number; // in minutes
   }
 
   // Interface for session items, typically used in lists (from former sessions.ts)
@@ -95,7 +95,6 @@ export interface BFRParameters {
     isBFR?: boolean; // New property for BFR status
     duration: number;  // in minutes
     difficulty?: number; // Kept for now, though not displayed in schedule
-    status: 'scheduled' | 'completed' | 'cancelled';
     performance?: string; // percentage completion
     linkState?: { from: string }; // For navigation state tracking
   }

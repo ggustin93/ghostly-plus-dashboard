@@ -26,7 +26,6 @@ const mockSessionListItems: SessionListItem[] = [
     isBFR: false,     
     duration: 25,     
     difficulty: 4,    
-    status: 'scheduled',
   },
   {
     id: 'P001-S02',
@@ -37,8 +36,6 @@ const mockSessionListItems: SessionListItem[] = [
     isBFR: false,     
     duration: 25,     
     difficulty: 3,    
-    status: 'completed',
-    performance: '85%', 
   },
   {
     id: 'P002-S01',
@@ -49,8 +46,6 @@ const mockSessionListItems: SessionListItem[] = [
     isBFR: true,      
     duration: 30,     
     difficulty: 4,    
-    status: 'completed',
-    performance: '92%', 
   },
   {
     id: 'P003-S01',
@@ -61,7 +56,6 @@ const mockSessionListItems: SessionListItem[] = [
     isBFR: false,      
     duration: 20,      
     difficulty: 2,     
-    status: 'scheduled',
   },
   {
     id: 'P004-S01', 
@@ -72,7 +66,6 @@ const mockSessionListItems: SessionListItem[] = [
     isBFR: false,      
     duration: 30,      
     difficulty: 2,     
-    status: 'cancelled',
   },
   {
     id: 'P005-S01',
@@ -83,7 +76,6 @@ const mockSessionListItems: SessionListItem[] = [
     isBFR: true,      
     duration: 35,      
     difficulty: 3,     
-    status: 'scheduled',
   },
   {
     id: 'P006-S01',
@@ -94,8 +86,6 @@ const mockSessionListItems: SessionListItem[] = [
     isBFR: false,      
     duration: 40,      
     difficulty: 2,     
-    status: 'completed',
-    performance: '78%', 
   },
   {
     id: 'P007-S01',
@@ -106,8 +96,6 @@ const mockSessionListItems: SessionListItem[] = [
     isBFR: true,      
     duration: 45,      
     difficulty: 3,     
-    status: 'completed',
-    performance: '88%', 
   },
   {
     id: 'P008-S01',
@@ -118,7 +106,6 @@ const mockSessionListItems: SessionListItem[] = [
     isBFR: false,      
     duration: 30,      
     difficulty: 1,     
-    status: 'cancelled',
   },
   {
     id: 'P009-S01',
@@ -129,8 +116,6 @@ const mockSessionListItems: SessionListItem[] = [
     isBFR: true,      
     duration: 35,      
     difficulty: 4,     
-    status: 'completed',
-    performance: '91%', 
   },
   {
     id: 'P010-S01',
@@ -141,7 +126,6 @@ const mockSessionListItems: SessionListItem[] = [
     isBFR: false,      
     duration: 25,      
     difficulty: 2,     
-    status: 'cancelled',
   }
 ];
 

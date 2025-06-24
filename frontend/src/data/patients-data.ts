@@ -1,121 +1,133 @@
 import { Patient } from '@/types/patient';
 
+const generateChartData = (startDate: string, numPoints: number, startValue: number, trend: 'up' | 'down' | 'flat' | 'mixed' = 'up', scale: number = 5) => {
+  const data: { date: string; value: number }[] = [];
+  const currentDate = new Date(startDate);
+  let currentValue = startValue;
+
+  for (let i = 0; i < numPoints; i++) {
+    data.push({
+      date: currentDate.toISOString().split('T')[0],
+      value: Math.round(currentValue),
+    });
+
+    let change = (Math.random() - 0.4) * scale; // Tendency to increase
+    if (trend === 'down') {
+      change = (Math.random() - 0.6) * scale; // Tendency to decrease
+    } else if (trend === 'flat') {
+      change = (Math.random() - 0.5) * scale;
+    } else if (trend === 'mixed') {
+       if (i % 4 < 2) {
+         change = (Math.random() - 0.4) * scale;
+       } else {
+         change = (Math.random() - 0.6) * scale;
+       }
+    }
+    
+    currentValue += change;
+    currentValue = Math.max(0, Math.min(100, currentValue)); // Clamp between 0 and 100
+
+    currentDate.setDate(currentDate.getDate() + (Math.floor(Math.random() * 3) + 2)); // next session in 2-4 days
+  }
+  return data;
+}
+
+const getProgressStatus = (trend: 'up' | 'down' | 'flat' | 'mixed'): 'Improving' | 'Declining' | 'Steady' | 'Mixed' => {
+  switch (trend) {
+    case 'up': return 'Improving';
+    case 'down': return 'Declining';
+    case 'flat': return 'Steady';
+    default: return 'Mixed';
+  }
+};
+
 export const mockPatients: Patient[] = [
-  // P001: Eleanor Thompson (merged with details from former ID '1' John Doe)
+  // P001: Eleanor Thompson
   {
     id: 'P001',
-    name: 'Eleanor Thompson', // From mock-data
-    age: 78, // From mock-data
-    gender: 'Female', // From mock-data
-    dateOfBirth: '1950-05-15', // From patients-data (John Doe)
-    studyArm: 'Intervention', // Consistent
-    admissionDate: '2025-05-15', // From mock-data (Eleanor)
-    room: '302', // From mock-data
-    status: 'active', // Consistent
-    lastSession: '2025-06-15', // From mock-data (Eleanor)
-    diagnosis: 'Postoperative weakness', // From mock-data
-    mobility: 'Limited with walker', // From mock-data
-    cognitiveStatus: 'Alert and oriented', // From mock-data
-    compliance: 'Good', // From mock-data
-    progress: 'Improving', // From mock-data
-    mmseScore: 26, // From patients-data (John Doe)
-    assignedTherapist: '1', // From patients-data (John Doe)
-    assessments: [
-      { id: 'a1', type: 'MicroFET', value: 65, date: '2025-01-12', assessmentPoint: 'T0', notes: 'Initial assessment' },
-      { id: 'a2', type: 'Ultrasound', value: 2.3, date: '2025-01-12', assessmentPoint: 'T0' },
-      { id: 'a3', type: 'SitToStand', value: 7, date: '2025-01-12', assessmentPoint: 'T0', notes: 'Needed assistance' }
-    ], // From patients-data (John Doe)
-    notes: [
-      { id: 'n1', content: 'Patient shows good motivation for therapy', createdAt: '2025-01-15T10:20:00Z', createdBy: 'Dr. Sarah Johnson' }
-    ], // From patients-data (John Doe)
-    alerts: ['Assessment T1 due', 'Declining EMG metrics'] // From patients-data (John Doe)
+    name: 'Eleanor Thompson',
+    age: 78,
+    gender: 'Female',
+    admissionDate: '2025-05-15',
+    room: '302',
+    status: 'active',
+    lastSession: '2025-06-15',
+    diagnosis: 'Postoperative weakness',
+    mobility: 'Limited with walker',
+    cognitiveStatus: 'Alert and oriented',
+    therapistId: 'T001',
+    adherence: 92,
+    progress: getProgressStatus('up'),
+    adherenceHistory: generateChartData('2025-05-16', 7, 70, 'up', 5),
+    gamePerformanceHistory: generateChartData('2025-05-16', 7, 60, 'up', 8),
+    fatigueHistory: generateChartData('2025-05-16', 7, 40, 'down', 8),
+    rpeHistory: generateChartData('2025-05-16', 7, 7, 'down', 2),
   },
-  // P002: Robert Chen (merged with details from former ID '2' Maria Garcia)
+  // P002: Robert Chen
   {
     id: 'P002',
-    name: 'Robert Chen', // From mock-data
-    age: 82, // From mock-data
-    gender: 'Male', // From mock-data
-    dateOfBirth: '1947-11-23', // From patients-data (Maria Garcia)
-    studyArm: 'Intervention', // Updated from Control to Intervention
-    admissionDate: '2025-05-20', // From mock-data (Robert)
-    room: '310', // From mock-data
-    status: 'active', // Consistent
-    lastSession: '2025-06-14', // From mock-data (Robert)
-    diagnosis: 'Deconditioning', // From mock-data
-    mobility: 'Wheelchair dependent', // From mock-data
-    cognitiveStatus: 'Mild cognitive impairment', // From mock-data
-    compliance: 'Excellent', // From mock-data
-    progress: 'Steady', // From mock-data
-    mmseScore: 28, // From patients-data (Maria Garcia)
-    assignedTherapist: '1', // From patients-data (Maria Garcia)
-    assessments: [
-      { id: 'a4', type: 'MicroFET', value: 58, date: '2025-02-07', assessmentPoint: 'T0' },
-      { id: 'a5', type: 'Ultrasound', value: 2.1, date: '2025-02-07', assessmentPoint: 'T0' },
-      { id: 'a6', type: 'SitToStand', value: 8, date: '2025-02-07', assessmentPoint: 'T0' }
-    ], // From patients-data (Maria Garcia)
-    notes: [
-      { id: 'n2', content: 'Patient expressed concern about leg weakness', createdAt: '2025-02-10T14:30:00Z', createdBy: 'Dr. Sarah Johnson' }
-    ] // From patients-data (Maria Garcia)
+    name: 'Robert Chen',
+    age: 82,
+    gender: 'Male',
+    admissionDate: '2025-05-20',
+    room: '310',
+    status: 'active',
+    lastSession: '2025-06-14',
+    diagnosis: 'Deconditioning',
+    mobility: 'Wheelchair dependent',
+    cognitiveStatus: 'Mild cognitive impairment',
+    therapistId: 'T001',
+    adherence: 75,
+    progress: getProgressStatus('mixed'),
+    adherenceHistory: generateChartData('2025-05-21', 6, 65, 'flat', 4),
+    gamePerformanceHistory: generateChartData('2025-05-21', 6, 50, 'mixed', 10),
+    fatigueHistory: generateChartData('2025-05-21', 6, 50, 'mixed', 10),
+    rpeHistory: generateChartData('2025-05-21', 6, 8, 'flat', 2),
   },
-  // P003: Mildred Jackson (merged with details from former ID '3' Robert Chen)
+  // P003: Mildred Jackson
   {
     id: 'P003',
-    name: 'Mildred Jackson', // From mock-data
-    age: 75, // From mock-data
-    gender: 'Female', // From mock-data
-    dateOfBirth: '1955-08-30', // From patients-data (Robert Chen ID 3)
-    studyArm: 'Intervention', // From mock-data (Mildred) vs Control (Robert Chen ID 3) - taking Mildred's
-    admissionDate: '2025-05-28', // From mock-data (Mildred)
-    room: '315', // From mock-data
-    status: 'active', // Consistent
-    lastSession: '2025-06-13', // From mock-data (Mildred)
-    diagnosis: 'Post-stroke', // From mock-data
-    mobility: 'Requires assistance', // From mock-data
-    cognitiveStatus: 'Alert and oriented', // From mock-data
-    compliance: 'Good', // From mock-data
-    progress: 'Improving', // From mock-data
-    mmseScore: 25, // From patients-data (Robert Chen ID 3)
-    assignedTherapist: '1', // From patients-data (Robert Chen ID 3)
-    assessments: [
-      { id: 'a7', type: 'MicroFET', value: 70, date: '2025-01-22', assessmentPoint: 'T0' },
-      { id: 'a8', type: 'Ultrasound', value: 2.5, date: '2025-01-22', assessmentPoint: 'T0' },
-      { id: 'a9', type: 'SitToStand', value: 10, date: '2025-01-22', assessmentPoint: 'T0' },
-      { id: 'a10', type: 'MicroFET', value: 72, date: '2025-03-22', assessmentPoint: 'T1', notes: 'Showing improvement' }
-    ], // From patients-data (Robert Chen ID 3)
-    notes: [
-      { id: 'n3', content: 'Patient adapting well to therapy regimen', createdAt: '2025-02-01T11:20:00Z', createdBy: 'Dr. Sarah Johnson' }
-    ] // From patients-data (Robert Chen ID 3)
+    name: 'Mildred Jackson',
+    age: 75,
+    gender: 'Female',
+    admissionDate: '2025-05-28',
+    room: '315',
+    status: 'active',
+    lastSession: '2025-06-13',
+    diagnosis: 'Post-stroke',
+    mobility: 'Requires assistance',
+    cognitiveStatus: 'Alert and oriented',
+    therapistId: 'T001',
+    adherence: 95,
+    progress: getProgressStatus('up'),
+    adherenceHistory: generateChartData('2025-05-29', 5, 80, 'up', 6),
+    gamePerformanceHistory: generateChartData('2025-05-29', 5, 70, 'up', 7),
+    fatigueHistory: generateChartData('2025-05-29', 5, 30, 'down', 5),
+    rpeHistory: generateChartData('2025-05-29', 5, 5, 'down', 1),
   },
-  // P004: Thomas Rivera (merged with details from former ID '4' Emily Wilson)
+  // P004: Thomas Rivera
   {
     id: 'P004',
-    name: 'Thomas Rivera', // From mock-data
-    age: 80, // From mock-data
-    gender: 'Male', // From mock-data
-    dateOfBirth: '1960-03-12', // From patients-data (Emily Wilson)
-    studyArm: 'Intervention', // Updated from Control to Intervention
-    admissionDate: '2025-04-10', // From mock-data (Thomas)
-    room: '308', // From mock-data
-    status: 'inactive', // From mock-data Thomas (vs active for Emily) - using Thomas's status
-    lastSession: '2025-05-30', // From mock-data (Thomas)
-    diagnosis: 'Generalized weakness', // From mock-data
-    mobility: 'Bed bound', // From mock-data
-    cognitiveStatus: 'Periodic confusion', // From mock-data
-    compliance: 'Fair', // From mock-data
-    progress: 'Slow', // From mock-data
-    mmseScore: 27, // From patients-data (Emily Wilson)
-    assignedTherapist: '1', // From patients-data (Emily Wilson)
-    assessments: [
-      { id: 'a11', type: 'MicroFET', value: 62, date: '2025-02-17', assessmentPoint: 'T0' },
-      { id: 'a12', type: 'Ultrasound', value: 2.2, date: '2025-02-17', assessmentPoint: 'T0' },
-      { id: 'a13', type: 'SitToStand', value: 9, date: '2025-02-17', assessmentPoint: 'T0' }
-    ], // From patients-data (Emily Wilson)
-    notes: [
-      { id: 'n4', content: 'Patient reports feeling stronger after recent sessions', createdAt: '2025-03-01T09:15:00Z', createdBy: 'Dr. Sarah Johnson' }
-    ] // From patients-data (Emily Wilson)
+    name: 'Thomas Rivera',
+    age: 80,
+    gender: 'Male',
+    admissionDate: '2025-04-10',
+    dischargeDate: '2025-05-30',
+    room: '308',
+    status: 'discharged',
+    lastSession: '2025-05-30',
+    diagnosis: 'Generalized weakness',
+    mobility: 'Bed bound',
+    cognitiveStatus: 'Periodic confusion',
+    therapistId: 'T001',
+    adherence: 35,
+    progress: getProgressStatus('down'),
+    adherenceHistory: generateChartData('2025-04-11', 8, 50, 'down', 7),
+    gamePerformanceHistory: generateChartData('2025-04-11', 8, 40, 'down', 9),
+    fatigueHistory: generateChartData('2025-04-11', 8, 60, 'up', 9),
+    rpeHistory: generateChartData('2025-04-11', 8, 8, 'up', 1),
   },
-  // P005 onwards from mock-data.ts (no previous detailed data to merge)
+  // P005: Sarah Wilson
   {
     id: 'P005',
     name: 'Sarah Wilson',
@@ -123,16 +135,18 @@ export const mockPatients: Patient[] = [
     gender: 'Female',
     room: '321',
     status: 'active',
-    studyArm: 'Intervention',
     admissionDate: '2025-06-05',
     diagnosis: 'Post-fall weakness',
     mobility: 'Ambulates with cane',
-    cognitiveStatus: 'Alert and oriented',
-    lastSession: '2025-06-12',
-    compliance: 'Excellent',
-    progress: 'Rapid improvement'
-    // Optional fields like dateOfBirth, mmseScore, assignedTherapist, assessments, notes, alerts will be undefined
+    therapistId: 'T001',
+    adherence: 85,
+    progress: getProgressStatus('mixed'),
+    adherenceHistory: generateChartData('2025-06-06', 4, 75, 'up', 5),
+    gamePerformanceHistory: generateChartData('2025-06-06', 4, 65, 'mixed', 12),
+    fatigueHistory: generateChartData('2025-06-06', 4, 25, 'mixed', 10),
+    rpeHistory: generateChartData('2025-06-06', 4, 4, 'up', 2),
   },
+  // P006: George Miller
   {
     id: 'P006',
     name: 'George Miller',
@@ -140,15 +154,20 @@ export const mockPatients: Patient[] = [
     gender: 'Male',
     room: '401',
     status: 'active',
-    studyArm: 'Intervention', // Updated from Control to Intervention
     admissionDate: '2025-06-01',
     diagnosis: 'Sarcopenia',
     mobility: 'Needs assistance for transfers',
     cognitiveStatus: 'Alert',
     lastSession: '2025-05-18',
-    compliance: 'Good',
-    progress: 'Steady'
+    therapistId: 'T002',
+    adherence: 88,
+    progress: getProgressStatus('up'),
+    adherenceHistory: generateChartData('2025-06-02', 7, 70, 'up', 4),
+    gamePerformanceHistory: generateChartData('2025-06-02', 7, 60, 'up', 6),
+    fatigueHistory: generateChartData('2025-06-02', 7, 45, 'down', 7),
+    rpeHistory: generateChartData('2025-06-02', 7, 6, 'down', 2),
   },
+  // P007: Brenda Lee
   {
     id: 'P007',
     name: 'Brenda Lee',
@@ -156,31 +175,41 @@ export const mockPatients: Patient[] = [
     gender: 'Female',
     room: '402',
     status: 'active',
-    studyArm: 'Intervention',
     admissionDate: '2025-06-03',
     diagnosis: 'Frailty',
     mobility: 'Uses walker, unsteady',
     cognitiveStatus: 'Forgetful',
     lastSession: '2025-06-19',
-    compliance: 'Fair',
-    progress: 'Slow improvement'
+    therapistId: 'T003',
+    adherence: 65,
+    progress: getProgressStatus('mixed'),
+    adherenceHistory: generateChartData('2025-06-04', 6, 60, 'mixed', 8),
+    gamePerformanceHistory: generateChartData('2025-06-04', 6, 55, 'mixed', 15),
+    fatigueHistory: generateChartData('2025-06-04', 6, 55, 'up', 8),
+    rpeHistory: generateChartData('2025-06-04', 6, 7, 'flat', 3),
   },
+  // P008: Arthur Lewis
   {
     id: 'P008',
     name: 'Arthur Lewis',
     age: 76,
     gender: 'Male',
     room: '405',
-    status: 'inactive', // This was 'inactive' in mock-data
-    studyArm: 'Intervention', // Updated from Control to Intervention
+    status: 'inactive',
     admissionDate: '2025-05-10',
     diagnosis: 'COPD Exacerbation',
     mobility: 'Bed rest',
     cognitiveStatus: 'Alert',
     lastSession: '2025-05-25',
-    compliance: 'Poor',
-    progress: 'Declined'
+    therapistId: 'T002',
+    adherence: 25,
+    progress: getProgressStatus('down'),
+    adherenceHistory: generateChartData('2025-05-11', 3, 40, 'down', 10),
+    gamePerformanceHistory: generateChartData('2025-05-11', 3, 30, 'down', 12),
+    fatigueHistory: generateChartData('2025-05-11', 3, 70, 'up', 10),
+    rpeHistory: generateChartData('2025-05-11', 3, 9, 'up', 1),
   },
+  // P009: Nancy Young
   {
     id: 'P009',
     name: 'Nancy Young',
@@ -188,15 +217,20 @@ export const mockPatients: Patient[] = [
     gender: 'Female',
     room: '408',
     status: 'active',
-    studyArm: 'Intervention',
     admissionDate: '2025-06-10',
     diagnosis: 'Hip fracture recovery',
     mobility: 'Wheelchair, non-weight bearing',
     cognitiveStatus: 'Alert and motivated',
     lastSession: '2025-06-20',
-    compliance: 'Excellent',
-    progress: 'Good'
+    therapistId: 'T003',
+    adherence: 94,
+    progress: getProgressStatus('up'),
+    adherenceHistory: generateChartData('2025-06-11', 5, 85, 'up', 3),
+    gamePerformanceHistory: generateChartData('2025-06-11', 5, 75, 'up', 5),
+    fatigueHistory: generateChartData('2025-06-11', 5, 20, 'down', 5),
+    rpeHistory: generateChartData('2025-06-11', 5, 3, 'down', 1),
   },
+  // P010: Kenneth Walker
   {
     id: 'P010',
     name: 'Kenneth Walker',
@@ -204,15 +238,20 @@ export const mockPatients: Patient[] = [
     gender: 'Male',
     room: '410',
     status: 'active',
-    studyArm: 'Intervention', // Updated from Control to Intervention
     admissionDate: '2025-06-12',
     diagnosis: 'Pneumonia recovery',
     mobility: 'Ambulates short distances with help',
     cognitiveStatus: 'Slightly confused at times',
     lastSession: '2025-06-19',
-    compliance: 'Fair',
-    progress: 'Steady'
+    therapistId: 'T002',
+    adherence: 68,
+    progress: getProgressStatus('mixed'),
+    adherenceHistory: generateChartData('2025-06-13', 4, 60, 'mixed', 10),
+    gamePerformanceHistory: generateChartData('2025-06-13', 4, 50, 'mixed', 15),
+    fatigueHistory: generateChartData('2025-06-13', 4, 65, 'up', 7),
+    rpeHistory: generateChartData('2025-06-13', 4, 7, 'mixed', 2),
   },
+  // P011: Patricia Hall
   {
     id: 'P011',
     name: 'Patricia Hall',
@@ -220,13 +259,17 @@ export const mockPatients: Patient[] = [
     gender: 'Female',
     room: '412',
     status: 'active',
-    studyArm: 'Intervention',
     admissionDate: '2025-06-15',
     diagnosis: 'Generalized deconditioning',
     mobility: 'Requires 2-person assist',
     cognitiveStatus: 'Alert',
     lastSession: '2025-06-21',
-    compliance: 'Good',
-    progress: 'Improving slowly'
+    therapistId: 'T003',
+    adherence: 85,
+    progress: getProgressStatus('up'),
+    adherenceHistory: generateChartData('2025-06-16', 3, 70, 'up', 6),
+    gamePerformanceHistory: generateChartData('2025-06-16', 3, 65, 'up', 7),
+    fatigueHistory: generateChartData('2025-06-16', 3, 50, 'down', 9),
+    rpeHistory: generateChartData('2025-06-16', 3, 6, 'down', 2),
   }
 ];

@@ -6,17 +6,51 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { mockData } from '@/data/mock-data';
 import { Patient } from '@/types/patient';
-import { SessionListItem } from '@/types/session';
-import { Calendar, FilePlus, BarChart, FileEdit, ArrowLeft } from 'lucide-react';
+import { RehabilitationSession } from '@/types/session';
+import { Calendar, FilePlus, BarChart, FileEdit, ArrowLeft, Info } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import SessionsList from '@/components/patients/sessions-list';
-import ClinicalAssessments from '@/components/patients/clinical-assessments';
-import { getInitials, getAvatarColor } from '@/lib/utils';
+import { getInitials, getAvatarColor, formatDate, cn, calculateAveragePerformance } from '@/lib/utils';
+import ProgressTrackingCharts from '@/components/patients/progress-tracking-charts';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+
+const StatusBadge = ({ status }: { status?: string }) => {
+  if (!status || status === 'N/A') {
+    return <span className="text-sm text-muted-foreground">N/A</span>;
+  }
+
+  let badgeClass = '';
+  switch (status.toLowerCase()) {
+    case 'good':
+    case 'high':
+    case 'excellent':
+    case 'improving':
+      badgeClass = 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300 border-green-300 dark:border-green-700';
+      break;
+    case 'fair':
+    case 'medium':
+      badgeClass = 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300 border-yellow-300 dark:border-yellow-700';
+      break;
+    case 'declining':
+    case 'poor':
+    case 'low':
+      badgeClass = 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300 border-red-300 dark:border-red-700';
+      break;
+    default:
+      badgeClass = 'border-border';
+  }
+
+  return (
+    <Badge variant="outline" className={cn('font-medium', badgeClass)}>
+      {status}
+    </Badge>
+  );
+};
 
 const PatientProfile = () => {
   const { id } = useParams<{ id: string }>();
   const [patient, setPatient] = useState<Patient | null>(null);
-  const [sessions, setSessions] = useState<SessionListItem[]>([]);
+  const [sessions, setSessions] = useState<RehabilitationSession[]>([]);
   const [loading, setLoading] = useState(true);
   
   useEffect(() => {
@@ -27,7 +61,7 @@ const PatientProfile = () => {
         setPatient(foundPatient);
         
         // Get patient sessions
-        const patientSessions = mockData.sessions.filter(s => s.patientId === id);
+        const patientSessions = mockData.rehabilitationSessions.filter(s => s.patientId === id);
         setSessions(patientSessions);
       }
       setLoading(false);
@@ -54,6 +88,27 @@ const PatientProfile = () => {
   
   const avatarStyle = getAvatarColor(patient.id);
   
+  const completedSessions = sessions.filter(s => new Date(s.date) <= new Date());
+  const totalSessions = sessions.length;
+  const adherencePercentage = totalSessions > 0 ? (completedSessions.length / totalSessions) * 100 : 0;
+  
+  const getAdherenceStatus = (percentage: number): string => {
+    if (percentage >= 80) return 'High';
+    if (percentage >= 50) return 'Medium';
+    if (percentage > 0) return 'Low';
+    return 'N/A';
+  };
+
+  const complianceScores = completedSessions.map(s => calculateAveragePerformance(s.gameSessions));
+  const averageCompliance = complianceScores.length > 0 ? complianceScores.reduce((a, b) => a + b, 0) / complianceScores.length : 0;
+
+  const getComplianceStatus = (score: number): string => {
+    if (score >= 85) return 'Excellent';
+    if (score >= 70) return 'Good';
+    if (score > 0) return 'Fair';
+    return 'N/A';
+  };
+  
   return (
     <div className="space-y-6">
       <div className="mb-4 flex justify-start">
@@ -77,24 +132,6 @@ const PatientProfile = () => {
           <div className="text-center sm:text-left">
             <h1 className="text-2xl font-bold md:text-3xl mb-1">{patient.name}</h1>
             <div className="flex flex-wrap items-center gap-2">
-              {patient.studyArm === 'Intervention' ? (
-                <Badge variant="static" className="bg-blue-100 text-blue-700 dark:bg-blue-700 dark:text-blue-100 border-blue-300 dark:border-blue-600">
-                  Intervention
-                </Badge>
-              ) : patient.studyArm === 'Control' ? (
-                <Badge variant="static" className="bg-orange-100 text-orange-700 dark:bg-orange-700 dark:text-orange-100 border-orange-300 dark:border-orange-600">
-                  Control
-                </Badge>
-              ) : patient.studyArm === 'Ghostly' ? (
-                <Badge variant="static" className="bg-purple-100 text-purple-700 dark:bg-purple-700 dark:text-purple-100 border-purple-300 dark:border-purple-600">
-                  Ghostly
-                </Badge>
-              ) : (
-                <Badge variant="static" className="text-foreground border-foreground">
-                  {patient.studyArm || 'N/A'}
-                </Badge>
-              )}
-              
               {patient.status === 'active' ? (
                 <Badge variant="static" className="bg-green-100 text-green-700 dark:bg-green-700 dark:text-green-100 border-green-300 dark:border-green-600">
                   Active
@@ -140,7 +177,7 @@ const PatientProfile = () => {
               
               <span className="text-sm font-medium">Admission:</span>
               <span className="text-sm">
-                {patient.admissionDate ? new Date(patient.admissionDate).toLocaleDateString() : 'N/A'}
+                {patient.admissionDate ? formatDate(patient.admissionDate) : 'N/A'}
               </span>
             </div>
           </CardContent>
@@ -171,23 +208,51 @@ const PatientProfile = () => {
         
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle className="text-base">Treatment Summary</CardTitle>
+            <div className="flex items-center gap-2">
+              <CardTitle className="text-base">Treatment Summary</CardTitle>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Info className="h-4 w-4 cursor-pointer text-muted-foreground" />
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <div className="max-w-xs p-2 text-left text-sm">
+                      <h4 className="mb-2 font-bold">GHOSTLY+ Protocol Details</h4>
+                      <ul className="list-inside list-disc space-y-1">
+                        <li>
+                          <span className="font-semibold">Frequency:</span> Min. 5 sessions/week.
+                        </li>
+                        <li>
+                          <span className="font-semibold">Exercise:</span> Isometric contractions @ 75% MVC.
+                        </li>
+                        <li>
+                          <span className="font-semibold">BFR:</span> 50% arterial occlusion pressure.
+                        </li>
+                        <li>
+                          <span className="font-semibold">Volume:</span> 3 sets of 12 repetitions.
+                        </li>
+                      </ul>
+                    </div>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </div>
           </CardHeader>
           <CardContent className="space-y-2">
             <div className="grid grid-cols-2 gap-1">
               <span className="text-sm font-medium">Sessions:</span>
-              <span className="text-sm">{sessions.length}</span>
+              <span className="text-sm">{`${completedSessions.length} / ${totalSessions} completed`}</span>
               
               <span className="text-sm font-medium">Last Session:</span>
               <span className="text-sm">
-                {patient.lastSession ? new Date(patient.lastSession).toLocaleDateString() : 'N/A'}
+                {patient.lastSession ? formatDate(patient.lastSession) : 'N/A'}
               </span>
               
               <span className="text-sm font-medium">Compliance:</span>
-              <span className="text-sm">{patient.compliance || 'N/A'}</span>
-              
-              <span className="text-sm font-medium">Progress:</span>
-              <span className="text-sm">{patient.progress || 'N/A'}</span>
+              <StatusBadge status={getComplianceStatus(averageCompliance)} />
+
+              <span className="text-sm font-medium">Adherence:</span>
+              <StatusBadge status={getAdherenceStatus(adherencePercentage)} />
             </div>
           </CardContent>
         </Card>
@@ -202,12 +267,12 @@ const PatientProfile = () => {
             <Calendar className="h-4 w-4" />
             <span>Sessions</span>
           </TabsTrigger>
-          <TabsTrigger 
-            value="clinical-assessments" 
+          <TabsTrigger
+            value="progress-tracking"
             className="flex items-center space-x-2 rounded-md px-4 py-2 text-sm font-medium transition-all duration-200 ease-in-out data-[state=active]:bg-background data-[state=active]:text-primary data-[state=active]:shadow-md data-[state=active]:font-semibold data-[state=active]:border-2 data-[state=active]:border-black data-[state=inactive]:text-muted-foreground data-[state=inactive]:hover:bg-background/60 focus:outline-none"
           >
-            <FileEdit className="h-4 w-4" />
-            <span>Clinical Assessments</span>
+            <BarChart className="mr-2 h-4 w-4" />
+            <span>Progress Tracking</span>
           </TabsTrigger>
           <TabsTrigger 
             value="notes" 
@@ -233,36 +298,13 @@ const PatientProfile = () => {
               </Button>
             </CardHeader>
             <CardContent>
-              <SessionsList sessions={sessions.map(session => ({
-                ...session,
-                linkState: { from: 'patient' }
-              }))} />
+              <SessionsList sessions={sessions} patients={mockData.patients} />
             </CardContent>
           </Card>
         </TabsContent>
         
-        <TabsContent value="clinical-assessments">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between">
-              <div>
-                <CardTitle className="text-left text-xl py-1">Clinical Assessments</CardTitle>
-                <CardDescription>Current treatment configuration and goals</CardDescription>
-              </div>
-              <div className="flex space-x-2">
-            
-                <Button variant="outline" size="sm">
-                    <BarChart className="mr-2 h-4 w-4" />
-                    View Progress                </Button>
-                <Button size="sm">
-                    <FilePlus className="mr-2 h-4 w-4" />
-                    Add Assessment
-                </Button>
-              </div>
-            </CardHeader>
-            <CardContent className="pt-4">
-              <ClinicalAssessments patientId={patient.id} isEmbedded={true} />
-            </CardContent>
-          </Card>
+        <TabsContent value="progress-tracking">
+          <ProgressTrackingCharts patient={patient} />
         </TabsContent>
         
         <TabsContent value="notes">
@@ -281,7 +323,10 @@ const PatientProfile = () => {
               <div className="space-y-4">
                 <div className="rounded-lg border p-4">
                   <div className="mb-2 flex justify-between">
-                    <div className="font-medium">Session Progress Note</div>
+                    <div className="flex items-center gap-2">
+                      <div className="font-medium">Session Progress Note</div>
+                      <Badge variant="outline">Progress Note</Badge>
+                    </div>
                     <div className="text-sm text-muted-foreground">June 15, 2025</div>
                   </div>
                   <p className="text-sm text-left">
@@ -291,7 +336,10 @@ const PatientProfile = () => {
                 
                 <div className="rounded-lg border p-4">
                   <div className="mb-2 flex justify-between">
-                    <div className="font-medium">Initial Assessment</div>
+                    <div className="flex items-center gap-2">
+                      <div className="font-medium">Initial Assessment</div>
+                      <Badge variant="outline">Assessment</Badge>
+                    </div>
                     <div className="text-sm text-muted-foreground">June 10, 2025</div>
                   </div>
                   <p className="text-sm text-left">

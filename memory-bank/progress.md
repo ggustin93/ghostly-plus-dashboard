@@ -69,6 +69,12 @@ source_documents: [[docs/00_PROJECT_DEFINITION/ressources/data_management_plan.m
     -   Mock data (`mockPatientAssessments`) populates the table, filtered to show only measures with data.
     -   Tab styling in `PatientProfile.tsx` updated to match dashboard, including icons.
     -   Linter warnings and unused imports addressed.
+8. ✅ **Patient Progress Tracking Charts (`ProgressTrackingCharts.tsx`)**:
+    -   Redefined and clarified key metrics: "Adherence", "Game Performance Score" (formerly Compliance), and added "Perceived Exertion (RPE)".
+    -   Updated the `Patient` data model (`types/patient.ts`) and mock data (`data/patients-data.ts`) to support these new metrics.
+    -   Completely redesigned the charts for a more professional and informative look, using a reusable `ChartCard` component.
+    -   Charts now include icons, descriptions, and reference lines for context.
+    -   The patient list view is now populated with `adherence` and `progress` data.
 
 *(Previous Vue and Next.js components have been completely removed)*
 

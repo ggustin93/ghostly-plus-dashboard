@@ -13,10 +13,13 @@ import PageHeader from '@/components/ui/page-header';
 
 const SessionsPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
+  const { rehabilitationSessions, patients } = mockData;
 
-  const filteredSessions = mockData.sessions.filter(session =>
-    session.patientName?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredSessions = rehabilitationSessions.filter(session => {
+    const patient = patients.find(p => p.id === session.patientId);
+    const patientName = patient ? patient.name : '';
+    return patientName.toLowerCase().includes(searchTerm.toLowerCase());
+  });
 
   return (
     <div className="container mx-auto p-6 space-y-6">
@@ -46,7 +49,7 @@ const SessionsPage = () => {
             </div>
           </div>
           <div className="space-y-4">
-            <SessionsList sessions={filteredSessions} />
+            <SessionsList sessions={filteredSessions} patients={patients} />
           </div>
         </CardContent>
       </Card>

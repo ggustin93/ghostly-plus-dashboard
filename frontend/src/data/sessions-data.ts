@@ -17,6 +17,8 @@ const createGameSessions = (patientId: string, date: string, completed: boolean)
     const aop = 180;
     const targetPercentageBFR = 50;
 
+    const engagementScore = Math.floor(Math.random() * (95 - 30 + 1)) + 30;
+
     const session: GameSession = {
       id: `gs-${patientId}-${date}-${i}`,
       startTime: startTime.toISOString(),
@@ -79,7 +81,7 @@ const createGameSessions = (patientId: string, date: string, completed: boolean)
         timePerLevel: [gameDurationMinutes * 60],
         activationPoints: Math.floor(15 * (75 + (Math.random() * 10 - 5))),
         inactivityPeriods: Math.floor(Math.random() * 2),
-        engagementScore: 80 + Math.floor(Math.random() * 11),
+        engagementScore: engagementScore,
         adherenceScore: 90 + Math.floor(Math.random() * 11),
       } : undefined,
     };
@@ -132,104 +134,104 @@ export const mockSessions: RehabilitationSession[] = [
     patientId: 'P001',
     date: '2025-05-20',
     therapistId: 'T001',
-    status: 'completed',
     gameSessions: createGameSessions('P001', '2025-05-20', true),
-    notes: 'Patient showed good progress in all game sessions.'
+    notes: 'Patient showed good progress in all game sessions.',
+    duration: 32
   },
   {
     id: 'P001-S02',
     patientId: 'P001',
     date: '2025-05-27',
     therapistId: 'T001',
-    status: 'completed',
     gameSessions: createGameSessions('P001', '2025-05-27', true),
-    notes: 'Increased difficulty level, patient adapted well.'
+    notes: 'Increased difficulty level, patient adapted well.',
+    duration: 32
   },
   {
     id: 'P001-S03',
     patientId: 'P001',
     date: '2025-06-03',
     therapistId: 'T001',
-    status: 'scheduled',
-    gameSessions: [],
+    gameSessions: createGameSessions('P001', '2025-06-03', true),
+    duration: 32
   },
   {
     id: 'P002-S01',
     patientId: 'P002',
     date: '2025-05-22',
     therapistId: 'T001',
-    status: 'completed',
     gameSessions: createGameSessions('P002', '2025-05-22', true),
-    notes: 'First session went well, patient enjoyed the games.'
+    notes: 'First session went well, patient enjoyed the games.',
+    duration: 32
   },
   {
     id: 'P002-S02',
     patientId: 'P002',
     date: '2025-05-29',
     therapistId: 'T001',
-    status: 'completed',
     gameSessions: createGameSessions('P002', '2025-05-29', true),
-    notes: 'Patient reported slight fatigue but completed all exercises.'
+    notes: 'Patient reported slight fatigue but completed all exercises.',
+    duration: 32
   },
   {
     id: 'P002-S03',
     patientId: 'P002',
     date: '2025-06-05',
     therapistId: 'T001',
-    status: 'scheduled',
-    gameSessions: [],
+    gameSessions: createGameSessions('P002', '2025-06-05', true),
+    duration: 32
   },
   {
     id: 'P003-S01',
     patientId: 'P003',
     date: '2025-05-30',
     therapistId: 'T001',
-    status: 'completed',
     gameSessions: createGameSessions('P003', '2025-05-30', true),
     notes: 'Patient showed excellent engagement with the games.',
-    assessmentPoint: 'T1'
+    assessmentPoint: 'T1',
+    duration: 32
   },
   {
     id: 'P003-S02',
     patientId: 'P003',
     date: '2025-06-06',
     therapistId: 'T001',
-    status: 'completed',
-    gameSessions: createGameSessions('P003', '2025-06-06', true)
+    gameSessions: createGameSessions('P003', '2025-06-06', true),
+    duration: 32
   },
   {
     id: 'P003-S03',
     patientId: 'P003',
     date: '2025-06-13',
     therapistId: 'T001',
-    status: 'scheduled',
-    gameSessions: [],
+    gameSessions: createGameSessions('P003', '2025-06-13', true),
+    duration: 32
   },
   {
     id: 'P004-S01',
     patientId: 'P004',
     date: '2025-04-12',
     therapistId: 'T001',
-    status: 'completed',
     gameSessions: createGameSessions('P004', '2025-04-12', true),
-    notes: 'Patient needed additional guidance but completed the session.'
+    notes: 'Patient needed additional guidance but completed the session.',
+    duration: 32
   },
   {
     id: 'P004-S02',
     patientId: 'P004',
     date: '2025-04-19',
     therapistId: 'T001',
-    status: 'completed',
-    gameSessions: createGameSessions('P004', '2025-04-19', true)
+    gameSessions: createGameSessions('P004', '2025-04-19', true),
+    duration: 32
   },
   {
     id: 'P007-S01',
     patientId: 'P007',
     date: '2025-06-19',
     therapistId: 'T001',
-    status: 'completed',
     gameSessions: createGameSessions('P007', '2025-06-19', true),
-    notes: 'Rehabilitation session for Brenda Lee focusing on coordination.'
+    notes: 'Rehabilitation session for Brenda Lee focusing on coordination.',
+    duration: 32
   },
 
   // New sessions for missing patients (P005, P006, P008, P009, P010, P011)
@@ -240,26 +242,27 @@ export const mockSessions: RehabilitationSession[] = [
     patientId: 'P005',
     date: '2025-06-07',
     therapistId: 'T001',
-    status: 'completed',
     gameSessions: createGameSessions('P005', '2025-06-07', true),
-    notes: 'First session post-fall. Patient demonstrated good motivation and compliance.'
+    notes: 'First session post-fall. Patient demonstrated good motivation and compliance.',
+    duration: 32
   },
   {
     id: 'P005-S02',
     patientId: 'P005',
     date: '2025-06-14',
     therapistId: 'T001',
-    status: 'completed',
     gameSessions: createGameSessions('P005', '2025-06-14', true),
-    notes: 'Excellent progress with cane mobility. Increased game difficulty.'
+    notes: 'Excellent progress with cane mobility. Increased game difficulty.',
+    duration: 32
   },
   {
     id: 'P005-S03',
     patientId: 'P005',
     date: '2025-06-21',
     therapistId: 'T001',
-    status: 'scheduled',
-    gameSessions: [],
+    gameSessions: createGameSessions('P005', '2025-06-21', true),
+    notes: 'Patient can now walk 10 feet with minimal assistance. Progress is good.',
+    duration: 32
   },
 
   // P006 - George Miller (active, admitted 2025-06-01)
@@ -268,35 +271,35 @@ export const mockSessions: RehabilitationSession[] = [
     patientId: 'P006',
     date: '2025-06-03',
     therapistId: 'T002',
-    status: 'completed',
     gameSessions: createGameSessions('P006', '2025-06-03', true),
-    notes: 'Initial session for sarcopenia treatment. Patient required assistance with transfers.'
+    notes: 'Initial session for sarcopenia treatment. Patient required assistance with transfers.',
+    duration: 32
   },
   {
     id: 'P006-S02',
     patientId: 'P006',
     date: '2025-06-10',
     therapistId: 'T002',
-    status: 'completed',
     gameSessions: createGameSessions('P006', '2025-06-10', true),
-    notes: 'Steady improvement in muscle activation patterns.'
+    notes: 'Steady improvement in muscle activation patterns.',
+    duration: 32
   },
   {
     id: 'P006-S03',
     patientId: 'P006',
     date: '2025-06-17',
     therapistId: 'T002',
-    status: 'completed',
     gameSessions: createGameSessions('P006', '2025-06-17', true),
-    notes: 'Patient showing consistent progress with transfer assistance.'
+    notes: 'Patient showing consistent progress with transfer assistance.',
+    duration: 32
   },
   {
     id: 'P006-S04',
     patientId: 'P006',
     date: '2025-06-24',
     therapistId: 'T002',
-    status: 'scheduled',
-    gameSessions: [],
+    gameSessions: createGameSessions('P006', '2025-06-24', true),
+    duration: 32
   },
 
   // P008 - Arthur Lewis (inactive, admitted 2025-05-10)
@@ -305,18 +308,18 @@ export const mockSessions: RehabilitationSession[] = [
     patientId: 'P008',
     date: '2025-05-12',
     therapistId: 'T002',
-    status: 'completed',
     gameSessions: createGameSessions('P008', '2025-05-12', true),
-    notes: 'Initial session post-COPD exacerbation. Limited activity due to respiratory concerns.'
+    notes: 'Initial session post-COPD exacerbation. Limited activity due to respiratory concerns.',
+    duration: 32
   },
   {
     id: 'P008-S02',
     patientId: 'P008',
     date: '2025-05-19',
     therapistId: 'T002',
-    status: 'cancelled',
-    gameSessions: [],
-    notes: 'Session cancelled due to patient declining health status.'
+    gameSessions: createGameSessions('P008', '2025-05-19', true),
+    notes: 'Session cancelled due to patient declining health status.',
+    duration: 32
   },
 
   // P009 - Nancy Young (active, admitted 2025-06-10)
@@ -325,26 +328,26 @@ export const mockSessions: RehabilitationSession[] = [
     patientId: 'P009',
     date: '2025-06-12',
     therapistId: 'T003',
-    status: 'completed',
     gameSessions: createGameSessions('P009', '2025-06-12', true),
-    notes: 'Hip fracture recovery session. Patient highly motivated and compliant.'
+    notes: 'Hip fracture recovery session. Patient highly motivated and compliant.',
+    duration: 32
   },
   {
     id: 'P009-S02',
     patientId: 'P009',
     date: '2025-06-19',
     therapistId: 'T003',
-    status: 'completed',
     gameSessions: createGameSessions('P009', '2025-06-19', true),
-    notes: 'Excellent engagement with wheelchair-based exercises. Good progress.'
+    notes: 'Excellent engagement with wheelchair-based exercises. Good progress.',
+    duration: 32
   },
   {
     id: 'P009-S03',
     patientId: 'P009',
     date: '2025-06-26',
     therapistId: 'T003',
-    status: 'scheduled',
-    gameSessions: [],
+    gameSessions: createGameSessions('P009', '2025-06-26', true),
+    duration: 32
   },
 
   // P010 - Kenneth Walker (active, admitted 2025-06-12)
@@ -353,17 +356,17 @@ export const mockSessions: RehabilitationSession[] = [
     patientId: 'P010',
     date: '2025-06-14',
     therapistId: 'T002',
-    status: 'completed',
     gameSessions: createGameSessions('P010', '2025-06-14', true),
-    notes: 'Pneumonia recovery session. Patient occasionally confused but participated well.'
+    notes: 'Pneumonia recovery session. Patient occasionally confused but participated well.',
+    duration: 32
   },
   {
     id: 'P010-S02',
     patientId: 'P010',
     date: '2025-06-21',
     therapistId: 'T002',
-    status: 'scheduled',
-    gameSessions: [],
+    gameSessions: createGameSessions('P010', '2025-06-21', true),
+    duration: 32
   },
 
   // P011 - Patricia Hall (active, admitted 2025-06-15)
@@ -372,17 +375,17 @@ export const mockSessions: RehabilitationSession[] = [
     patientId: 'P011',
     date: '2025-06-17',
     therapistId: 'T003',
-    status: 'completed',
     gameSessions: createGameSessions('P011', '2025-06-17', true),
-    notes: 'Generalized deconditioning treatment. Required 2-person assist but engaged well.'
+    notes: 'Generalized deconditioning treatment. Required 2-person assist but engaged well.',
+    duration: 32
   },
   {
     id: 'P011-S02',
     patientId: 'P011',
     date: '2025-06-24',
     therapistId: 'T003',
-    status: 'scheduled',
-    gameSessions: [],
+    gameSessions: createGameSessions('P011', '2025-06-24', true),
+    duration: 32
   },
 ];
 
@@ -402,31 +405,31 @@ const formatDate = (dateObj: Date): string => dateObj.toISOString().split('T')[0
 
 const nextWeekSessionsDemo: RehabilitationSession[] = [
   {
-    id: 'P001-S04-NextWeek',
+    id: 'P001-S04',
     patientId: 'P001',
     date: formatDate(todayPlus1), // Scheduled for tomorrow
     therapistId: 'T001',
-    status: 'scheduled',
-    gameSessions: [],
-    notes: 'Dynamically scheduled demo session for tomorrow.'
+    gameSessions: createGameSessions('P001', formatDate(todayPlus1), true),
+    notes: 'Dynamically scheduled demo session for tomorrow.',
+    duration: 32
   },
   {
-    id: 'P002-S04-NextWeek',
+    id: 'P002-S04',
     patientId: 'P002',
     date: formatDate(todayPlus3), // Scheduled for 3 days from today
     therapistId: 'T001',
-    status: 'scheduled',
-    gameSessions: [],
-    notes: 'Dynamically scheduled demo session for 3 days from today.'
+    gameSessions: createGameSessions('P002', formatDate(todayPlus3), true),
+    notes: 'Dynamically scheduled demo session for 3 days from today.',
+    duration: 32
   },
   {
-    id: 'P005-S04-NextWeek',
+    id: 'P005-S04',
     patientId: 'P005',
     date: formatDate(todayPlus5), // Scheduled for 5 days from today
     therapistId: 'T001',
-    status: 'scheduled',
-    gameSessions: [],
-    notes: 'Dynamically scheduled demo session for 5 days from today.'
+    gameSessions: createGameSessions('P005', formatDate(todayPlus5), true),
+    notes: 'Upcoming session to focus on balance and coordination exercises.',
+    duration: 32
   },
 ];
 

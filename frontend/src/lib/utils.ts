@@ -1,5 +1,6 @@
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
+import { GameSession } from "@/types/session";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -48,4 +49,29 @@ export const getAvatarColor = (id: string) => {
   }
   const index = Math.abs(hash) % avatarColorPalette.length;
   return avatarColorPalette[index];
+};
+
+export const formatDate = (dateString: string | Date): string => {
+  if (!dateString) return 'N/A';
+  const date = new Date(dateString);
+  // Check if the date is valid
+  if (isNaN(date.getTime())) {
+    return 'Invalid Date';
+  }
+  return new Intl.DateTimeFormat('fr-FR', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+  }).format(date);
+};
+
+export const calculateAveragePerformance = (gameSessions: GameSession[]): number => {
+  const completedSessions = gameSessions.filter(gs => gs.statistics && gs.statistics.adherenceScore > 0);
+  if (completedSessions.length === 0) return 0;
+
+  const totalScore = completedSessions.reduce((acc, curr) => {
+    return acc + (curr.statistics?.adherenceScore || 0);
+  }, 0);
+  
+  return Math.round(totalScore / completedSessions.length);
 };

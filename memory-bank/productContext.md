@@ -213,7 +213,32 @@ The web dashboard must support:
     3.  They can compare outcomes between intervention and control groups.
     4.  They can export data for statistical analysis.
 
-## 9. Study Coordinators/PIs (e.g., Eva Swinnen, Mahyar Firouzi as per DMP)
+## 9. Key Performance Indicators (KPIs) & Metrics
+
+To effectively track patient engagement and therapeutic progress, the GHOSTLY+ Dashboard focuses on several key metrics derived from session and game data. These metrics provide therapists and researchers with actionable insights into a patient's journey.
+
+### 9.1. Adherence
+-   **Definition:** Adherence measures how consistently a patient follows their prescribed therapy schedule. It is a critical indicator of a patient's commitment and participation in the rehabilitation program.
+-   **Calculation:** It is calculated as the **ratio of completed therapy sessions to the total number of prescribed sessions** over a given period.
+    -   `Adherence % = (Number of Completed Sessions / Total Number of Prescribed Sessions) * 100`
+-   **Dashboard Representation:** Displayed as a percentage on the patient list and as a historical trend in the "Adherence History" chart on the patient's profile.
+
+### 9.2. Game Performance Score (Formerly Compliance)
+-   **Definition:** The Game Performance Score is a measure of a patient's in-session performance and effort. It reflects how well a patient is achieving the therapeutic goals set within the game, such as reaching target muscle contraction levels.
+-   **Calculation:** This score is derived from the average performance across all game sessions within a rehabilitation session. The specific calculation is based on an aggregation of in-game metrics (e.g., meeting MVC targets, repetitions completed, engagement score).
+-   **Dashboard Representation:** Represented as a trend in the "Game Performance Score" chart on the patient's profile.
+
+### 9.3. Perceived Exertion (RPE)
+-   **Definition:** The Rating of Perceived Exertion (RPE) is a subjective measure of how hard a patient feels their body is working during an exercise session. It is a valuable metric for understanding a patient's tolerance and for adjusting exercise intensity.
+-   **Calculation:** This is a self-reported score provided by the patient, typically on a scale of 0 (no exertion) to 10 (maximal exertion).
+-   **Dashboard Representation:** Displayed as a historical trend in the "Perceived Exertion (RPE)" chart on the patient's profile.
+
+### 9.4. Fatigue
+-   **Definition:** Fatigue is an objective measure calculated from sEMG data, indicating the decline in muscle force-generating capacity during a game session.
+-   **Calculation:** It is derived from changes in the sEMG signal's frequency or amplitude over time (e.g., a decrease in median frequency).
+-   **Dashboard Representation:** Shown as a trend in the "Fatigue History" chart on the patient's profile.
+
+## 10. Study Coordinators/PIs (e.g., Eva Swinnen, Mahyar Firouzi as per DMP)
 
 - **Workflow:**
     1.  The study coordinator oversees trial progress across all sites.
@@ -221,7 +246,7 @@ The web dashboard must support:
     3.  They ensure data quality and integrity.
     4.  They ensure adherence to the DMP.
 
-## 10. Data Managers (e.g., Carlos Cevallos Barragan as per DMP)
+## 11. Data Managers (e.g., Carlos Cevallos Barragan as per DMP)
 
 - **Workflow:**
     1.  The data manager performs data cleaning and quality checks.

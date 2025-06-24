@@ -199,7 +199,52 @@ The application follows a **versioned API structure** with clear domain separati
     };
     ```
 
-## 3. Component Relationships
+## 3. Component & UI Patterns
+
+### 3.1. `StatusBadge` Component
+
+-   **Purpose**: To provide a consistent, color-coded visual indicator for status-based information across the application (e.g., patient progress, compliance levels).
+-   **Location**: `frontend/src/components/patients/patient-profile.tsx` (Initially, can be extracted to `ui/` if used more widely).
+-   **Functionality**:
+    -   Accepts a `status` string as a prop.
+    -   Uses a `switch` statement to map different status keywords (e.g., 'Good', 'High', 'Excellent', 'Improving') to specific Tailwind CSS classes.
+    -   Applies distinct color schemes (background, text, border) for positive (green), neutral/warning (yellow), and negative (red) statuses.
+    -   Provides a default style for unknown statuses.
+    -   Leverages `cn` utility for elegantly merging base and conditional classes.
+-   **Usage Example**:
+    ```tsx
+    import { StatusBadge } from './StatusBadge'; // Assuming extracted
+    
+    // In a component
+    <StatusBadge status="Improving" />
+    <StatusBadge status="Declining" />
+    ```
+
+### 3.2. Reusable `ChartCard` Component
+
+-   **Purpose**: To create a standardized and professional-looking container for displaying time-series data using `recharts`. This ensures visual consistency across all progress tracking charts.
+-   **Location**: `frontend/src/components/patients/progress-tracking-charts.tsx`.
+-   **Key Features**:
+    -   **Props**: Takes `title`, `description`, `data`, `dataKey`, `lineColor`, an `Icon`, a `domain` for the Y-axis, and an optional `referenceLine`.
+    -   **Header**: Displays the provided `Icon` and `title`/`description` for clear context.
+    -   **Styling**: Uses professional and clean styling for axes, grids, and lines.
+    -   **Custom Tooltip**: Implements a `CustomTooltip` to provide a well-formatted data display on hover.
+    -   **Reference Line**: Optionally displays a `ReferenceLine` to indicate goals or targets (e.g., 'Target' performance score, 'Goal' adherence rate).
+-   **Usage Example**:
+    ```tsx
+    <ChartCard 
+      title="Game Performance Score"
+      description="Evolution of the patient's average game scores."
+      data={patient.gamePerformanceHistory || []}
+      dataKey="value"
+      lineColor="#10b981"
+      Icon={Gamepad2}
+      domain={[0, 100]}
+      referenceLine={{ y: 75, label: 'Target', color: '#f59e0b' }}
+    />
+    ```
+
+## 4. Component Relationships
 
 -   **GHOSTLY+ Game (OpenFeasyo Adaptation)**: Collects EMG data for each **Game Session** -> Authenticates *directly* with Supabase Auth -> Uploads C3D file(s) (one per Game Session, potentially batched per **Rehabilitation Session**) to FastAPI Backend (sending JWT). Game stores/sends data related to game levels, DDA parameters used, and basic performance (WP2.1, WP2.3, WP2.4). C3D file path stored in `GameSession` table (operational Supabase DB).
 -   **Web Dashboard (React)**: User Interface (React components specific to Therapist, Researcher, Admin roles) -> Authenticates *directly* with Supabase Auth -> Manages auth state -> Communicates with FastAPI Backend (sending JWT) to manage **Rehabilitation Sessions**, their associated **Game Session** data (C3D file paths, **processed sEMG metrics from `EMGCalculatedMetric`**, **game stats from `GamePlayStatistic`**, DDA data logged in `GameSession`), **clinical assessments from `ClinicalAssessment` & `ClinicalOutcomeMeasure`**, and user/patient data from relevant tables in the operational Supabase DB. Fetches and displays this structured data according to persona needs. Must also support workflows for data export to systems like REDCap or for data preparation for archiving in Pixiu, as per `data_management_plan.md`.
@@ -211,7 +256,7 @@ The application follows a **versioned API structure** with clear domain separati
 
 See diagrams in [docs/prd.md](mdc:docs/prd.md) (Sections 4.8, 4.9) and [docs/security.md](mdc:docs/security.md) (Data Flow Diagrams) for visual representations. **Note:** Diagrams may need manual updates to reflect the React frontend and these interaction patterns. *Refer to Section 5 below for a detailed guide on choosing the appropriate backend implementation strategy.*
 
-## 4. Critical Implementation Paths
+## 5. Critical Implementation Paths
 
 -   **Authentication Flow**: Ensuring seamless and secure JWT-based authentication for both the C# game client and the React web client against the central Supabase Auth service, leveraging libraries like `@supabase/ssr`.
 -   **C3D Data Pipeline**: The flow of C3D files from game generation, authenticated upload to API, processing (parsing, pseudonymization, encryption), storage in Supabase Storage, and retrieval/visualization in the dashboard.
@@ -221,7 +266,7 @@ See diagrams in [docs/prd.md](mdc:docs/prd.md) (Sections 4.8, 4.9) and [docs/sec
 -   **Hybrid Backend Strategy**: Defining clear boundaries between logic handled by Next.js server-side features, Supabase Edge Functions, and the potential separate FastAPI analytics service. *Refer to Section 5 below for detailed guidance.*
 -   **Dynamic Difficulty Adjustment (DDA) Data Flow and Dashboard Interaction**: If the dashboard is to display or influence DDA parameters (WP2.4, WP2.5), ensuring this data is correctly logged, stored, and presented is critical.
 
-### 4.1. Authentication
+### 5.1. Authentication
 
 ```
 ┌────────────┐     ┌────────────┐     ┌────────────┐     ┌────────────┐
@@ -236,7 +281,7 @@ See diagrams in [docs/prd.md](mdc:docs/prd.md) (Sections 4.8, 4.9) and [docs/sec
 └────────────┘     └────────────┘     └────────────┘     └────────────┘
 ```
 
-### 4.2. C3D File Processing
+### 5.2. C3D File Processing
 
 *This describes processing for C3D files, typically one per Game Session, which are then associated with an overall Rehabilitation Session.*
 
@@ -258,7 +303,7 @@ See diagrams in [docs/prd.md](mdc:docs/prd.md) (Sections 4.8, 4.9) and [docs/sec
 └────────────┘     └────────────┘     └────────────┘     └────────────┘
 ```
 
-## 5. Implementation Strategy Selection
+## 6. Implementation Strategy Selection
 
 For interacting with the database and implementing backend logic, multiple options are available, each suited to different scenarios:
 
@@ -292,9 +337,9 @@ For interacting with the database and implementing backend logic, multiple optio
     *   Complex statistical analysis of patient data.
     *   **How:** Deploy as a separate service that can be scaled independently, with its own authentication and resource allocation.
 
-## 6. Frontend Structure
+## 7. Frontend Structure
 
-### 6.1. Component Structure
+### 7.1. Component Structure
 
 The React frontend follows a feature-based architecture:
 
@@ -325,7 +370,7 @@ This organization enables:
 - Simplified testing and maintenance
 - Clear separation between UI components and business logic
 
-### 6.2. Frontend Authentication Flow
+### 7.2. Frontend Authentication Flow
 
 The authentication process uses a custom fetch implementation to avoid Supabase client header issues:
 
@@ -336,7 +381,7 @@ The authentication process uses a custom fetch implementation to avoid Supabase 
 5. Protected routes check auth state in React Router
 6. Auth context provides user information throughout the app
 
-### 6.3. Component Composition
+### 7.3. Component Composition
 
 The frontend uses a **composed component pattern** with shadcn/ui:
 
@@ -352,7 +397,7 @@ The frontend uses a **composed component pattern** with shadcn/ui:
          └─ Primitive Components
 ```
 
-### 6.4. State Management
+### 7.4. State Management
 
 - **React Context API** for global state:
   - Authentication state
@@ -366,9 +411,9 @@ The frontend uses a **composed component pattern** with shadcn/ui:
 
 - **Query Hooks** for data fetching (potential future addition)
 
-## 7. Backend Structure
+## 8. Backend Structure
 
-### 7.1. FastAPI Organization
+### 8.1. FastAPI Organization
 
 ```
 app/
@@ -387,15 +432,15 @@ app/
 └── main.py              # Application entry point
 ```
 
-### 7.2. API Documentation
+### 8.2. API Documentation
 
 - **OpenAPI/Swagger UI** automatically generated by FastAPI
 - **Tags** used to categorize endpoints by domain
 - **Description** for each endpoint with expected inputs and outputs
 
-## 8. Database Schema
+## 9. Database Schema
 
-### 8.1. Core Entities
+### 9.1. Core Entities
 
 - **users** (Managed by Supabase Auth)
   - id (primary key)
@@ -439,7 +484,7 @@ app/
   - created_at
   - updated_at
 
-### 8.2. Row-Level Security (RLS)
+### 9.2. Row-Level Security (RLS)
 
 - **users**: Only the user themselves or admin can access their data
 - **profiles**: Only the user themselves or admin can modify their profile
@@ -447,29 +492,29 @@ app/
 - **sessions**: Only involved therapist or admin can access session data
 - **emg_data**: Only therapist who created the session or admin can access data
 
-## 9. Testing Strategy
+## 10. Testing Strategy
 
-### 9.1. Frontend Testing
+### 10.1. Frontend Testing
 
 - **Component Tests**: Testing individual components in isolation
 - **Integration Tests**: Testing component interactions
 - **E2E Tests**: Testing full user flows with Playwright
 
-### 9.2. Backend Testing
+### 10.2. Backend Testing
 
 - **Unit Tests**: Testing individual functions and methods
 - **API Tests**: Testing API endpoints with FastAPI TestClient
 - **Integration Tests**: Testing service interactions
 
-## 10. Security Patterns
+## 11. Security Patterns
 
-### 10.1. Authentication and Authorization
+### 11.1. Authentication and Authorization
 
 - **JWT-based Authentication**: Using Supabase Auth
 - **Role-Based Access Control**: Different UI views and API access based on user role
 - **Row-Level Security**: Database access control at the row level
 
-### 10.1.1. RBAC Implementation Strategy: `raw_user_meta_data`
+### 11.1.1. RBAC Implementation Strategy: `raw_user_meta_data`
 
 A key architectural decision is how to store user roles (e.g., 'Therapist', 'Admin'). For the GHOSTLY+ project, we are using the `raw_user_meta_data` JSONB column in the `auth.users` table.
 
@@ -485,20 +530,20 @@ We considered creating a dedicated `Roles` table and a `UserRoles` join table. W
 
 **Verdict**: The use of `raw_user_meta_data` is the cleaner, more performant, and more idiomatic approach within the Supabase ecosystem for this project's specific needs.
 
-##### 10.1.1.2. Management of Roles
+##### 11.1.1.2. Management of Roles
 
 -   **Manual (Development/Initial Setup):** During development, roles can be set manually via the Supabase Studio SQL Editor by updating the `raw_user_meta_data` field for a specific user ID. This is suitable for developers but not for end-users.
 -   **Programmatic (Production):** For production, user roles must be managed via a dedicated, secure administrative interface. An administrator with the 'admin' role should be able to change another user's role via a UI. This action must trigger a call to a secure backend endpoint (e.g., a FastAPI route or a Supabase Edge Function) that uses the `service_role` key to perform the update. Direct client-side updates of other users' metadata are not and should not be possible.
 
-#### 10.1.2. Data Access Policies
+#### 11.1.2. Data Access Policies
 
 -   **Row-Level Security (RLS):** RLS is enabled on all tables containing sensitive or user-specific data. Policies are written to restrict access based on the user's ID (`auth.uid()`) and their role (`auth.jwt() ->> 'role'`).
 
-### 10.2. C3D File Storage and Naming Convention
+### 11.2. C3D File Storage and Naming Convention
 
 A hybrid approach of subfolders and a clear naming convention is used to ensure security, organization, and scalability for C3D files stored in the `ghostly-c3d-files` bucket.
 
-#### 10.2.1. Folder Structure (Security & Organization)
+#### 11.2.1. Folder Structure (Security & Organization)
 
 The folder structure is critical as it is directly tied to the Row-Level Security policies. The policies work by checking the top-level folder name against the `pseudo_id` of patients assigned to the therapist.
 
@@ -515,7 +560,7 @@ The definitive folder structure is a two-level hierarchy:
 
 **Example Path:** `/P001/20250611T143000_c7a5f8e1-b3d4-4c2a-a8f7-9e6d5b4c3a2b/`
 
-#### 10.2.2. File Naming (Traceability & Portability)
+#### 11.2.2. File Naming (Traceability & Portability)
 
 Within the session folder, filenames should be both unique and self-describing. This is a deliberate choice to include redundant information in the filename to provide portable context, which is critical in a research environment where files may be exported or analyzed offline.
 
@@ -534,7 +579,7 @@ This combined structure provides:
 -   **Data Integrity:** A direct link from the stored file back to the `GameSession` record in the database.
 -   **High Performance:** Efficient lookups using path prefixes.
 
-## 11. Backend Implementation Strategy: When to Use What
+## 12. Backend Implementation Strategy: When to Use What
 
 For interacting with the database and implementing backend logic, multiple options are available, each suited to different scenarios:
 
@@ -568,7 +613,7 @@ For interacting with the database and implementing backend logic, multiple optio
     *   Complex statistical analysis of patient data.
     *   **How:** Deploy as a separate service that can be scaled independently, with its own authentication and resource allocation.
 
-## 12. Data Flow Architecture
+## 13. Data Flow Architecture
 
 The GHOSTLY+ system follows a clear data flow pattern for capturing, storing, and analyzing quadriceps muscle data:
 
@@ -579,9 +624,9 @@ The GHOSTLY+ system follows a clear data flow pattern for capturing, storing, an
 5. **Data Analysis**: Web Dashboard visualizes data with appropriate access controls
 6. **Data Export**: Exports to SPSS-compatible formats for statistical analysis
 
-## 13. Visualization Patterns
+## 14. Visualization Patterns
 
-### 13.1. EMG Visualization
+### 14.1. EMG Visualization
 
 ```
 ┌─────────────────────────────────┐
@@ -603,7 +648,7 @@ The GHOSTLY+ system follows a clear data flow pattern for capturing, storing, an
 - Training protocol markers (sets, repetitions)
 - Comparison between left and right leg
 
-### 13.2. Muscle Heatmap Visualization
+### 14.2. Muscle Heatmap Visualization
 
 ```
 ┌─────────────────────────────────┐
@@ -632,7 +677,7 @@ The GHOSTLY+ system follows a clear data flow pattern for capturing, storing, an
 - Side-by-side comparison of left and right leg
 - Time-series visualization (baseline, 2-week, 6-week)
 
-### 13.3. Progress Tracking Visualization
+### 14.3. Progress Tracking Visualization
 
 ```
 ┌─────────────────────────────────┐
@@ -655,7 +700,7 @@ The GHOSTLY+ system follows a clear data flow pattern for capturing, storing, an
 - Baseline, 2-week, and 6-week measurements
 - Population-specific assessment visualizations
 
-### 13.4. Group Comparison Visualization
+### 14.4. Group Comparison Visualization
 
 ```
 ┌─────────────────────────────────┐
@@ -678,7 +723,7 @@ The GHOSTLY+ system follows a clear data flow pattern for capturing, storing, an
 - Error bars and significance indicators
 - Interactive filtering by timepoint
 
-## 14. Data Access Patterns
+## 15. Data Access Patterns
 
 Different user roles have different access patterns:
 
@@ -700,7 +745,7 @@ Different user roles have different access patterns:
    - Access audit logs
    - Monitor system health
 
-## 15. Integration Patterns
+## 16. Integration Patterns
 
 The system integrates with several external components:
 
@@ -711,7 +756,7 @@ The system integrates with several external components:
 5. **Ultrasound**: Viamo sv7 device captures muscle measurements
 6. **MicroFET**: Dynamometer for strength measurements
 
-## 16. Reporting Patterns
+## 17. Reporting Patterns
 
 Standard reports follow consistent patterns:
 
