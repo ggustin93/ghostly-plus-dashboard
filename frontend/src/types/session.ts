@@ -91,6 +91,7 @@ export interface BFRParameters {
       // Add other summary metrics as needed
     };
     duration: number; // in minutes
+    status?: 'scheduled' | 'completed' | 'cancelled'; // Add status to RehabilitationSession
   }
 
   // Interface for session items, typically used in lists (from former sessions.ts)
@@ -105,4 +106,5 @@ export interface BFRParameters {
     difficulty?: number; // Kept for now, though not displayed in schedule
     performance?: string; // percentage completion
     linkState?: { from: string }; // For navigation state tracking
+    status?: 'scheduled' | 'completed' | 'cancelled'; // Add status to SessionListItem
   }

@@ -1,5 +1,3 @@
-import React from "react";
-
 // This is a custom fingerprint icon component to avoid content blockers
 export const FingerprintIcon = ({
   size = 24,
