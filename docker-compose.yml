@@ -25,17 +25,16 @@ services:
     build:
       context: ./frontend # Original context
       dockerfile: Dockerfile
-      target: build-stage # Original target
     container_name: ghostly_frontend # Original name
     # Use Vite dev server for development with hot-reload
-    command: npm run dev -- --host 0.0.0.0 --port 5173 # Original command
+    command: npm run dev -- --host 0.0.0.0 --port 3001 # Updated to port 3001 to match Dockerfile
     volumes:
       - ./frontend/src:/app/src # Original volumes
       - ./frontend/public:/app/public
       - /app/node_modules
-    # Port 5173 is internal, proxied via Nginx
+    # Port 3001 is internal, proxied via Nginx
     # ports:
-    #  - "5173:5173"
+    #  - "3001:3001"
     depends_on:
       - backend # Original dependency
     env_file:

@@ -1,6 +1,8 @@
 # GHOSTLY+ Project Git Ignore
 # ---------------------------
 
+
+docs/00_PROJECT_DEFINITION/ressources/*
 # Environment variables
 # Ignore all .env files, including those in subdirectories
 *.env
@@ -61,7 +63,7 @@ develop-eggs/
 downloads/
 eggs/
 .eggs/
-lib/
+backend/lib/
 lib60/
 parts/
 sdist/
@@ -255,3 +257,5 @@ supabase_cli_config_backup/
 
 # Backup files
 *.bak 
+
+data/uploads/*

@@ -116,3 +116,9 @@ The project structure is organized as follows:
 - `.env`: (At project root, **not versioned**) Stores all necessary environment variables.
 
 The project is designed to be modular and scalable, with a focus on security and data privacy. 
+
+## 6. License and Intellectual Property
+
+The project operates under an "Academic Research" license, as indicated by the badge at the top of this document.
+
+For comprehensive details on intellectual property rights, ownership of the GHOSTLY+ software (which belongs to VUB), data reuse, and collaboration terms, please consult the [LICENSE.md](mdc:LICENSE.md) file.
