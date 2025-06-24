@@ -48,6 +48,27 @@ const EmgVisualization = ({ detailed, simplified, previous, groupType = 'ghostly
     return data;
   };
 
+  // Calculate statistics for EMG data
+  const calculateEmgStats = (data: number[]) => {
+    // Calculate mean/average
+    const sum = data.reduce((acc, val) => acc + Math.abs(val), 0);
+    const mean = sum / data.length;
+    
+    // Calculate standard deviation
+    const squaredDifferences = data.map(val => Math.pow(Math.abs(val) - mean, 2));
+    const variance = squaredDifferences.reduce((acc, val) => acc + val, 0) / data.length;
+    const std = Math.sqrt(variance);
+    
+    // Calculate root mean square (RMS)
+    const sumOfSquares = data.reduce((acc, val) => acc + Math.pow(val, 2), 0);
+    const rms = Math.sqrt(sumOfSquares / data.length);
+    
+    // Calculate mean absolute value (MAV)
+    const mav = mean;
+    
+    return { mean, std, rms, mav };
+  };
+
   // Function to draw the EMG visualization
   const drawVisualization = (offset = 0) => {
     if (!canvasRef.current) return;
@@ -110,6 +131,9 @@ const EmgVisualization = ({ detailed, simplified, previous, groupType = 'ghostly
     const noise = 10;
     const dataLength = Math.floor(width * zoom);
     const data = generateEmgData(dataLength, baseAmplitude, 1, noise);
+    
+    // Calculate statistics
+    const stats = calculateEmgStats(data);
     
     // Draw time axis
     ctx.strokeStyle = textColor;
@@ -178,6 +202,22 @@ const EmgVisualization = ({ detailed, simplified, previous, groupType = 'ghostly
       ctx.fillStyle = 'rgba(255, 50, 50, 0.8)';
       ctx.textAlign = 'left';
       ctx.fillText('Target 75% MVC (120 μV)', 55, thresholdY - 5);
+      
+      // Display statistics
+      ctx.fillStyle = textColor;
+      ctx.textAlign = 'right';
+      ctx.font = '12px Arial';
+      
+      // Format stats to 2 decimal places and convert to mV
+      const rmsFormatted = (stats.rms / 1000).toFixed(2) + ' mV';
+      const mavFormatted = (stats.mav / 1000).toFixed(2) + ' mV';
+      const avgFormatted = (stats.mean / 1000).toFixed(2) + ' mV';
+      const stdFormatted = (stats.std / 1000).toFixed(2) + ' mV';
+      
+      ctx.fillText(`RMS: ${rmsFormatted}`, width - 20, 20);
+      ctx.fillText(`MAV: ${mavFormatted}`, width - 20, 40);
+      ctx.fillText(`Avg: ${avgFormatted}`, width - 20, 60);
+      ctx.fillText(`Std: ${stdFormatted}`, width - 20, 80);
     }
   };
 

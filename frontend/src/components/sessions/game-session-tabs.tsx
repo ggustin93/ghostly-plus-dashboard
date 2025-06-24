@@ -1,24 +1,17 @@
+import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
 import { GameSession } from '@/types/session';
 import { Clock, Activity, Dumbbell, Award, Zap, ChevronsLeftRight } from 'lucide-react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, PieChart, Pie, Cell } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, Legend, PieChart, Pie, Cell } from 'recharts';
 import MetricCard from '@/components/sessions/metric-card';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface EMGDataPoint {
   time: number;
   leftQuadriceps: number;
   rightQuadriceps: number;
-}
-
-declare module '@/types/session' {
-  interface EMGMetrics {
-    longContractionsLeft?: number;
-    longContractionsRight?: number;
-    shortContractionsLeft?: number;
-    shortContractionsRight?: number;
-  }
 }
 
 interface GameSessionTabsProps {
@@ -35,6 +28,43 @@ export default function GameSessionTabs({
   mvcPercentage,
   symmetryScore,
 }: GameSessionTabsProps) {
+  const [selectedMuscle, setSelectedMuscle] = useState<'both' | 'left' | 'right'>('both');
+  
+  // Generate muscle-specific metrics based on the selected muscle
+  const getMuscleSpecificMetrics = () => {
+    const metrics = selectedGameSession.metrics;
+    if (!metrics) return null;
+    
+    // Default values when both muscles are selected
+    let rmsValue = metrics.rms;
+    let mavValue = metrics.mav;
+    let fatigueValue = metrics.fatigueIndex;
+    let forceValue = metrics.forceEstimation || 0;
+    
+    // Adjust values based on selected muscle (using mock data for demonstration)
+    // In a real app, these would come from the API with separate metrics for each muscle
+    if (selectedMuscle === 'left') {
+      rmsValue = metrics.rms * 0.9;  // Example: left is 90% of combined
+      mavValue = metrics.mav * 0.85;
+      fatigueValue = metrics.fatigueIndex * 1.1;
+      forceValue = (metrics.forceEstimation || 0) * 0.9;
+    } else if (selectedMuscle === 'right') {
+      rmsValue = metrics.rms * 1.1;  // Example: right is 110% of combined
+      mavValue = metrics.mav * 1.15;
+      fatigueValue = metrics.fatigueIndex * 0.9;
+      forceValue = (metrics.forceEstimation || 0) * 1.1;
+    }
+    
+    return {
+      rms: rmsValue,
+      mav: mavValue,
+      fatigueIndex: fatigueValue,
+      forceEstimation: forceValue
+    };
+  };
+  
+  const muscleSpecificMetrics = getMuscleSpecificMetrics();
+  
   return (
     <Tabs defaultValue="analysis" className="space-y-4">
       <TabsList>
@@ -44,12 +74,29 @@ export default function GameSessionTabs({
       </TabsList>
 
       <TabsContent value="analysis" className="space-y-4">
+        <div className="flex justify-between items-center mb-2">
+          <h3 className="text-lg font-medium">EMG Analysis</h3>
+          <Select value={selectedMuscle} onValueChange={(value) => setSelectedMuscle(value as 'both' | 'left' | 'right')}>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Select muscle" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="both">Both Quadriceps</SelectItem>
+              <SelectItem value="left">Left Quadriceps</SelectItem>
+              <SelectItem value="right">Right Quadriceps</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        
         <div className="grid gap-4 md:grid-cols-4">
           <Card className="md:col-span-3">
             <CardHeader>
               <CardTitle className="text-base font-medium">Muscle Activation</CardTitle>
               <CardDescription>
-                Time series EMG data for {selectedGameSession.muscleGroups.join(' & ')}
+                Time series EMG data for {
+                  selectedMuscle === 'both' ? selectedGameSession.muscleGroups.join(' & ') :
+                  selectedMuscle === 'left' ? 'Left Quadriceps' : 'Right Quadriceps'
+                }
               </CardDescription>
             </CardHeader>
             <CardContent className="pt-0">
@@ -69,24 +116,28 @@ export default function GameSessionTabs({
                       tickLine={false}
                       label={{ value: 'Activation (mV)', angle: -90, position: 'insideLeft' }}
                     />
-                    <Tooltip />
+                    <RechartsTooltip />
                     <Legend />
-                    <Line
-                      type="monotone"
-                      dataKey="leftQuadriceps"
-                      name="Left Quadriceps"
-                      stroke="hsl(var(--chart-1))"
-                      dot={false}
-                      strokeWidth={2}
-                    />
-                    <Line
-                      type="monotone"
-                      dataKey="rightQuadriceps"
-                      name="Right Quadriceps"
-                      stroke="hsl(var(--chart-2))"
-                      dot={false}
-                      strokeWidth={2}
-                    />
+                    {(selectedMuscle === 'both' || selectedMuscle === 'left') && (
+                      <Line
+                        type="monotone"
+                        dataKey="leftQuadriceps"
+                        name="Left Quadriceps"
+                        stroke="hsl(var(--chart-1))"
+                        dot={false}
+                        strokeWidth={2}
+                      />
+                    )}
+                    {(selectedMuscle === 'both' || selectedMuscle === 'right') && (
+                      <Line
+                        type="monotone"
+                        dataKey="rightQuadriceps"
+                        name="Right Quadriceps"
+                        stroke="hsl(var(--chart-2))"
+                        dot={false}
+                        strokeWidth={2}
+                      />
+                    )}
                   </LineChart>
                 </ResponsiveContainer>
               </div>
@@ -102,61 +153,88 @@ export default function GameSessionTabs({
               <CardContent>
                 <div className="flex flex-col items-center">
                   <div className="w-full mb-2">
-                    <Progress value={mvcPercentage} className="h-3" />
+                    <Progress value={
+                      selectedMuscle === 'left' ? mvcPercentage * 0.9 :
+                      selectedMuscle === 'right' ? mvcPercentage * 1.1 :
+                      mvcPercentage
+                    } className="h-3" />
                   </div>
-                  <div className="text-2xl font-bold">{mvcPercentage.toFixed(1)}%</div>
+                  <div className="text-2xl font-bold">{
+                    (selectedMuscle === 'left' ? mvcPercentage * 0.9 :
+                    selectedMuscle === 'right' ? mvcPercentage * 1.1 :
+                    mvcPercentage).toFixed(1)
+                  }%</div>
                   <p className="text-xs text-muted-foreground">of target MVC</p>
                 </div>
               </CardContent>
             </Card>
 
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-base font-medium">Muscle Symmetry</CardTitle>
-                <CardDescription>Balance between left and right</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="flex flex-col items-center">
-                  <div className="w-full mb-2">
-                    <Progress value={symmetryScore} className="h-3" />
+            {selectedMuscle === 'both' && (
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-base font-medium">Muscle Symmetry</CardTitle>
+                  <CardDescription>Balance between left and right</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex flex-col items-center">
+                    <div className="w-full mb-2">
+                      <Progress value={symmetryScore} className="h-3" />
+                    </div>
+                    <div className="text-2xl font-bold">{symmetryScore.toFixed(1)}%</div>
+                    <p className="text-xs text-muted-foreground">symmetry score</p>
                   </div>
-                  <div className="text-2xl font-bold">{symmetryScore.toFixed(1)}%</div>
-                  <p className="text-xs text-muted-foreground">symmetry score</p>
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            )}
           </div>
         </div>
 
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          <MetricCard
-            title="RMS"
-            value={selectedGameSession.metrics?.rms || 0}
-            unit="mV"
-            description="Root Mean Square"
-            icon={<Activity className="h-4 w-4" />}
-          />
-          <MetricCard
-            title="MAV"
-            value={selectedGameSession.metrics?.mav || 0}
-            unit="mV"
-            description="Mean Absolute Value"
-            icon={<Activity className="h-4 w-4" />}
-          />
-          <MetricCard
-            title="Fatigue Index"
-            value={selectedGameSession.metrics?.fatigueIndex || 0}
-            unit=""
-            description="Dimitrov's index"
-            icon={<Activity className="h-4 w-4" />}
-          />
-          <MetricCard
-            title="Force Estimation"
-            value={selectedGameSession.metrics?.forceEstimation || 0}
-            unit="N"
-            description="Estimated muscle force"
-            icon={<Activity className="h-4 w-4" />}
-          />
+          {selectedMuscle !== 'both' && (
+            <>
+              <MetricCard
+                title="RMS"
+                value={muscleSpecificMetrics?.rms || 0}
+                unit="mV"
+                description={`Root Mean Square (${selectedMuscle === 'left' ? 'Left' : 'Right'})`}
+                icon={<Activity className="h-4 w-4" />}
+                avg={selectedGameSession.metrics?.rmsAvg || 0.75}
+                std={selectedGameSession.metrics?.rmsStd || 0.12}
+                isWIP={true}
+              />
+              <MetricCard
+                title="MAV"
+                value={muscleSpecificMetrics?.mav || 0}
+                unit="mV"
+                description={`Mean Absolute Value (${selectedMuscle === 'left' ? 'Left' : 'Right'})`}
+                icon={<Activity className="h-4 w-4" />}
+                avg={selectedGameSession.metrics?.mavAvg || 0.65}
+                std={selectedGameSession.metrics?.mavStd || 0.09}
+                isWIP={true}
+              />
+              <MetricCard
+                title="Fatigue Index"
+                value={muscleSpecificMetrics?.fatigueIndex || 0}
+                unit=""
+                description={`Dimitrov's index (${selectedMuscle === 'left' ? 'Left' : 'Right'})`}
+                icon={<Activity className="h-4 w-4" />}
+                isWIP={true}
+              />
+              <MetricCard
+                title="Force Estimation"
+                value={muscleSpecificMetrics?.forceEstimation || 0}
+                unit="N"
+                description={`Estimated muscle force (${selectedMuscle === 'left' ? 'Left' : 'Right'})`}
+                icon={<Activity className="h-4 w-4" />}
+                isWIP={true}
+              />
+            </>
+          )}
+          {selectedMuscle === 'both' && (
+            <div className="col-span-4 flex justify-center items-center p-4 bg-muted/20 rounded-lg border border-dashed">
+              <p className="text-muted-foreground text-sm">Select Left or Right Quadriceps to view muscle-specific metrics</p>
+            </div>
+          )}
         </div>
         
         <Card>
@@ -165,38 +243,46 @@ export default function GameSessionTabs({
             <CardDescription>Number of long and short muscle contractions.</CardDescription>
           </CardHeader>
           <CardContent className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            <MetricCard
-              title="Long (L)"
-              value={selectedGameSession.metrics?.longContractionsLeft || 0}
-              unit="count"
-              description="Left Muscle"
-              isInteger
-              icon={<ChevronsLeftRight className="h-4 w-4" />}
-            />
-            <MetricCard
-              title="Long (R)"
-              value={selectedGameSession.metrics?.longContractionsRight || 0}
-              unit="count"
-              description="Right Muscle"
-              isInteger
-              icon={<ChevronsLeftRight className="h-4 w-4" />}
-            />
-            <MetricCard
-              title="Short (L)"
-              value={selectedGameSession.metrics?.shortContractionsLeft || 0}
-              unit="count"
-              description="Left Muscle"
-              isInteger
-              icon={<Zap className="h-4 w-4" />}
-            />
-            <MetricCard
-              title="Short (R)"
-              value={selectedGameSession.metrics?.shortContractionsRight || 0}
-              unit="count"
-              description="Right Muscle"
-              isInteger
-              icon={<Zap className="h-4 w-4" />}
-            />
+            {(selectedMuscle === 'both' || selectedMuscle === 'left') && (
+              <MetricCard
+                title="Long (L)"
+                value={selectedGameSession.metrics?.longContractionsLeft || 0}
+                unit="count"
+                description="Left Muscle"
+                isInteger
+                icon={<ChevronsLeftRight className="h-4 w-4" />}
+              />
+            )}
+            {(selectedMuscle === 'both' || selectedMuscle === 'right') && (
+              <MetricCard
+                title="Long (R)"
+                value={selectedGameSession.metrics?.longContractionsRight || 0}
+                unit="count"
+                description="Right Muscle"
+                isInteger
+                icon={<ChevronsLeftRight className="h-4 w-4" />}
+              />
+            )}
+            {(selectedMuscle === 'both' || selectedMuscle === 'left') && (
+              <MetricCard
+                title="Short (L)"
+                value={selectedGameSession.metrics?.shortContractionsLeft || 0}
+                unit="count"
+                description="Left Muscle"
+                isInteger
+                icon={<Zap className="h-4 w-4" />}
+              />
+            )}
+            {(selectedMuscle === 'both' || selectedMuscle === 'right') && (
+              <MetricCard
+                title="Short (R)"
+                value={selectedGameSession.metrics?.shortContractionsRight || 0}
+                unit="count"
+                description="Right Muscle"
+                isInteger
+                icon={<Zap className="h-4 w-4" />}
+              />
+            )}
           </CardContent>
         </Card>
       </TabsContent>
@@ -232,7 +318,7 @@ export default function GameSessionTabs({
                         <Cell key={`cell-achieved`} fill="hsl(var(--chart-1))" />
                         <Cell key={`cell-remaining`} fill="hsl(var(--muted))" />
                       </Pie>
-                      <Tooltip formatter={(value: number, name: string) => [`${value} pts`, name]} />
+                      <RechartsTooltip formatter={(value: number, name: string) => [`${value} pts`, name]} />
                       <text
                         x="50%"
                         y="48%"

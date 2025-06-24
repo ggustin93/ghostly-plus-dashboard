@@ -35,6 +35,14 @@ export interface BFRParameters {
     symmetryScore?: number; // For comparing left/right
     forceEstimation?: number; // Estimated force
     muscleMassEstimation?: number; // Estimated muscle mass
+    rmsAvg?: number; // Average RMS value across the session
+    rmsStd?: number; // Standard deviation of RMS values
+    mavAvg?: number; // Average MAV value across the session
+    mavStd?: number; // Standard deviation of MAV values
+    longContractionsLeft?: number; // Count of long contractions for left muscle
+    longContractionsRight?: number; // Count of long contractions for right muscle
+    shortContractionsLeft?: number; // Count of short contractions for left muscle
+    shortContractionsRight?: number; // Count of short contractions for right muscle
     // Add other EMG metrics as needed
   }
   
