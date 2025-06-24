@@ -10,12 +10,17 @@ import SessionsList from '@/components/patients/sessions-list';
 import { Input } from '@/components/ui/input';
 import { useState } from 'react';
 import PageHeader from '@/components/ui/page-header';
+import { calculateAveragePerformance } from '@/lib/utils';
 
 const SessionsPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const { rehabilitationSessions, patients } = mockData;
 
-  const filteredSessions = rehabilitationSessions.filter(session => {
+  const completedSessions = rehabilitationSessions.filter(
+    session => calculateAveragePerformance(session.gameSessions) > 0
+  );
+
+  const filteredSessions = completedSessions.filter(session => {
     const patient = patients.find(p => p.id === session.patientId);
     const patientName = patient ? patient.name : '';
     return patientName.toLowerCase().includes(searchTerm.toLowerCase());

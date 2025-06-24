@@ -88,9 +88,14 @@ const PatientProfile = () => {
   
   const avatarStyle = getAvatarColor(patient.id);
   
-  const completedSessions = sessions.filter(s => new Date(s.date) <= new Date());
-  const totalSessions = sessions.length;
-  const adherencePercentage = totalSessions > 0 ? (completedSessions.length / totalSessions) * 100 : 0;
+  // --- Adherence Calculation ---
+  // The total number of prescribed sessions according to the clinical protocol.
+  const totalPrescribedSessions = 10; 
+  // Since only performed sessions exist in the data, the count of records is the count of completed sessions.
+  const completedSessionsCount = sessions.length; 
+  const adherencePercentage = totalPrescribedSessions > 0 
+    ? (completedSessionsCount / totalPrescribedSessions) * 100 
+    : 0;
   
   const getAdherenceStatus = (percentage: number): string => {
     if (percentage >= 80) return 'High';
@@ -99,7 +104,8 @@ const PatientProfile = () => {
     return 'N/A';
   };
 
-  const complianceScores = completedSessions.map(s => calculateAveragePerformance(s.gameSessions));
+  // --- Compliance Calculation ---
+  const complianceScores = sessions.map(s => calculateAveragePerformance(s.gameSessions));
   const averageCompliance = complianceScores.length > 0 ? complianceScores.reduce((a, b) => a + b, 0) / complianceScores.length : 0;
 
   const getComplianceStatus = (score: number): string => {
@@ -109,6 +115,22 @@ const PatientProfile = () => {
     return 'N/A';
   };
   
+  // --- Missed Sessions Calculation (Last 7 Days) ---
+  const MOCK_TODAY = new Date('2025-06-25'); // Use a fixed date for consistent demo logic
+  const sevenDaysAgo = new Date(MOCK_TODAY);
+  sevenDaysAgo.setDate(MOCK_TODAY.getDate() - 7);
+
+  const completedSessionsLastWeek = sessions.filter(s => {
+    const sessionDate = new Date(s.date);
+    // A session is completed if its duration is greater than 0
+    return sessionDate >= sevenDaysAgo && sessionDate <= MOCK_TODAY && s.duration > 0;
+  }).length;
+  
+  const expectedSessionsLastWeek = 5;
+  const missedSessions = patient.status === 'active' 
+    ? Math.max(0, expectedSessionsLastWeek - completedSessionsLastWeek)
+    : 0;
+
   return (
     <div className="space-y-6">
       <div className="mb-4 flex justify-start">
@@ -241,7 +263,7 @@ const PatientProfile = () => {
           <CardContent className="space-y-2">
             <div className="grid grid-cols-2 gap-1">
               <span className="text-sm font-medium">Sessions:</span>
-              <span className="text-sm">{`${completedSessions.length} / ${totalSessions} completed`}</span>
+              <span className="text-sm">{`${completedSessionsCount} / ${totalPrescribedSessions} completed`}</span>
               
               <span className="text-sm font-medium">Last Session:</span>
               <span className="text-sm">
@@ -253,6 +275,15 @@ const PatientProfile = () => {
 
               <span className="text-sm font-medium">Adherence:</span>
               <StatusBadge status={getAdherenceStatus(adherencePercentage)} />
+
+              {missedSessions > 0 && (
+                <>
+                  <span className="text-sm font-medium text-destructive">Missed Sessions</span>
+                  <span className="text-sm font-bold text-destructive">
+                    {missedSessions} in last 7 days
+                  </span>
+                </>
+              )}
             </div>
           </CardContent>
         </Card>
