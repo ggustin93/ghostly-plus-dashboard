@@ -1,5 +1,4 @@
-import { Button } from '@/components/ui/button';
-import { PlusCircle, Search } from 'lucide-react';
+import { Search } from 'lucide-react';
 import { mockData } from '@/data/mock-data';
 import {
   Card,
@@ -30,11 +29,6 @@ const SessionsPage = () => {
     <div className="container mx-auto p-6 space-y-6">
       <div className="flex items-center mb-6">
         <PageHeader title="All Sessions" description="Search, view, and manage all patient therapy sessions" />
-        <div className="ml-auto flex gap-2">
-          <Button>
-            <PlusCircle className="mr-2 h-4 w-4" /> New Session
-          </Button>
-        </div>
       </div>
 
       <Card>
