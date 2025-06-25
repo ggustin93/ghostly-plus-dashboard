@@ -93,7 +93,7 @@ const Header = ({ openSidebar }: HeaderProps) => {
           onClick={openSidebar}
         >
           <span className="inline-flex items-center justify-center h-full w-full">
-            <Menu className="h-5 w-5" />
+            <Menu className="h-5 w-5 text-gray-600 dark:text-gray-400" />
             <span className="sr-only">Toggle menu</span>
           </span>
         </Button>
@@ -103,7 +103,7 @@ const Header = ({ openSidebar }: HeaderProps) => {
       <div className="flex items-center gap-4">
         <Button variant="ghost" size="icon" asChild>
           <span className="inline-flex items-center justify-center">
-            <Bell className="h-5 w-5" />
+            <Bell className="h-5 w-5 text-gray-600 dark:text-gray-400" />
           </span>
         </Button>
         
@@ -111,7 +111,7 @@ const Header = ({ openSidebar }: HeaderProps) => {
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="icon" asChild>
               <span className="inline-flex items-center justify-center">
-                <Globe className="h-5 w-5" />
+                <Globe className="h-5 w-5 text-gray-600 dark:text-gray-400" />
               </span>
             </Button>
           </DropdownMenuTrigger>
@@ -152,16 +152,16 @@ const Header = ({ openSidebar }: HeaderProps) => {
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem>
-              <UserCircle className="mr-2 h-4 w-4" />
+              <UserCircle className="mr-2 h-4 w-4 text-gray-600 dark:text-gray-400" />
               <span>{t('profile')}</span>
             </DropdownMenuItem>
             <DropdownMenuItem>
-              <Settings className="mr-2 h-4 w-4" />
+              <Settings className="mr-2 h-4 w-4 text-gray-600 dark:text-gray-400" />
               <span>{t('settings')}</span>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={handleLogout}>
-              <LogOut className="mr-2 h-4 w-4" />
+              <LogOut className="mr-2 h-4 w-4 text-gray-600 dark:text-gray-400" />
               <span>{t('logout')}</span>
             </DropdownMenuItem>
           </DropdownMenuContent>

@@ -2,7 +2,9 @@ import { Patient } from '@/types/patient';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ReferenceLine, TooltipProps } from 'recharts';
 import { NameType, ValueType } from 'recharts/types/component/DefaultTooltipContent';
-import { Droplets, Gamepad2, TrendingUp, TrendingDown } from 'lucide-react';
+import { Droplets, Gamepad2, TrendingUp, TrendingDown, Info, AlertTriangle } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Tooltip as UITooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface ProgressTrackingChartsProps {
   patient: Patient | null;
@@ -38,7 +40,9 @@ const ChartCard = ({
   lineColor, 
   Icon, 
   domain, 
-  referenceLine 
+  referenceLine,
+  isExperimental = false,
+  clinicalInfo
 }: { 
   title: string, 
   description: string,
@@ -47,15 +51,43 @@ const ChartCard = ({
   lineColor: string, 
   Icon: React.ElementType,
   domain: [number, number],
-  referenceLine?: { y: number, label: string, color: string }
+  referenceLine?: { y: number, label: string, color: string },
+  isExperimental?: boolean,
+  clinicalInfo?: string
 }) => (
   <Card>
-    <CardHeader>
-      <div className="flex items-center space-x-3">
-        <Icon className="h-6 w-6 text-muted-foreground" />
-        <div>
-          <CardTitle className="text-base">{title}</CardTitle>
-          <CardDescription className="text-sm">{description}</CardDescription>
+    <CardHeader className="pb-3">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-800">
+            <Icon className="h-5 w-5 text-gray-600 dark:text-gray-400" />
+          </div>
+          <div>
+            <div className="flex items-center gap-2">
+              <CardTitle className="text-base font-semibold">{title}</CardTitle>
+              {isExperimental && (
+                <Badge variant="outline" className="bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-300 border-amber-300 dark:border-amber-700">
+                  <AlertTriangle className="h-3 w-3 mr-1" />
+                  Experimental
+                </Badge>
+              )}
+              {clinicalInfo && (
+                <TooltipProvider>
+                  <UITooltip>
+                    <TooltipTrigger asChild>
+                      <Info className="h-4 w-4 cursor-pointer text-muted-foreground hover:text-foreground transition-colors" />
+                    </TooltipTrigger>
+                    <TooltipContent className="max-w-xs">
+                      <div className="p-1 text-left text-sm">
+                        <p>{clinicalInfo}</p>
+                      </div>
+                    </TooltipContent>
+                  </UITooltip>
+                </TooltipProvider>
+              )}
+            </div>
+            <CardDescription className="text-sm">{description}</CardDescription>
+          </div>
         </div>
       </div>
     </CardHeader>
@@ -93,6 +125,7 @@ const ProgressTrackingCharts = ({ patient }: ProgressTrackingChartsProps) => {
         Icon={Gamepad2}
         domain={[0, 100]}
         referenceLine={{ y: 75, label: 'Target', color: '#f59e0b' }}
+        clinicalInfo="Game performance scores reflect patient engagement and motor control. Higher scores indicate better coordination and reaction time. The target line represents the clinical goal for this patient."
       />
       <ChartCard 
         title="Adherence History"
@@ -103,6 +136,7 @@ const ProgressTrackingCharts = ({ patient }: ProgressTrackingChartsProps) => {
         Icon={TrendingUp}
         domain={[0, 100]}
         referenceLine={{ y: 80, label: 'Goal', color: '#10b981' }}
+        clinicalInfo="Adherence tracks completion of prescribed sessions. The GHOSTLY+ protocol requires 5 sessions per week (10 total over 2 weeks). The goal line represents the 80% adherence threshold for optimal outcomes."
       />
       <ChartCard 
         title="Fatigue History"
@@ -112,6 +146,8 @@ const ProgressTrackingCharts = ({ patient }: ProgressTrackingChartsProps) => {
         lineColor="#f43f5e" // Rose
         Icon={TrendingDown}
         domain={[0, 100]}
+        isExperimental={true}
+        clinicalInfo="This experimental metric is derived from EMG signal analysis. It estimates muscle fatigue based on frequency domain shifts and amplitude changes during exercise. Higher values indicate greater fatigue."
       />
       <ChartCard 
         title="Perceived Exertion (RPE)"
@@ -121,6 +157,7 @@ const ProgressTrackingCharts = ({ patient }: ProgressTrackingChartsProps) => {
         lineColor="#a855f7" // Purple
         Icon={Droplets}
         domain={[0, 10]}
+        clinicalInfo="Rate of Perceived Exertion (RPE) is a subjective scale where patients rate their effort from 0 (no exertion) to 10 (maximum exertion). This helps calibrate exercise intensity and track subjective improvement over time."
       />
     </div>
   );

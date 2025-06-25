@@ -39,19 +39,19 @@ if (!supabaseUrl || !supabaseAnonKey) {
 } else {
   // 3. Create and export the real Supabase client
   supabase = createClient(supabaseUrl, supabaseAnonKey, {
-    // Options de configuration globales du client Supabase si nécessaire
-    // Par exemple, pour la persistance de la session :
-    // auth: {
-    //   persistSession: true,
-    //   autoRefreshToken: true,
-    //   detectSessionInUrl: true,
-    // },
-  });
+  // Options de configuration globales du client Supabase si nécessaire
+  // Par exemple, pour la persistance de la session :
+  // auth: {
+  //   persistSession: true,
+  //   autoRefreshToken: true,
+  //   detectSessionInUrl: true,
+  // },
+});
 
-  // Optionnel: Log pour confirmer quelle instance est utilisée au démarrage de l'app
-  if (import.meta.env.DEV) { // Uniquement en mode développement
-    console.log(`[Supabase Client] Initialized for URL: ${supabaseUrl.includes("localhost") || supabaseUrl.includes("127.0.0.1") ? "local Supabase instance" : supabaseUrl}`);
-  } 
+// Optionnel: Log pour confirmer quelle instance est utilisée au démarrage de l'app
+if (import.meta.env.DEV) { // Uniquement en mode développement
+  console.log(`[Supabase Client] Initialized for URL: ${supabaseUrl.includes("localhost") || supabaseUrl.includes("127.0.0.1") ? "local Supabase instance" : supabaseUrl}`);
+} 
 }
 
 export { supabase }; 

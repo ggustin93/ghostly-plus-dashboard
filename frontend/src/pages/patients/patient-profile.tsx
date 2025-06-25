@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { mockData } from '@/data/mock-data';
 import { Patient } from '@/types/patient';
 import { RehabilitationSession } from '@/types/session';
-import { Calendar, FilePlus, BarChart, FileEdit, ArrowLeft, Info } from 'lucide-react';
+import { Calendar, FilePlus, BarChart, FileEdit, Info, User, Heart, Activity, ChevronRight } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import SessionsList from '@/components/patients/sessions-list';
 import { getInitials, getAvatarColor, formatDate, cn, calculateAveragePerformance } from '@/lib/utils';
@@ -116,31 +116,23 @@ const PatientProfile = () => {
   };
   
   // --- Missed Sessions Calculation (Last 7 Days) ---
-  const MOCK_TODAY = new Date('2025-06-25'); // Use a fixed date for consistent demo logic
-  const sevenDaysAgo = new Date(MOCK_TODAY);
-  sevenDaysAgo.setDate(MOCK_TODAY.getDate() - 7);
-
-  const completedSessionsLastWeek = sessions.filter(s => {
-    const sessionDate = new Date(s.date);
-    // A session is completed if its duration is greater than 0
-    return sessionDate >= sevenDaysAgo && sessionDate <= MOCK_TODAY && s.duration > 0;
-  }).length;
-  
-  const expectedSessionsLastWeek = 5;
-  const missedSessions = patient.status === 'active' 
-    ? Math.max(0, expectedSessionsLastWeek - completedSessionsLastWeek)
-    : 0;
+  // Make missed sessions more realistic - show 1-2 missed sessions for demonstration
+  const missedSessions = patient.status === 'active' ? 2 : 0;
 
   return (
     <div className="space-y-6">
-      <div className="mb-4 flex justify-start">
-        <Button variant="ghost" size="sm" asChild className="pl-0">
-          <Link to="/patients">
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            <span className="text-xs text-muted-foreground">All Patients</span>
-          </Link>
-        </Button>
-      </div>
+      {/* Breadcrumb Navigation */}
+      <nav className="flex items-center space-x-1 text-sm text-muted-foreground">
+        <Link 
+          to="/patients" 
+          className="hover:text-foreground transition-colors font-medium"
+        >
+          All Patients
+        </Link>
+        <ChevronRight className="h-4 w-4" />
+        <span className="text-foreground font-medium">{patient.name}</span>
+      </nav>
+
       <div className="flex flex-col justify-between sm:flex-row sm:items-center">
         <div className="flex items-center space-x-4 mx-auto sm:mx-0">
           <Avatar className="h-16 w-16 border-2 border-primary/20">
@@ -177,112 +169,258 @@ const PatientProfile = () => {
       </div>
       
       <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle className="text-base">Demographics</CardTitle>
-            <Button variant="ghost" size="icon" className="h-8 w-8">
-              <span className="inline-flex items-center justify-center">
-                <FileEdit className="h-5 w-5" />
-              </span>
-            </Button>
+        <Card className="overflow-hidden">
+          <CardHeader className="flex flex-row items-center justify-between pb-3">
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-900">
+                <User className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+              </div>
+              <CardTitle className="text-base font-semibold">Demographics</CardTitle>
+            </div>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button variant="ghost" size="icon" className="h-8 w-8 opacity-60 hover:opacity-100" asChild>
+                    <span className="inline-flex items-center justify-center">
+                      <FileEdit className="h-5 w-5 text-gray-600 dark:text-gray-400" />
+                    </span>
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p className="text-xs">Edit demographics</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </CardHeader>
-          <CardContent className="space-y-2">
-            <div className="grid grid-cols-2 gap-1">
-              <span className="text-sm font-medium">Age:</span>
-              <span className="text-sm">{patient.age}</span>
-              
-              <span className="text-sm font-medium">Gender:</span>
-              <span className="text-sm">{patient.gender}</span>
-              
-              <span className="text-sm font-medium">Room:</span>
-              <span className="text-sm">{patient.room || 'N/A'}</span>
-              
-              <span className="text-sm font-medium">Admission:</span>
-              <span className="text-sm">
-                {patient.admissionDate ? formatDate(patient.admissionDate) : 'N/A'}
-              </span>
+          <CardContent className="pt-0">
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium text-muted-foreground">Age</span>
+                <span className="text-sm font-semibold">{patient.age}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium text-muted-foreground">Gender</span>
+                <span className="text-sm font-semibold">{patient.gender}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium text-muted-foreground">Room</span>
+                <span className="text-sm font-semibold">{patient.room || 'N/A'}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium text-muted-foreground">Admission</span>
+                <span className="text-sm font-semibold">
+                  {patient.admissionDate ? formatDate(patient.admissionDate) : 'N/A'}
+                </span>
+              </div>
             </div>
           </CardContent>
         </Card>
         
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle className="text-base">Medical Info</CardTitle>
-            <Button variant="ghost" size="icon" className="h-8 w-8">
-              <span className="inline-flex items-center justify-center">
-                <FileEdit className="h-5 w-5" />
-              </span>
-            </Button>
+        <Card className="overflow-hidden">
+          <CardHeader className="flex flex-row items-center justify-between pb-3">
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-900">
+                <Heart className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+              </div>
+              <CardTitle className="text-base font-semibold">Medical Info</CardTitle>
+            </div>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button variant="ghost" size="icon" className="h-8 w-8 opacity-60 hover:opacity-100" asChild>
+                    <span className="inline-flex items-center justify-center">
+                      <FileEdit className="h-5 w-5 text-gray-600 dark:text-gray-400" />
+                    </span>
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p className="text-xs">Edit medical information</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </CardHeader>
-          <CardContent className="space-y-2">
-            <div className="grid grid-cols-2 gap-1">
-              <span className="text-sm font-medium">Diagnosis:</span>
-              <span className="text-sm">{patient.diagnosis || 'N/A'}</span>
-              
-              <span className="text-sm font-medium">Mobility:</span>
-              <span className="text-sm">{patient.mobility || 'N/A'}</span>
-              
-              <span className="text-sm font-medium">Cognitive:</span>
-              <span className="text-sm">{patient.cognitiveStatus || 'N/A'}</span>
+          <CardContent className="pt-0">
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium text-muted-foreground">Diagnosis</span>
+                <span className="text-sm font-semibold">{patient.diagnosis || 'N/A'}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium text-muted-foreground">Mobility</span>
+                <span className="text-sm font-semibold">{patient.mobility || 'N/A'}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-medium text-muted-foreground">BMI</span>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Info className="h-3 w-3 cursor-pointer text-muted-foreground hover:text-foreground transition-colors" />
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <div className="max-w-xs p-2 text-left text-sm">
+                          <h4 className="mb-1 font-bold">Body Mass Index</h4>
+                          <p className="text-xs">
+                            Height: {patient.height || '165 cm'}<br />
+                            Weight: {patient.weight || '58 kg'}<br />
+                            BMI: {patient.bmi || '21.3'} kg/m²<br />
+                            Normal range: 18.5-24.9
+                          </p>
+                        </div>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                </div>
+                <Badge variant="outline" className={cn('font-medium', 
+                  (() => {
+                    const bmi = parseFloat(patient.bmi || '21.3');
+                    if (bmi < 18.5) return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300 border-blue-300 dark:border-blue-700';
+                    if (bmi >= 18.5 && bmi <= 24.9) return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300 border-green-300 dark:border-green-700';
+                    if (bmi >= 25 && bmi <= 29.9) return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300 border-yellow-300 dark:border-yellow-700';
+                    return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300 border-red-300 dark:border-red-700';
+                  })()
+                )}>
+                  {(() => {
+                    const bmi = parseFloat(patient.bmi || '21.3');
+                    const bmiValue = patient.bmi || '21.3';
+                    if (bmi < 18.5) return `Underweight (${bmiValue} kg/m²)`;
+                    if (bmi >= 18.5 && bmi <= 24.9) return `Normal (${bmiValue} kg/m²)`;
+                    if (bmi >= 25 && bmi <= 29.9) return `Overweight (${bmiValue} kg/m²)`;
+                    return `Obese (${bmiValue} kg/m²)`;
+                  })()}
+                </Badge>
+              </div>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-medium text-muted-foreground">Cognitive</span>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Info className="h-3 w-3 cursor-pointer text-muted-foreground hover:text-foreground transition-colors" />
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <div className="max-w-xs p-2 text-left text-sm">
+                          <h4 className="mb-1 font-bold">Mini Mental State Examination (MMSE)</h4>
+                          <p className="text-xs">
+                            A 30-point questionnaire used to measure cognitive impairment. 
+                            Scores: 24-30 (normal), 18-23 (mild), 0-17 (severe cognitive impairment).
+                          </p>
+                        </div>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                </div>
+                {patient.cognitiveStatus && patient.cognitiveStatus !== 'N/A' ? (
+                  <Badge variant="outline" className={cn('font-medium', 
+                    (() => {
+                      const status = patient.cognitiveStatus?.toLowerCase();
+                      if (status === 'normal' || status === 'excellent') return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300 border-green-300 dark:border-green-700';
+                      if (status === 'mild' || status === 'good' || status === 'fair') return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300 border-yellow-300 dark:border-yellow-700';
+                      if (status === 'forgetful' || status === 'declining') return 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300 border-orange-300 dark:border-orange-700';
+                      return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300 border-red-300 dark:border-red-700';
+                    })()
+                  )}>
+                    {(() => {
+                      const status = patient.cognitiveStatus;
+                      const statusLower = status?.toLowerCase();
+                      if (statusLower === 'forgetful') return 'Attention Needed';
+                      if (statusLower === 'declining') return 'Declining';
+                      if (statusLower === 'normal') return 'Normal';
+                      if (statusLower === 'excellent') return 'Excellent';
+                      if (statusLower === 'mild') return 'Mild Impairment';
+                      if (statusLower === 'good') return 'Good';
+                      if (statusLower === 'fair') return 'Fair';
+                      return status;
+                    })()}
+                  </Badge>
+                ) : (
+                  <span className="text-sm font-semibold">N/A</span>
+                )}
+              </div>
             </div>
           </CardContent>
         </Card>
         
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between">
-            <div className="flex items-center gap-2">
-              <CardTitle className="text-base">Treatment Summary</CardTitle>
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Info className="h-4 w-4 cursor-pointer text-muted-foreground" />
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <div className="max-w-xs p-2 text-left text-sm">
-                      <h4 className="mb-2 font-bold">GHOSTLY+ Protocol Details</h4>
-                      <ul className="list-inside list-disc space-y-1">
-                        <li>
-                          <span className="font-semibold">Frequency:</span> Min. 5 sessions/week.
-                        </li>
-                        <li>
-                          <span className="font-semibold">Exercise:</span> Isometric contractions @ 75% MVC.
-                        </li>
-                        <li>
-                          <span className="font-semibold">BFR:</span> 50% arterial occlusion pressure.
-                        </li>
-                        <li>
-                          <span className="font-semibold">Volume:</span> 3 sets of 12 repetitions.
-                        </li>
-                      </ul>
-                    </div>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
+        <Card className="overflow-hidden">
+          <CardHeader className="flex flex-row items-center justify-between pb-3">
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-900">
+                <Activity className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+              </div>
+              <div className="flex items-center gap-2">
+                <CardTitle className="text-base font-semibold">Treatment Summary</CardTitle>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Info className="h-4 w-4 cursor-pointer text-muted-foreground hover:text-foreground transition-colors" />
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <div className="max-w-xs p-2 text-left text-sm">
+                        <h4 className="mb-2 font-bold">GHOSTLY+ Protocol Details</h4>
+                        <ul className="list-inside list-disc space-y-1">
+                          <li>
+                            <span className="font-semibold">Frequency:</span> Min. 5 sessions/week.
+                          </li>
+                          <li>
+                            <span className="font-semibold">Exercise:</span> Isometric contractions @ 75% MVC.
+                          </li>
+                          <li>
+                            <span className="font-semibold">BFR:</span> 50% arterial occlusion pressure.
+                          </li>
+                          <li>
+                            <span className="font-semibold">Volume:</span> 3 sets of 12 repetitions.
+                          </li>
+                        </ul>
+                      </div>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </div>
             </div>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button variant="ghost" size="icon" className="h-8 w-8 opacity-60 hover:opacity-100" asChild>
+                    <span className="inline-flex items-center justify-center">
+                      <FileEdit className="h-5 w-5 text-gray-600 dark:text-gray-400" />
+                    </span>
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p className="text-xs">Edit treatment plan</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </CardHeader>
-          <CardContent className="space-y-2">
-            <div className="grid grid-cols-2 gap-1">
-              <span className="text-sm font-medium">Sessions:</span>
-              <span className="text-sm">{`${completedSessionsCount} / ${totalPrescribedSessions} completed`}</span>
-              
-              <span className="text-sm font-medium">Last Session:</span>
-              <span className="text-sm">
-                {patient.lastSession ? formatDate(patient.lastSession) : 'N/A'}
-              </span>
-              
-              <span className="text-sm font-medium">Compliance:</span>
-              <StatusBadge status={getComplianceStatus(averageCompliance)} />
-
-              <span className="text-sm font-medium">Adherence:</span>
-              <StatusBadge status={getAdherenceStatus(adherencePercentage)} />
-
+          <CardContent className="pt-0">
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium text-muted-foreground">Sessions</span>
+                <span className="text-sm font-semibold">{`${completedSessionsCount} / ${totalPrescribedSessions} completed`}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium text-muted-foreground">Last Session</span>
+                <span className="text-sm font-semibold">
+                  {patient.lastSession ? formatDate(patient.lastSession) : 'N/A'}
+                </span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium text-muted-foreground">Compliance</span>
+                <StatusBadge status={getComplianceStatus(averageCompliance)} />
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium text-muted-foreground">Adherence</span>
+                <StatusBadge status={getAdherenceStatus(adherencePercentage)} />
+              </div>
               {missedSessions > 0 && (
-                <>
-                  <span className="text-sm font-medium text-destructive">Missed Sessions</span>
-                  <span className="text-sm font-bold text-destructive">
-                    {missedSessions} in last 7 days
-                  </span>
-                </>
+                <div className="rounded-lg bg-orange-50 dark:bg-orange-950/20 p-3 border border-orange-200 dark:border-orange-800">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium text-orange-800 dark:text-orange-200">Missed Sessions</span>
+                    <span className="text-sm font-bold text-orange-900 dark:text-orange-100">
+                      {missedSessions} in last 7 days
+                    </span>
+                  </div>
+                </div>
               )}
             </div>
           </CardContent>

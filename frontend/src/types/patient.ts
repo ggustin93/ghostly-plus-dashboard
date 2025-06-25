@@ -23,6 +23,8 @@ export interface Patient {
   age: number; // From patients.ts (used in mock data and profile)
   dateOfBirth?: string; // From patient.ts (made optional as age is primary in mock)
   gender: string; // Widened to string to match mock data ("Male", "Female") and patients.ts
+  height?: string; // Height in cm (e.g., "165 cm")
+  weight?: string; // Weight in kg (e.g., "58 kg")
 
   // Clinical/Study Info
   room?: string; // From patients.ts
@@ -32,6 +34,7 @@ export interface Patient {
   diagnosis: string; // From patients.ts
   mobility?: string; // From patients.ts
   mmseScore?: number; // From patient.ts (made optional as not in mock)
+  bmi?: string; // Body Mass Index (e.g., "21.3")
 
   // Functional Status
   cognitiveStatus?: string; // From patients.ts
